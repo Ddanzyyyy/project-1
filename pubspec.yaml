@@ -1,4 +1,4 @@
-name: simba
+name: Simba
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
@@ -22,3 +22,4 @@ flutter:
     - assets/images/SIMBA.png
     - assets/images/LOGO_INDOCEMENT.jpg
     - assets/images/icons/BOX.png
+    - assets/images/icons/registered_assets.png

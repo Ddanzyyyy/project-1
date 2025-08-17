@@ -1,3 +1,5 @@
+import 'package:Simba/screens/registered_page/asset_list_page.dart';
+import 'package:Simba/screens/search_page.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatelessWidget {
@@ -6,7 +8,7 @@ class WelcomePage extends StatelessWidget {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white, // Background putih
+      backgroundColor: Colors.white, 
       body: Stack(
         children: [
           Positioned(
@@ -14,9 +16,9 @@ class WelcomePage extends StatelessWidget {
             left: 0,
             right: 0,
             child: Container(
-              height: screenSize.height * 0.32, 
+              height: screenSize.height * 0.32,
               decoration: BoxDecoration(
-                color: const Color(0xFF27519D),
+                color: const Color(0xFF405189),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(40),
                   bottomRight: Radius.circular(40),
@@ -95,39 +97,50 @@ class WelcomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Search Bar menyatu dengan big box
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: const Color(0xFF405189),
-                        width: 1,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => SearchPage()),
+                      );
+                    },
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          color: const Color(0xFF405189),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        prefixIcon:
-                            const Icon(Icons.search, color: Color(0xFF405189)),
-                        hintText: 'Find Place, Division, or Assets',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Poppins',
-                          color: Colors.grey[500],
-                          fontSize: 14,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 15),
+                      child: Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 15),
+                            child: Icon(Icons.search, color: Color(0xFF405189)),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Find Place, Division, or Assets',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: Colors.grey[500],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -146,30 +159,36 @@ class WelcomePage extends StatelessWidget {
                           iconColor: const Color.fromARGB(255, 30, 255, 0),
                           count: '1.250',
                           description: 'Has been registered',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => AssetListPage()),
+                            );
+                          },
                         ),
                         const SizedBox(height: 16),
-                        AssetCard(
-                          title: 'Unscanned Assets',
-                          icon: Icons.qr_code_2,
-                          iconColor: const Color(0xFF405189),
-                          count: '98',
-                          description: 'Have not been scanned',
-                        ),
-                        const SizedBox(height: 16),
-                        AssetCard(
-                          title: 'Damaged Assets',
-                          icon: Icons.warning_amber_rounded,
-                          iconColor: const Color(0xFFFFD700),
-                          count: '12',
-                          description: 'Already damaged',
-                        ),
-                        AssetCard(
-                          title: 'Lost Assets',
-                          icon: Icons.location_off,
-                          iconColor: const Color.fromARGB(255, 255, 0, 0),
-                          count: '0',
-                          description: 'Assets Losses',
-                        ),
+                        // AssetCard(
+                        //   title: 'Unscanned Assets',
+                        //   icon: Icons.qr_code_2,
+                        //   iconColor: const Color(0xFF405189),
+                        //   count: '98',
+                        //   description: 'Have not been scanned',
+                        // ),
+                        // const SizedBox(height: 16),
+                        // AssetCard(
+                        //   title: 'Damaged Assets',
+                        //   icon: Icons.warning_amber_rounded,
+                        //   iconColor: const Color(0xFFFFD700),
+                        //   count: '12',
+                        //   description: 'Already damaged',
+                        // ),
+                        // AssetCard(
+                        //   title: 'Lost Assets',
+                        //   icon: Icons.location_off,
+                        //   iconColor: const Color.fromARGB(255, 255, 0, 0),
+                        //   count: '0',
+                        //   description: 'Assets Losses',
+                        // ),
                       ],
                     ),
                   ),
@@ -231,166 +250,172 @@ class AssetCard extends StatelessWidget {
   final Color iconColor;
   final String count;
   final String description;
+  final VoidCallback onTap;
 
-  const AssetCard({
+  AssetCard({
     required this.title,
     required this.icon,
     required this.iconColor,
     required this.count,
     required this.description,
+    required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Bubble decorations
-          Positioned(
-            right: 10,
-            top: -5,
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF27519D), // biru full
-                    const Color.fromARGB(255, 144, 160, 190), //
-                    const Color(0x00C4C4C4), //
-                  ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Bubble decorations
+            Positioned(
+              right: 10,
+              top: -5,
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF27519D), // biru full
+                      const Color.fromARGB(255, 144, 160, 190), //
+                      const Color(0x00C4C4C4), //
+                    ],
+                  ),
+                  shape: BoxShape.circle,
                 ),
-                shape: BoxShape.circle,
               ),
             ),
-          ),
-          Positioned(
-            right: 30,
-            bottom: -10,
-            child: Container(
-              width: 25,
-              height: 25,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF27519D), // biru full
-                    const Color.fromARGB(255, 144, 160, 190), //
-                    const Color(0x00C4C4C4), //
-                  ],
+            Positioned(
+              right: 30,
+              bottom: -10,
+              child: Container(
+                width: 25,
+                height: 25,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFF27519D), // biru full
+                      const Color.fromARGB(255, 144, 160, 190), //
+                      const Color(0x00C4C4C4), //
+                    ],
+                  ),
+                  shape: BoxShape.circle,
                 ),
-                shape: BoxShape.circle,
               ),
             ),
-          ),
-          // Positioned(
-          //   left: 10,
-          //   bottom: -5,
-          //   child: Container(
-          //     width: 20,
-          //     height: 20,
-          //     decoration: BoxDecoration(
-          //       gradient: LinearGradient(
-          //         begin: Alignment.topLeft,
-          //         end: Alignment.bottomRight,
-          //         colors: [
-          //           const Color(0xFF27519D), // biru full
-          //           const Color.fromARGB(255, 144, 160, 190), //
-          //           const Color(0x00C4C4C4), //
-          //         ],
-          //       ),
-          //       shape: BoxShape.circle,
-          //     ),
-          //   ),
-          // ),
-          // Content
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(icon, color: iconColor, size: 22),
-                  const SizedBox(width: 10),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF405189),
-                      borderRadius: BorderRadius.circular(10),
+            // Positioned(
+            //   left: 10,
+            //   bottom: -5,
+            //   child: Container(
+            //     width: 20,
+            //     height: 20,
+            //     decoration: BoxDecoration(
+            //       gradient: LinearGradient(
+            //         begin: Alignment.topLeft,
+            //         end: Alignment.bottomRight,
+            //         colors: [
+            //           const Color(0xFF27519D), // biru full
+            //           const Color.fromARGB(255, 144, 160, 190), //
+            //           const Color(0x00C4C4C4), //
+            //         ],
+            //       ),
+            //       shape: BoxShape.circle,
+            //     ),
+            //   ),
+            // ),
+            // Content
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, color: iconColor, size: 22),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF405189),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      title,
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      count,
                       style: const TextStyle(
                         fontFamily: 'Poppins',
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 32,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    count,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 32,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      'Assets',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: const Color(0xFF405189),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                    const SizedBox(width: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        'Assets',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          color: const Color(0xFF405189),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                description,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
+                  ],
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(height: 6),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: Colors.grey[600],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+
 
 class NavItem extends StatelessWidget {
   final IconData icon;

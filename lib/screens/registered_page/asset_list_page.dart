@@ -46,9 +46,9 @@ class AssetListPage extends StatelessWidget {
         mainAxisSpacing: 10,
         children: [
           AssetCard(
-              title: 'Laptop', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
+              title: 'Buku', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
           AssetCard(
-              title: 'Laptop', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
+              title: 'Semen', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
           AssetCard(
               title: 'Laptop', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
           AssetCard(
@@ -98,7 +98,13 @@ class AssetCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text(title),
+            child: Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),
@@ -115,8 +121,12 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$title Details'),
+        title: Text(
+          '$title Details',
+          style: TextStyle(color: Colors.white), 
+        ),
         backgroundColor: Color(0xFF405189),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: Text(

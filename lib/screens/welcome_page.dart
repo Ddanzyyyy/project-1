@@ -9,7 +9,7 @@ class WelcomePage extends StatelessWidget {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned(
@@ -156,27 +156,27 @@ class WelcomePage extends StatelessWidget {
                       children: [
                         AssetCard(
                           title: 'Registered Assets',
-                          icon: Icons.add_box,
-                          iconColor: const Color.fromARGB(255, 30, 255, 0),
+                          imagePath: 'assets/images/icons/BOX.png',
                           count: '1.250',
                           description: 'Has been registered',
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => AssetListPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => AssetListPage()),
                             );
                           },
                         ),
                         AssetCard(
                           title: 'Unscanned Assets',
-                          icon: Icons.qr_code_2,
-                          iconColor: const Color(0xFF405189),
+                          imagePath: 'assets/images/icons/BOX.png',
                           count: '98',
                           description: 'Have not been scanned',
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => UnscannedAssetsPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => UnscannedAssetsPage()),
                             );
                           },
                         ),
@@ -260,16 +260,14 @@ class WelcomePage extends StatelessWidget {
 
 class AssetCard extends StatelessWidget {
   final String title;
-  final IconData icon;
-  final Color iconColor;
+  final String imagePath;
   final String count;
   final String description;
   final VoidCallback onTap;
 
   AssetCard({
     required this.title,
-    required this.icon,
-    required this.iconColor,
+    required this.imagePath,
     required this.count,
     required this.description,
     required this.onTap,
@@ -361,11 +359,11 @@ class AssetCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(icon, color: iconColor, size: 22),
+                    Image.asset(imagePath, width: 22, height: 22),
                     const SizedBox(width: 10),
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFF405189),
                         borderRadius: BorderRadius.circular(10),
@@ -428,8 +426,6 @@ class AssetCard extends StatelessWidget {
     );
   }
 }
-
-
 
 class NavItem extends StatelessWidget {
   final IconData icon;

@@ -11,49 +11,19 @@ class _SearchPageState extends State<SearchPage> {
   List<SearchResult> _searchResults = [];
   List<SearchResult> _filteredResults = [];
 
-  // Dummmy data
+  // Dummy d
   final List<SearchResult> _allResults = [
     SearchResult(
       title: 'SHE Logistic',
       subtitle: 'Safety Health Environment Department',
-      icon: Icons.local_shipping_outlined,
-      iconColor: Color(0xFF4CAF50),
+      imagePath: 'assets/images/dummy_logo_indocemenet.png',
       type: 'Division',
     ),
     SearchResult(
       title: 'Logistic Dispatch',
       subtitle: 'Dispatch and Distribution Center',
-      icon: Icons.airport_shuttle_outlined,
-      iconColor: Color(0xFF405189),
+      imagePath: 'assets/images/logo_she.png',
       type: 'Division',
-    ),
-    SearchResult(
-      title: 'IT Division',
-      subtitle: 'Information Technology Department',
-      icon: Icons.computer_outlined,
-      iconColor: Color(0xFF2196F3),
-      type: 'Division',
-    ),
-    SearchResult(
-      title: 'Finance Department',
-      subtitle: 'Financial Management Division',
-      icon: Icons.account_balance_outlined,
-      iconColor: Color(0xFFFF9800),
-      type: 'Division',
-    ),
-    SearchResult(
-      title: 'Warehouse A',
-      subtitle: 'Main Storage Facility',
-      icon: Icons.warehouse_outlined,
-      iconColor: Color(0xFF795548),
-      type: 'Place',
-    ),
-    SearchResult(
-      title: 'Office Building 1',
-      subtitle: 'Administrative Center',
-      icon: Icons.business_outlined,
-      iconColor: Color(0xFF9C27B0),
-      type: 'Place',
     ),
   ];
 
@@ -63,7 +33,6 @@ class _SearchPageState extends State<SearchPage> {
     _searchResults = _allResults;
     _filteredResults = [];
 
-    // Auto focus when page opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -195,12 +164,12 @@ class _SearchPageState extends State<SearchPage> {
           // Results section
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(top: 20), 
+              margin: const EdgeInsets.only(top: 20),
               decoration: const BoxDecoration(
                 color: Color(0xFFF8F9FA),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(28), 
-                  topRight: Radius.circular(28), 
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
                 ),
               ),
               child:
@@ -244,17 +213,18 @@ class _SearchPageState extends State<SearchPage> {
       ),
       child: Row(
         children: [
+          // Ganti icon dengan image asset
           Container(
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: result.iconColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              result.icon,
-              color: result.iconColor,
-              size: 24,
+            child: Image.asset(
+              result.imagePath,
+              width: 32,
+              height: 32,
+              fit: BoxFit.contain,
             ),
           ),
           const SizedBox(width: 16),
@@ -376,15 +346,13 @@ class _SearchPageState extends State<SearchPage> {
 class SearchResult {
   final String title;
   final String subtitle;
-  final IconData icon;
-  final Color iconColor;
+  final String imagePath;
   final String type;
 
   SearchResult({
     required this.title,
     required this.subtitle,
-    required this.icon,
-    required this.iconColor,
+    required this.imagePath,
     required this.type,
   });
 }

@@ -29,7 +29,7 @@ class AssetListPage extends StatelessWidget {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(top: 60), 
+              padding: const EdgeInsets.only(top: 60),
               child: Image.asset(
                 'assets/images/icons/registered_assets.png',
                 height: 38,
@@ -122,7 +122,9 @@ class DetailPage extends StatelessWidget {
         child: Text(
           'Details for $title\nHas been registered',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20),
+          style: const TextStyle(
+            fontSize: 20,
+          ),
         ),
       ),
     );

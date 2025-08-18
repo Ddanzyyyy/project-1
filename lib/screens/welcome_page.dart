@@ -1,4 +1,5 @@
 import 'package:Simba/screens/registered_page/asset_list_page.dart';
+import 'package:Simba/screens/registered_page/unscanned_assets.dart';
 import 'package:Simba/screens/search_page.dart';
 import 'package:flutter/material.dart';
 
@@ -163,6 +164,19 @@ class WelcomePage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => AssetListPage()),
+                            );
+                          },
+                        ),
+                        AssetCard(
+                          title: 'Unscanned Assets',
+                          icon: Icons.qr_code_2,
+                          iconColor: const Color(0xFF405189),
+                          count: '98',
+                          description: 'Have not been scanned',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => UnscannedAssetsPage()),
                             );
                           },
                         ),

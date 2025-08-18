@@ -195,12 +195,12 @@ class _SearchPageState extends State<SearchPage> {
           // Results section
           Expanded(
             child: Container(
-              // margin: const EdgeInsets.only(top: 20), 
+              margin: const EdgeInsets.only(top: 20), 
               decoration: const BoxDecoration(
                 color: Color(0xFFF8F9FA),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30), // lebih bulat
-                  topRight: Radius.circular(30), // lebih bulat
+                  topLeft: Radius.circular(28), 
+                  topRight: Radius.circular(28), 
                 ),
               ),
               child:

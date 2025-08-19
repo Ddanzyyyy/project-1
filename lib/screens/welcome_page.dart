@@ -1,8 +1,10 @@
-import 'package:Simba/screens/edit_profile_page.dart';
-import 'package:Simba/screens/registered_page/asset_list_page.dart';
-import 'package:Simba/screens/registered_page/damaged_asset.dart';
-import 'package:Simba/screens/registered_page/unscanned_assets.dart';
-import 'package:Simba/screens/search_page.dart';
+import 'package:Simba/screens/activity_screen/activity_page.dart';
+import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
+import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
+import 'package:Simba/screens/home_screen/registered_page/asset_list_page.dart';
+import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
+import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_assets.dart';
+import 'package:Simba/screens/home_screen/search_page.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -86,8 +88,10 @@ class _WelcomePageState extends State<WelcomePage> {
                         if (result != null && result is Map<String, String>) {
                           setState(() {
                             currentUserName = result['name'] ?? currentUserName;
-                            currentUserEmail = result['email'] ?? currentUserEmail;
-                            currentUserDivision = result['division'] ?? currentUserDivision;
+                            currentUserEmail =
+                                result['email'] ?? currentUserEmail;
+                            currentUserDivision =
+                                result['division'] ?? currentUserDivision;
                           });
                         }
                       } catch (e) {
@@ -128,7 +132,7 @@ class _WelcomePageState extends State<WelcomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  currentUserName, // Menggunakan currentUserName yang sudah terdefinisi
+                                  currentUserName,
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                     color: const Color(0xFF405189),
@@ -149,7 +153,6 @@ class _WelcomePageState extends State<WelcomePage> {
                               ],
                             ),
                           ),
-                          // Icon panah untuk menunjukkan bahwa card bisa diklik
                           Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.grey[400],
@@ -261,6 +264,20 @@ class _WelcomePageState extends State<WelcomePage> {
                           },
                         ),
                         const SizedBox(height: 16),
+                        AssetCard(
+                          title: 'Lost Assets',
+                          imagePath: 'assets/images/icons/warning.png',
+                          count: '4',
+                          description: 'Assets that are missing',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LostAsset()),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
@@ -293,21 +310,48 @@ class _WelcomePageState extends State<WelcomePage> {
               icon: Icons.home_rounded,
               label: 'Home',
               selected: true,
+              onTap: () {
+                // Already on home page, no action needed
+              },
             ),
             NavItem(
               icon: Icons.timeline_rounded,
               label: 'Activity',
               selected: false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ActivityPage()),
+                );
+              },
             ),
             NavItem(
               icon: Icons.qr_code_scanner_rounded,
               label: 'Scan Asset',
               selected: false,
+              onTap: () {
+               
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Scan Asset feature coming soon!'),
+                    backgroundColor: Color(0xFF405189),
+                  ),
+                );
+              },
             ),
             NavItem(
               icon: Icons.settings_rounded,
               label: 'Setting',
               selected: false,
+              onTap: () {
+               
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Settings feature coming soon!'),
+                    backgroundColor: Color(0xFF405189),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -471,37 +515,42 @@ class NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool selected;
+  final VoidCallback? onTap;
 
   const NavItem({
     Key? key,
     required this.icon,
     required this.label,
     required this.selected,
+    this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(height: 8),
-        Icon(
-          icon,
-          color: selected ? const Color(0xFF405189) : Colors.grey,
-          size: 28,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Poppins',
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          Icon(
+            icon,
             color: selected ? const Color(0xFF405189) : Colors.grey,
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
+            size: 28,
           ),
-        ),
-        const SizedBox(height: 8),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              color: selected ? const Color(0xFF405189) : Colors.grey,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
     );
   }
 }

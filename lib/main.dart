@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/login_splash_page.dart';
-import 'screens/login_page.dart';
-import 'screens/forgot_password_page.dart';
+import 'screens/login/login_splash_page.dart';
+import 'screens/login/login_page.dart';
+import 'screens/login/forgot_password_page.dart';
 import 'screens/welcome_page.dart';
 
 void main() {

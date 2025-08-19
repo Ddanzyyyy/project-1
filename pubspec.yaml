@@ -27,4 +27,7 @@ flutter:
     - assets/images/dummy_logo_indocemenet.png
     - assets/images/logo_she.png
     - assets/images/icons/BOX.png
+    - assets/images/icons/alert.png
+    - assets/images/icons/lost_assest.png
+    - assets/images/icons/damage_asset.png
 

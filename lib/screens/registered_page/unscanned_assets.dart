@@ -112,10 +112,16 @@ class UnscannedAssetsPage extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.only(top: 60),
-              child: Image.asset(
-                'assets/images/icons/registered_assets.png',
-                height: 38,
-                fit: BoxFit.contain,
+              child: Center(
+                child: Text(
+                  'Unscanned Assets',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
               ),
             ),
           ),

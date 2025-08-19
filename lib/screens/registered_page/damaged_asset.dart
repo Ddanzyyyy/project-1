@@ -1,7 +1,7 @@
 import 'package:Simba/screens/welcome_page.dart';
 import 'package:flutter/material.dart';
 
-class AssetListPage extends StatelessWidget {
+class DamagedAsset extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +32,7 @@ class AssetListPage extends StatelessWidget {
               padding: const EdgeInsets.only(top: 60),
               child: Center(
                 child: Text(
-                  'Registered Assets',
+                  'Damaged Assets',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -55,10 +55,10 @@ class AssetListPage extends StatelessWidget {
               title: 'Buku', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
           AssetCard(
               title: 'Semen', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
-          AssetCard(
-              title: 'Laptop', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
-          AssetCard(
-              title: 'Laptop', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
+          // AssetCard(
+          //     title: 'Laptop', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
+          // AssetCard(
+          //     title: 'Laptop', imagePath: 'assets/images/LOGO_INDOCEMENT.jpg'),
         ],
       ),
     );
@@ -129,7 +129,7 @@ class DetailPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           '$title Details',
-          style: TextStyle(color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Color(0xFF405189),
         iconTheme: IconThemeData(color: Colors.white),

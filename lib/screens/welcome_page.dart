@@ -1,9 +1,30 @@
+import 'package:Simba/screens/edit_profile_page.dart';
 import 'package:Simba/screens/registered_page/asset_list_page.dart';
+import 'package:Simba/screens/registered_page/damaged_asset.dart';
 import 'package:Simba/screens/registered_page/unscanned_assets.dart';
 import 'package:Simba/screens/search_page.dart';
 import 'package:flutter/material.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
+  @override
+  _WelcomePageState createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+  // Data profile user saat ini
+  String currentUserName = "caccarehana"; // Sesuai dengan current user login
+  String currentUserEmail = "caccarehana@example.com";
+  String currentUserDivision = "IT Department";
+
+  // Method untuk update profile
+  void _updateUserProfile(String name, String email, String division) {
+    setState(() {
+      currentUserName = name;
+      currentUserEmail = email;
+      currentUserDivision = division;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -45,59 +66,103 @@ class WelcomePage extends StatelessWidget {
                 // Profile Card
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: const Color(0xFF405189),
-                          child:
-                              Icon(Icons.person, color: Colors.white, size: 24),
-                        ),
-                        const SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'dummy',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: const Color(0xFF405189),
-                                fontWeight: FontWeight.w800,
-                                fontSize: 16,
-                              ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      try {
+                        // Navigate ke edit profile dengan data saat ini
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditProfilePage(
+                              initialName: currentUserName,
+                              initialEmail: currentUserEmail,
+                              initialDivision: currentUserDivision,
+                              onProfileUpdated: _updateUserProfile,
                             ),
-                            const SizedBox(height: 0),
-                            Text(
-                              'Citeureup',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: const Color(0xFF405189),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
+                          ),
+                        );
+
+                        // Jika ada data yang dikembalikan, update profile
+                        if (result != null && result is Map<String, String>) {
+                          setState(() {
+                            currentUserName = result['name'] ?? currentUserName;
+                            currentUserEmail = result['email'] ?? currentUserEmail;
+                            currentUserDivision = result['division'] ?? currentUserDivision;
+                          });
+                        }
+                      } catch (e) {
+                        // Handle error
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error: ${e.toString()}'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: const Color(0xFF405189),
+                            child: Icon(Icons.person,
+                                color: Colors.white, size: 24),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  currentUserName, // Menggunakan currentUserName yang sudah terdefinisi
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    color: const Color(0xFF405189),
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Citeureup',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    color: const Color(0xFF405189),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          // Icon panah untuk menunjukkan bahwa card bisa diklik
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.grey[400],
+                            size: 16,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
 
+                // Search Bar
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: GestureDetector(
@@ -167,6 +232,7 @@ class WelcomePage extends StatelessWidget {
                             );
                           },
                         ),
+                        const SizedBox(height: 16),
                         AssetCard(
                           title: 'Unscanned Assets',
                           imagePath: 'assets/images/icons/BOX.png',
@@ -181,28 +247,20 @@ class WelcomePage extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 16),
-                        // AssetCard(
-                        //   title: 'Unscanned Assets',
-                        //   icon: Icons.qr_code_2,
-                        //   iconColor: const Color(0xFF405189),
-                        //   count: '98',
-                        //   description: 'Have not been scanned',
-                        // ),
-                        // const SizedBox(height: 16),
-                        // AssetCard(
-                        //   title: 'Damaged Assets',
-                        //   icon: Icons.warning_amber_rounded,
-                        //   iconColor: const Color(0xFFFFD700),
-                        //   count: '12',
-                        //   description: 'Already damaged',
-                        // ),
-                        // AssetCard(
-                        //   title: 'Lost Assets',
-                        //   icon: Icons.location_off,
-                        //   iconColor: const Color.fromARGB(255, 255, 0, 0),
-                        //   count: '0',
-                        //   description: 'Assets Losses',
-                        // ),
+                        AssetCard(
+                          title: 'Damaged Assets',
+                          imagePath: 'assets/images/icons/alert.png',
+                          count: '12',
+                          description: 'Already Damaged',
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DamagedAsset()),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
@@ -265,13 +323,15 @@ class AssetCard extends StatelessWidget {
   final String description;
   final VoidCallback onTap;
 
-  AssetCard({
+  const AssetCard({
+    Key? key,
     required this.title,
     required this.imagePath,
     required this.count,
     required this.description,
     required this.onTap,
-  });
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -304,9 +364,9 @@ class AssetCard extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF27519D), // biru full
-                      const Color.fromARGB(255, 144, 160, 190), //
-                      const Color(0x00C4C4C4), //
+                      const Color(0xFF27519D),
+                      const Color.fromARGB(255, 144, 160, 190),
+                      const Color(0x00C4C4C4),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -324,35 +384,15 @@ class AssetCard extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF27519D), // biru full
-                      const Color.fromARGB(255, 144, 160, 190), //
-                      const Color(0x00C4C4C4), //
+                      const Color(0xFF27519D),
+                      const Color.fromARGB(255, 144, 160, 190),
+                      const Color(0x00C4C4C4),
                     ],
                   ),
                   shape: BoxShape.circle,
                 ),
               ),
             ),
-            // Positioned(
-            //   left: 10,
-            //   bottom: -5,
-            //   child: Container(
-            //     width: 20,
-            //     height: 20,
-            //     decoration: BoxDecoration(
-            //       gradient: LinearGradient(
-            //         begin: Alignment.topLeft,
-            //         end: Alignment.bottomRight,
-            //         colors: [
-            //           const Color(0xFF27519D), // biru full
-            //           const Color.fromARGB(255, 144, 160, 190), //
-            //           const Color(0x00C4C4C4), //
-            //         ],
-            //       ),
-            //       shape: BoxShape.circle,
-            //     ),
-            //   ),
-            // ),
             // Content
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,10 +473,11 @@ class NavItem extends StatelessWidget {
   final bool selected;
 
   const NavItem({
+    Key? key,
     required this.icon,
     required this.label,
     required this.selected,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

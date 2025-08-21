@@ -5,6 +5,8 @@ import 'package:Simba/screens/home_screen/registered_page/asset_list_page.dart';
 import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_assets.dart';
 import 'package:Simba/screens/home_screen/search_page.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
+import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -13,8 +15,8 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  // Data profile user saat ini
-  String currentUserName = "caccarehana"; // Sesuai dengan current user login
+  // Data profile Dummy
+  String currentUserName = "caccarehana";
   String currentUserEmail = "caccarehana@example.com";
   String currentUserDivision = "IT Department";
 
@@ -84,7 +86,6 @@ class _WelcomePageState extends State<WelcomePage> {
                           ),
                         );
 
-                        // Jika ada data yang dikembalikan, update profile
                         if (result != null && result is Map<String, String>) {
                           setState(() {
                             currentUserName = result['name'] ?? currentUserName;
@@ -311,7 +312,6 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Home',
               selected: true,
               onTap: () {
-                // Already on home page, no action needed
               },
             ),
             NavItem(
@@ -330,12 +330,9 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Scan Asset',
               selected: false,
               onTap: () {
-               
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Scan Asset feature coming soon!'),
-                    backgroundColor: Color(0xFF405189),
-                  ),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ScanAssetPage()),
                 );
               },
             ),
@@ -344,11 +341,10 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Setting',
               selected: false,
               onTap: () {
-               
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Settings feature coming soon!'),
-                    backgroundColor: Color(0xFF405189),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(),
                   ),
                 );
               },

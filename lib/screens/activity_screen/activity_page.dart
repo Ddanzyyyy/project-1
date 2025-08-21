@@ -1,3 +1,6 @@
+import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
+import 'package:Simba/screens/setting_screen/settings_page.dart';
+import 'package:Simba/screens/welcome_page.dart';
 import 'package:flutter/material.dart';
 
 class ActivityPage extends StatefulWidget {
@@ -66,7 +69,7 @@ class _ActivityPageState extends State<ActivityPage> {
               ],
             ),
           ),
-          
+
           // Activity List
           Expanded(
             child: Padding(
@@ -85,7 +88,6 @@ class _ActivityPageState extends State<ActivityPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
 
                   //Dummy Dataset
                   Expanded(
@@ -108,7 +110,8 @@ class _ActivityPageState extends State<ActivityPage> {
                         _buildActivityItem(
                           icon: Icons.warning,
                           title: 'Damaged Asset Reported',
-                          description: 'Printer Canon - IT-023 marked as damaged',
+                          description:
+                              'Printer Canon - IT-023 marked as damaged',
                           time: '2025-08-18 16:45',
                           color: Colors.orange,
                         ),
@@ -167,15 +170,21 @@ class _ActivityPageState extends State<ActivityPage> {
               label: 'Home',
               selected: false,
               onTap: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => WelcomePage()),
+                );
               },
             ),
             NavItem(
               icon: Icons.timeline_rounded,
               label: 'Activity',
-              selected: true, // Selected since we're on Activity page
-              onTap: () {
-                // Already on Activity page, no action needed
+              selected: true,
+             onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ActivityPage()),
+                );
               },
             ),
             NavItem(
@@ -183,11 +192,9 @@ class _ActivityPageState extends State<ActivityPage> {
               label: 'Scan Asset',
               selected: false,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Scan Asset feature coming soon!'),
-                    backgroundColor: Color(0xFF405189),
-                  ),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ScanAssetPage()),
                 );
               },
             ),
@@ -196,10 +203,10 @@ class _ActivityPageState extends State<ActivityPage> {
               label: 'Setting',
               selected: false,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Settings feature coming soon!'),
-                    backgroundColor: Color(0xFF405189),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(),
                   ),
                 );
               },

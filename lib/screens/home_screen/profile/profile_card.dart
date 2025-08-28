@@ -1,6 +1,6 @@
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileCard extends StatefulWidget {
   @override
@@ -8,22 +8,35 @@ class ProfileCard extends StatefulWidget {
 }
 
 class _ProfileCardState extends State<ProfileCard> {
-  String currentName = "caccarehana"; 
-  String currentEmail = "caccarehana@example.com";
-  String currentDivision = "IT Department";
+  String currentName = "Loading..."; 
+  String currentUsername = "Loading...";
+  bool _isLoading = true;
 
-  void _updateProfile(String name, String email, String division) {
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currentName = prefs.getString('name') ?? 'No Name';
+      currentUsername = prefs.getString('username') ?? 'username';
+    });
+  }
+
+  void _updateProfile(String name, String username) {
     setState(() {
       currentName = name;
-      currentEmail = email;
-      currentDivision = division;
+      currentUsername = username;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GestureDetector(
         onTap: () async {
           try {
@@ -32,8 +45,7 @@ class _ProfileCardState extends State<ProfileCard> {
               MaterialPageRoute(
                 builder: (context) => EditProfilePage(
                   initialName: currentName,
-                  initialEmail: currentEmail,
-                  initialDivision: currentDivision,
+                  initialUsername: currentUsername,
                   onProfileUpdated: _updateProfile,
                 ),
               ),
@@ -42,16 +54,17 @@ class _ProfileCardState extends State<ProfileCard> {
             if (result != null && result is Map<String, String>) {
               setState(() {
                 currentName = result['name'] ?? currentName;
-                currentEmail = result['email'] ?? currentEmail;
-                currentDivision = result['division'] ?? currentDivision;
+                currentUsername = result['username'] ?? currentUsername;
               });
             }
           } catch (e) {
-            // Handle error
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error: ${e.toString()}'),
                 backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                margin: EdgeInsets.all(16),
               ),
             );
           }
@@ -61,49 +74,94 @@ class _ProfileCardState extends State<ProfileCard> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: const Color(0xFF405189),
-                child: Icon(Icons.person, color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      currentName,
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: const Color(0xFF405189),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Citeureup',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        color: const Color(0xFF405189),
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                      ),
+              // Profile Picture
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF405189),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
+                child: Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
+              const SizedBox(width: 12),
+              
+              // Profile Info
+              Expanded(
+                child: _isLoading
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Container(
+                          width: 80,
+                          height: 14,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          currentName,
+                          style: TextStyle(
+                            color: const Color(0xFF405189),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '@$currentUsername',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w400,
+                            fontSize: 13,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+              ),
+              
+              // Arrow Icon
               Icon(
                 Icons.arrow_forward_ios,
                 color: Colors.grey[400],

@@ -27,9 +27,9 @@ class LoginSplashPage extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF27519D), // biru full
-                      const Color.fromARGB(255, 144, 160, 190), //
-                      const Color(0x00C4C4C4), //
+                      const Color(0xFF27519D),
+                      const Color.fromARGB(255, 144, 160, 190),
+                      const Color(0x00C4C4C4),
                     ],
                   ),
                 ),
@@ -45,9 +45,9 @@ class LoginSplashPage extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF27519D), // biru full
-                      const Color.fromARGB(255, 144, 160, 190), //
-                      const Color(0x00C4C4C4), //
+                      const Color(0xFF27519D),
+                      const Color.fromARGB(255, 144, 160, 190),
+                      const Color(0x00C4C4C4),
                     ],
                   ),
                 ),
@@ -66,36 +66,34 @@ class LoginSplashPage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF27519D), // biru full
-                      const Color.fromARGB(255, 144, 160, 190), //
-                      const Color(0x00C4C4C4), //
+                      const Color(0xFF27519D),
+                      const Color.fromARGB(255, 144, 160, 190),
+                      const Color(0x00C4C4C4),
                     ],
                   ),
                 ),
               ),
             ),
-
             Positioned(
               top: 555,
               bottom: 100,
               right: 90,
               left: 40,
               child: Container(
-                width: 80.42589075730851,
-                height: 81.8406865991023,
+                width: 80.4,
+                height: 81.8,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF27519D), // biru full
-                      const Color.fromARGB(255, 144, 160, 190), //
-                      const Color(0x00C4C4C4), //
+                      const Color(0xFF27519D),
+                      const Color.fromARGB(255, 144, 160, 190),
+                      const Color(0x00C4C4C4),
                     ],
                   ),
                   shape: BoxShape.circle,
                 ),
               ),
             ),
-
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -107,15 +105,12 @@ class LoginSplashPage extends StatelessWidget {
                     height: 140,
                     fit: BoxFit.contain,
                   ),
-                  Positioned(
-                    top: 501,
-                    left: 45,
-                    child: Image.asset(
-                      'assets/images/SIMBA.png',
-                      width: 270,
-                      height: 30,
-                      fit: BoxFit.contain,
-                    ),
+                  // SIMBA LOGO
+                  Image.asset(
+                    'assets/images/SIMBA.png',
+                    width: 270,
+                    height: 30,
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 30),
                   const Text(
@@ -124,7 +119,7 @@ class LoginSplashPage extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xFF405189),
                       fontSize: 20,
-                      fontFamily: 'Poppins',
+                      fontFamily: 'Inter',
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -146,6 +141,7 @@ class LoginSplashPage extends StatelessWidget {
                       child: const Text(
                         'Login',
                         style: TextStyle(
+                          fontFamily: 'Inter',
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -156,7 +152,6 @@ class LoginSplashPage extends StatelessWidget {
                 ],
               ),
             ),
-
           ],
         ),
       ),

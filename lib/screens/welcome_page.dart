@@ -1,13 +1,15 @@
 import 'package:Simba/screens/activity_screen/activity_page.dart';
 import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
-import 'package:Simba/screens/home_screen/registered_page/asset_list_page.dart';
 import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_assets.dart';
 import 'package:Simba/screens/home_screen/search_page.dart';
+import 'package:Simba/screens/registered_page/asset_list_page.dart';
+import 'package:Simba/screens/registered_page/asset_service.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -15,18 +17,55 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  // Data profile Dummy
-  String currentUserName = "caccarehana";
-  String currentUserEmail = "caccarehana@example.com";
-  String currentUserDivision = "IT Department";
+  String currentUserName = "Loading...";
+  String currentUsername = "Loading...";
+  bool isProfileLoading = true;
+  int assetCount = 0;
+  bool isAssetLoading = true;
 
-  // Method untuk update profile
-  void _updateUserProfile(String name, String email, String division) {
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+    fetchAssetCount();
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        currentUserName = prefs.getString('name') ?? 'No Name';
+        currentUsername = prefs.getString('username') ?? 'username';
+        isProfileLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        currentUserName = 'Error loading';
+        currentUsername = 'username';
+        isProfileLoading = false;
+      });
+    }
+  }
+
+  void _updateUserProfile(String name, String username) {
     setState(() {
       currentUserName = name;
-      currentUserEmail = email;
-      currentUserDivision = division;
+      currentUsername = username;
     });
+  }
+
+  Future<void> fetchAssetCount() async {
+    try {
+      final assets = await AssetService.getAssets();
+      setState(() {
+        assetCount = assets.length;
+        isAssetLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isAssetLoading = false;
+      });
+    }
   }
 
   @override
@@ -37,6 +76,7 @@ class _WelcomePageState extends State<WelcomePage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          // HEADER & PROFILE CARD (TIDAK DIUBAH)
           Positioned(
             top: 0,
             left: 0,
@@ -56,7 +96,6 @@ class _WelcomePageState extends State<WelcomePage> {
             child: Column(
               children: [
                 const SizedBox(height: 18),
-                // SIMBA Logo
                 Center(
                   child: Image.asset(
                     'assets/images/SIMBA.png',
@@ -67,40 +106,39 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
                 const SizedBox(height: 20),
 
-                // Profile Card
+                // PROFILE CARD (TIDAK DIUBAH)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: GestureDetector(
                     onTap: () async {
                       try {
-                        // Navigate ke edit profile dengan data saat ini
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => EditProfilePage(
                               initialName: currentUserName,
-                              initialEmail: currentUserEmail,
-                              initialDivision: currentUserDivision,
+                              initialUsername: currentUsername,
                               onProfileUpdated: _updateUserProfile,
                             ),
                           ),
                         );
-
                         if (result != null && result is Map<String, String>) {
                           setState(() {
                             currentUserName = result['name'] ?? currentUserName;
-                            currentUserEmail =
-                                result['email'] ?? currentUserEmail;
-                            currentUserDivision =
-                                result['division'] ?? currentUserDivision;
+                            currentUsername = result['username'] ?? currentUsername;
                           });
                         }
                       } catch (e) {
-                        // Handle error
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Error: ${e.toString()}'),
+                            content: Text(
+                              'Error: ${e.toString()}',
+                              style: TextStyle(fontFamily: 'Inter'),
+                            ),
                             backgroundColor: Colors.red,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            margin: EdgeInsets.all(16),
                           ),
                         );
                       }
@@ -110,50 +148,96 @@ class _WelcomePageState extends State<WelcomePage> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: const Color(0xFF405189),
-                            child: Icon(Icons.person,
-                                color: Colors.white, size: 24),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  currentUserName,
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    color: const Color(0xFF405189),
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Citeureup',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    color: const Color(0xFF405189),
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14,
-                                  ),
+                          // Profile Picture
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF405189),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 24,
+                            ),
                           ),
+                          const SizedBox(width: 12),
+
+                          // Profile Info
+                          Expanded(
+                            child: isProfileLoading
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 120,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Container(
+                                      width: 80,
+                                      height: 14,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      currentUserName,
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: const Color(0xFF405189),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '@$currentUsername',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: Colors.grey[600],
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 13,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                          ),
+
+                          // Arrow Icon
                           Icon(
                             Icons.arrow_forward_ios,
                             color: Colors.grey[400],
@@ -166,37 +250,30 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Search Bar
+                // SEARCH BAR (DIPERBARUI AGAR MINIMALIS)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SearchPage()),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
                     },
                     child: Container(
-                      height: 50,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(
-                          color: const Color(0xFF405189),
-                          width: 1,
-                        ),
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(22),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 15),
+                            padding: EdgeInsets.only(left: 14),
                             child: Icon(Icons.search, color: Color(0xFF405189)),
                           ),
                           const SizedBox(width: 10),
@@ -204,7 +281,7 @@ class _WelcomePageState extends State<WelcomePage> {
                             child: Text(
                               'Find Place, Division, or Assets',
                               style: TextStyle(
-                                fontFamily: 'Poppins',
+                                fontFamily: 'Inter',
                                 color: Colors.grey[500],
                                 fontSize: 14,
                               ),
@@ -215,70 +292,58 @@ class _WelcomePageState extends State<WelcomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 22),
 
-                // Asset Cards
+                // ASSET CARDS (DIPERBARUI AGAR MINIMALIS)
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ListView(
                       children: [
-                        AssetCard(
+                        AssetCardMinimalist(
                           title: 'Registered Assets',
-                          imagePath: 'assets/images/icons/BOX.png',
-                          count: '1.250',
+                          icon: Icons.inventory_2_rounded,
+                          count: isAssetLoading ? '...' : assetCount.toString(),
                           description: 'Has been registered',
+                          color: Color(0xFF405189),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AssetListPage()),
-                            );
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => AssetListPage()));
                           },
                         ),
-                        const SizedBox(height: 16),
-                        AssetCard(
+                        const SizedBox(height: 10),
+                        AssetCardMinimalist(
                           title: 'Unscanned Assets',
-                          imagePath: 'assets/images/icons/BOX.png',
+                          icon: Icons.qr_code_2_rounded,
                           count: '98',
                           description: 'Have not been scanned',
+                          color: Colors.orange,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => UnscannedAssetsPage()),
-                            );
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => UnscannedAssetsPage()));
                           },
                         ),
-                        const SizedBox(height: 16),
-                        AssetCard(
+                        const SizedBox(height: 10),
+                        AssetCardMinimalist(
                           title: 'Damaged Assets',
-                          imagePath: 'assets/images/icons/alert.png',
+                          icon: Icons.warning_amber_rounded,
                           count: '12',
                           description: 'Already Damaged',
+                          color: Colors.red,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DamagedAsset()),
-                            );
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => DamagedAsset()));
                           },
                         ),
-                        const SizedBox(height: 16),
-                        AssetCard(
+                        const SizedBox(height: 10),
+                        AssetCardMinimalist(
                           title: 'Lost Assets',
-                          imagePath: 'assets/images/icons/warning.png',
+                          icon: Icons.error_outline_rounded,
                           count: '4',
                           description: 'Assets that are missing',
+                          color: Colors.grey,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LostAsset()),
-                            );
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => LostAsset()));
                           },
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 10),
                       ],
                     ),
                   ),
@@ -288,6 +353,7 @@ class _WelcomePageState extends State<WelcomePage> {
           ),
         ],
       ),
+      // NAVBAR (TIDAK DIUBAH)
       bottomNavigationBar: Container(
         height: 70,
         decoration: BoxDecoration(
@@ -311,18 +377,14 @@ class _WelcomePageState extends State<WelcomePage> {
               icon: Icons.home_rounded,
               label: 'Home',
               selected: true,
-              onTap: () {
-              },
+              onTap: () {},
             ),
             NavItem(
               icon: Icons.timeline_rounded,
               label: 'Activity',
               selected: false,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ActivityPage()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ActivityPage()));
               },
             ),
             NavItem(
@@ -330,10 +392,7 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Scan Asset',
               selected: false,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ScanAssetPage()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ScanAssetPage()));
               },
             ),
             NavItem(
@@ -341,12 +400,7 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Setting',
               selected: false,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SettingsPage(),
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()));
               },
             ),
           ],
@@ -356,157 +410,93 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 }
 
-class AssetCard extends StatelessWidget {
+// AssetCardMinimalist: Card asset lebih simple dan segar
+class AssetCardMinimalist extends StatelessWidget {
   final String title;
-  final String imagePath;
+  final IconData icon;
   final String count;
   final String description;
+  final Color color;
   final VoidCallback onTap;
 
-  const AssetCard({
+  const AssetCardMinimalist({
     Key? key,
     required this.title,
-    required this.imagePath,
+    required this.icon,
     required this.count,
     required this.description,
+    required this.color,
     required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            // Bubble decorations
-            Positioned(
-              right: 10,
-              top: -5,
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF27519D),
-                      const Color.fromARGB(255, 144, 160, 190),
-                      const Color(0x00C4C4C4),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-            Positioned(
-              right: 30,
-              bottom: -10,
-              child: Container(
-                width: 25,
-                height: 25,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF27519D),
-                      const Color.fromARGB(255, 144, 160, 190),
-                      const Color(0x00C4C4C4),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-            // Content
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    final Color cardBg = Colors.grey[50]!;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Material(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Image.asset(imagePath, width: 22, height: 22),
-                    const SizedBox(width: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF405189),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
+                Container(
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Icon(icon, color: color, size: 28),
+                ),
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         title,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          color: Colors.white,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
                           fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                          fontSize: 15,
+                        ),
+                      ),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          color: Colors.grey[600],
                           fontSize: 12,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      count,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 32,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        'Assets',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          color: const Color(0xFF405189),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
+                const SizedBox(width: 8),
                 Text(
-                  description,
+                  count,
                   style: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                    fontSize: 22,
                   ),
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
+// NavItem (TIDAK DIUBAH)
 class NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -538,7 +528,7 @@ class NavItem extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'Poppins',
+              fontFamily: 'Inter',
               color: selected ? const Color(0xFF405189) : Colors.grey,
               fontSize: 10,
               fontWeight: FontWeight.w500,

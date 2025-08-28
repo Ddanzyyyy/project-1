@@ -48,6 +48,8 @@ class Asset {
       scannedBy: scannedBy ?? this.scannedBy,
     );
   }
+
+  static fromJson(e) {}
 }
 
 class ScanAssetPage extends StatefulWidget {

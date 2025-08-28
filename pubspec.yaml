@@ -9,12 +9,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  camera: ^0.10.5+5
-  permission_handler: ^11.0.1
-  # qr_code_scanner: ^1.0.1
-  # permission_handler: ^11.3.1
   cupertino_icons: ^1.0.2
-  http: ^1.5.0
+  http: ^1.2.0
+  shared_preferences: ^2.5.3
+  image_picker: ^1.0.0
+  permission_handler: ^11.3.0
+  flutter_expandable_fab: ^2.5.2
+  shimmer: ^3.0.0
+  carousel_slider: ^5.1.1
 
 dev_dependencies:
   flutter_test:
@@ -37,3 +39,7 @@ flutter:
     # - assets/images/icons/lost_assest.png
     # - assets/images/icons/damage_asset.png
 
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter_28pt-Light.ttf

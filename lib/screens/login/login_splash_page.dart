@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart'; // pastikan package lottie sudah di pubspec.yaml
 
 class LoginSplashPage extends StatelessWidget {
   @override
@@ -17,6 +18,7 @@ class LoginSplashPage extends StatelessWidget {
         ),
         child: Stack(
           children: [
+            // Background circles
             Positioned(
               top: -50,
               right: -50,
@@ -99,13 +101,22 @@ class LoginSplashPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 30),
+                  // // --- Lottie Gift Animation ---
+                  //                  SizedBox(
+                  //   width: 110,
+                  //   height: 110,
+                  //   child: Image.asset(
+                  //     'assets/lottie/idea.gif', // path ke file GIF
+                  //     fit: BoxFit.contain,
+                  //   ),
+                  // ),
+                  const SizedBox(height: 20),
                   Image.asset(
                     'assets/images/LOGO_INDOCEMENT.jpg',
                     width: 190,
                     height: 140,
                     fit: BoxFit.contain,
                   ),
-                  // SIMBA LOGO
                   Image.asset(
                     'assets/images/SIMBA.png',
                     width: 270,

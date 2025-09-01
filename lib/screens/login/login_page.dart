@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
     if (Platform.isAndroid) {
       return 'http://192.168.8.131:8000/api/login';
     } else {
-      return 'http://127.0.0.1:8000/api/login'; // IOS
+      return 'http://127.0.0.1:8000/api/login'; // If IOS Console
     }
   }
 
@@ -77,10 +77,9 @@ class _LoginPageState extends State<LoginPage> {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setString('name', data['user']['name']);
             prefs.setString('username', data['user']['username']);
-            prefs.setString('token', data['token']); // jika butuh token
+            prefs.setString('token', data['token']); 
             Navigator.pushNamed(context, '/welcome');
           } else {
-            // Login gagal, tampilkan pesan error dari API
             setState(() {
               apiWarning = data['message'] ?? 'Login gagal';
             });

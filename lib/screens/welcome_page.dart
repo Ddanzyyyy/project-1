@@ -10,6 +10,7 @@ import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_service.dart';
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -20,14 +21,17 @@ class _WelcomePageState extends State<WelcomePage> {
   String currentUserName = "Loading...";
   String currentUsername = "Loading...";
   bool isProfileLoading = true;
-  int assetCount = 0;
-  bool isAssetLoading = true;
+    int assetCount = 0;
+    bool isAssetLoading = true;
+    int unscannedAssetCount = 0;
+    bool isUnscannedLoading = true;
 
   @override
   void initState() {
     super.initState();
     _loadProfileData();
     fetchAssetCount();
+  fetchUnscannedAssetCount();
   }
 
   Future<void> _loadProfileData() async {
@@ -64,6 +68,22 @@ class _WelcomePageState extends State<WelcomePage> {
     } catch (e) {
       setState(() {
         isAssetLoading = false;
+      });
+    }
+  }
+
+  Future<void> fetchUnscannedAssetCount() async {
+    try {
+      // Ganti auditId sesuai kebutuhan, misal dari SharedPreferences atau default
+      final auditId = '1';
+      final assets = await UnscannedAssetService.fetchUnscannedAssets(auditId: auditId);
+      setState(() {
+        unscannedAssetCount = assets.length;
+        isUnscannedLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isUnscannedLoading = false;
       });
     }
   }
@@ -125,7 +145,8 @@ class _WelcomePageState extends State<WelcomePage> {
                         if (result != null && result is Map<String, String>) {
                           setState(() {
                             currentUserName = result['name'] ?? currentUserName;
-                            currentUsername = result['username'] ?? currentUsername;
+                            currentUsername =
+                                result['username'] ?? currentUsername;
                           });
                         }
                       } catch (e) {
@@ -137,7 +158,8 @@ class _WelcomePageState extends State<WelcomePage> {
                             ),
                             backgroundColor: Colors.red,
                             behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
                             margin: EdgeInsets.all(16),
                           ),
                         );
@@ -185,56 +207,60 @@ class _WelcomePageState extends State<WelcomePage> {
                           // Profile Info
                           Expanded(
                             child: isProfileLoading
-                              ? Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 120,
-                                      height: 16,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(4),
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 120,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Container(
-                                      width: 80,
-                                      height: 14,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(4),
+                                      SizedBox(height: 4),
+                                      Container(
+                                        width: 80,
+                                        height: 14,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      currentUserName,
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        color: const Color(0xFF405189),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
+                                    ],
+                                  )
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        currentUserName,
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          color: const Color(0xFF405189),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '@$currentUsername',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 13,
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '@$currentUsername',
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 13,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
                           ),
 
                           // Arrow Icon
@@ -255,7 +281,10 @@ class _WelcomePageState extends State<WelcomePage> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SearchPage()));
                     },
                     child: Container(
                       height: 44,
@@ -307,18 +336,27 @@ class _WelcomePageState extends State<WelcomePage> {
                           description: 'Has been registered',
                           color: Color(0xFF405189),
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => AssetListPage()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AssetListPage()));
                           },
                         ),
                         const SizedBox(height: 10),
                         AssetCardMinimalist(
                           title: 'Unscanned Assets',
                           icon: Icons.qr_code_2_rounded,
-                          count: '98',
+                          count: isUnscannedLoading ? '...' : unscannedAssetCount.toString(),
                           description: 'Have not been scanned',
                           color: Colors.orange,
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => UnscannedAssetsPage()));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UnscannedAssetsPage(
+                                    auditId: '1'),
+                              ),
+                            );
                           },
                         ),
                         const SizedBox(height: 10),
@@ -329,7 +367,10 @@ class _WelcomePageState extends State<WelcomePage> {
                           description: 'Already Damaged',
                           color: Colors.red,
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => DamagedAsset()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DamagedAssetPage()));
                           },
                         ),
                         const SizedBox(height: 10),
@@ -340,7 +381,10 @@ class _WelcomePageState extends State<WelcomePage> {
                           description: 'Assets that are missing',
                           color: Colors.grey,
                           onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => LostAsset()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LostAsset()));
                           },
                         ),
                         const SizedBox(height: 10),
@@ -384,7 +428,8 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Activity',
               selected: false,
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ActivityPage()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ActivityPage()));
               },
             ),
             NavItem(
@@ -392,7 +437,8 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Scan Asset',
               selected: false,
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => ScanAssetPage()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ScanAssetPage()));
               },
             ),
             NavItem(
@@ -400,7 +446,8 @@ class _WelcomePageState extends State<WelcomePage> {
               label: 'Setting',
               selected: false,
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()));
               },
             ),
           ],

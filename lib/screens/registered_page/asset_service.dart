@@ -56,7 +56,7 @@ class AssetService {
     var uri = Uri.parse('$apiUrl/${asset.id}');
     if (imageFile != null) {
       var request = http.MultipartRequest('POST', uri);
-      request.fields['_method'] = 'PATCH'; // Laravel update via POST
+      request.fields['_method'] = 'PATCH';
       request.fields['name'] = asset.name;
       request.fields['category'] = asset.category;
       if (asset.description.isNotEmpty) request.fields['description'] = asset.description;

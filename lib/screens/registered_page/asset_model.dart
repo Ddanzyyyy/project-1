@@ -5,10 +5,10 @@ class Asset {
   final String description;
   final String imagePath;
   final String dateAdded;
-  final String assetCode; // Kode Aset / QR Code
-  final String location;  // Lokasi
-  final String pic;       // PIC / Penanggung Jawab
-  final String status;    // Status Aset
+  final String assetCode; 
+  final String location;  
+  final String pic;      
+  final String status; 
 
   Asset({
     required this.id,

@@ -17,6 +17,12 @@ dependencies:
   flutter_expandable_fab: ^2.5.2
   shimmer: ^3.0.0
   carousel_slider: ^5.1.1
+  # url_launcher: ^6.3.1
+  # flutter_barcode_scanner: ^2.0.0
+  mobile_scanner: ^5.1.1
+  flutter_slidable: ^3.1.2
+  lottie: ^3.2.0
+  # custom_refresh_indicator: ^4.0.1
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +40,7 @@ flutter:
     - assets/images/logo_she.png
     - assets/images/icons/BOX.png
     - assets/images/icons/alert.png
+    # - assets/lottie/idea.gif
     # - assets/images/icons/registered_assets.png
     # - assets/images/icons/unscanned_assets.png
     # - assets/images/icons/lost_assest.png

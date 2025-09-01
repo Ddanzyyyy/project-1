@@ -28,15 +28,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
   late TextEditingController _locationController;
   late TextEditingController _picController;
   String _selectedCategory = '';
-  String _status = 'aktif';
+  String _status = 'registered';
   File? _pickedImage;
   bool _isUploading = false;
 
   final List<String> statusOptions = [
-    'aktif',
-    'rusak',
-    'perbaikan',
-    'dipinjam'
+    'registered',
+    'unscanned',
+    'damaged',
+    'lost'
   ];
 
   @override
@@ -50,7 +50,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
     _locationController =
         TextEditingController(text: widget.asset?.location ?? '');
     _picController = TextEditingController(text: widget.asset?.pic ?? '');
-    _status = widget.asset?.status ?? 'aktif';
+    _status = widget.asset?.status ?? 'registered';
 
     if (widget.asset?.category != null &&
         widget.categories.contains(widget.asset!.category)) {
@@ -286,15 +286,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                           filled: true,
                           fillColor: Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide:
                                 BorderSide(color: Color(0xFF405189), width: 2),
                           ),
@@ -343,15 +343,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                           filled: true,
                           fillColor: Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide:
                                 BorderSide(color: Color(0xFF405189), width: 2),
                           ),
@@ -400,15 +400,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                           filled: true,
                           fillColor: Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide:
                                 BorderSide(color: Color(0xFF405189), width: 2),
                           ),
@@ -457,15 +457,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                           filled: true,
                           fillColor: Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide:
                                 BorderSide(color: Color(0xFF405189), width: 2),
                           ),
@@ -509,15 +509,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                           filled: true,
                           fillColor: Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide:
                                 BorderSide(color: Color(0xFF405189), width: 2),
                           ),
@@ -573,15 +573,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                           filled: true,
                           fillColor: Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide:
                                 BorderSide(color: Color(0xFF405189), width: 2),
                           ),
@@ -644,15 +644,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                           filled: true,
                           fillColor: Color(0xFFF9FAFB),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(color: Color(0xFFE5E7EB)),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(10),
                             borderSide:
                                 BorderSide(color: Color(0xFF405189), width: 2),
                           ),

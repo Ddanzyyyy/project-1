@@ -17,11 +17,14 @@ class _AssetListPageState extends State<AssetListPage>
   late Animation<double> _fadeAnimation;
 
   List<Asset> assets = [];
+  Set<String> selectedAssetIds = {};
+  bool isBulkMode = false;
   String searchQuery = '';
   String selectedCategory = 'All';
   List<String> categories = ['All'];
   bool isLoadingAssets = true;
   bool isLoadingCategories = true;
+  final _scrollController = ScrollController();
 
   Future<void> loadAssets() async {
     setState(() => isLoadingAssets = true);
@@ -162,39 +165,46 @@ class _AssetListPageState extends State<AssetListPage>
   @override
   void dispose() {
     _animationController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _showAddAssetDialog() {
+    final parentContext = context;
     showDialog(
       context: context,
       builder: (context) => AddEditAssetDialog(
         onSave: (asset) async {
           await loadAssets();
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              content: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.green, size: 48),
-                    SizedBox(height: 12),
-                    Text('Asset ditambah',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        color: Colors.black87,
+          if (mounted) {
+            showDialog(
+              context: parentContext,
+              builder: (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                content: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green, size: 48),
+                      SizedBox(height: 12),
+                      Text(
+                        'Asset ditambah',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: Colors.black87,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
+            );
+          }
         },
         categories: categories.where((cat) => cat != 'All').toList(),
       ),
@@ -308,6 +318,82 @@ class _AssetListPageState extends State<AssetListPage>
     );
   }
 
+  void _toggleBulkMode() {
+    setState(() {
+      isBulkMode = !isBulkMode;
+      selectedAssetIds.clear();
+    });
+  }
+
+  void _toggleSelectAsset(String id) {
+    setState(() {
+      if (selectedAssetIds.contains(id)) {
+        selectedAssetIds.remove(id);
+      } else {
+        selectedAssetIds.add(id);
+      }
+    });
+  }
+
+  void _deleteSelectedAssets() async {
+    if (selectedAssetIds.isEmpty) return;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+            SizedBox(width: 8),
+            Text('Delete Selected Assets',
+                style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontFamily: 'Inter')),
+          ],
+        ),
+        content: Text('Are you sure you want to delete selected assets?',
+            style: TextStyle(fontFamily: 'Inter', fontSize: 14)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Cancel',
+                style: TextStyle(fontFamily: 'Inter', fontSize: 12)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+            child: Text('Delete',
+                style: TextStyle(
+                    fontFamily: 'Inter', color: Colors.white, fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      for (final id in selectedAssetIds) {
+        await AssetService.deleteAsset(id);
+      }
+      await loadAssets();
+      setState(() {
+        selectedAssetIds.clear();
+        isBulkMode = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Selected assets deleted'),
+            backgroundColor: Colors.green),
+      );
+    }
+  }
+
+  Future<void> _refreshAssets() async {
+    await loadAssets();
+    await loadCategories();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -348,6 +434,12 @@ class _AssetListPageState extends State<AssetListPage>
                 ),
               ),
             ),
+          ),
+          IconButton(
+            icon: Icon(isBulkMode ? Icons.close : Icons.select_all,
+                color: Colors.white),
+            tooltip: isBulkMode ? 'Batal Bulk' : 'Bulk Action',
+            onPressed: _toggleBulkMode,
           ),
         ],
       ),
@@ -402,7 +494,7 @@ class _AssetListPageState extends State<AssetListPage>
                       ),
                     ),
                     SizedBox(height: 12),
-                    // Category Filter
+                    // Category Filter & Add Category Button
                     Row(
                       children: [
                         Expanded(
@@ -473,6 +565,26 @@ class _AssetListPageState extends State<AssetListPage>
                                   ),
                           ),
                         ),
+                        SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.add,
+                              size: 16, color: Color(0xFF405189)),
+                          label: Text('Kategori',
+                              style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 12,
+                                  color: Color(0xFF405189))),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Color(0xFF405189),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: _addCategoryDialog,
+                        ),
                       ],
                     ),
                   ],
@@ -480,105 +592,148 @@ class _AssetListPageState extends State<AssetListPage>
               ),
             ),
 
+            // Bulk Action Bar
+            if (isBulkMode)
+              Container(
+                color: Colors.orange[50],
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Text('Bulk Mode: ${selectedAssetIds.length} selected',
+                        style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 13,
+                            color: Colors.orange[900],
+                            fontWeight: FontWeight.w600)),
+                    Spacer(),
+                    ElevatedButton.icon(
+                      icon: Icon(Icons.delete, size: 16),
+                      label: Text('Delete',
+                          style: TextStyle(fontFamily: 'Inter', fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: selectedAssetIds.isEmpty
+                          ? null
+                          : _deleteSelectedAssets,
+                    ),
+                  ],
+                ),
+              ),
+
             // Asset List
             Expanded(
-              child: isLoadingAssets
-                  ? buildShimmerList()
-                  : filteredAssets.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
+              child: RefreshIndicator(
+                color: Color(0xFF405189),
+                onRefresh: _refreshAssets,
+                child: isLoadingAssets
+                    ? buildShimmerList()
+                    : filteredAssets.isEmpty
+                        ? ListView(
+                            physics: AlwaysScrollableScrollPhysics(),
                             children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 48,
-                                color: Colors.grey[400],
-                              ),
-                              SizedBox(height: 12),
-                              Text(
-                                'No assets found',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                'Try adjusting your search',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 13,
-                                  color: Colors.grey[500],
+                              SizedBox(height: 100),
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.inventory_2_outlined,
+                                        size: 48, color: Colors.grey[400]),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      'No assets found',
+                                      style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 16,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      'Try adjusting your search',
+                                      style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 13,
+                                          color: Colors.grey[500]),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: EdgeInsets.all(12),
-                          itemCount: filteredAssets.length,
-                          itemBuilder: (context, index) {
-                            final asset = filteredAssets[index];
-                            return Padding(
-                              padding: EdgeInsets.only(bottom: 8),
-                              child: CompactAssetCard(
-                                asset: asset,
-                                onEdit: () => _showEditAssetDialog(asset),
-                                onDelete: () => _confirmDelete(asset),
-                                onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        DetailPage(asset: asset),
+                          )
+                        : ListView.builder(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            controller: _scrollController,
+                            padding: EdgeInsets.all(12),
+                            itemCount: filteredAssets.length,
+                            itemBuilder: (context, index) {
+                              final asset = filteredAssets[index];
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 8),
+                                child: CompactAssetCard(
+                                  asset: asset,
+                                  onEdit: () => _showEditAssetDialog(asset),
+                                  onDelete: () => _confirmDelete(asset),
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DetailPage(asset: asset),
+                                    ),
                                   ),
+                                  isBulkMode: isBulkMode,
+                                  isSelected:
+                                      selectedAssetIds.contains(asset.id),
+                                  onSelect: () => _toggleSelectAsset(asset.id),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
+                              );
+                            },
+                          ),
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButtonLocation: ExpandableFab.location,
-      floatingActionButton: ExpandableFab(
-        distance: 80.0,
-        type: ExpandableFabType.up,
-        overlayStyle: ExpandableFabOverlayStyle(
-          color: Colors.black.withOpacity(0.2),
-        ),
-        children: [
-          FloatingActionButton.extended(
-            heroTag: 'addAsset',
-            backgroundColor: Color.fromARGB(255, 255, 255, 255),
-            label: Text("Tambah Asset",
-                style: TextStyle(
-                    fontFamily: 'Inter',
-                    color: const Color.fromARGB(255, 0, 0, 0))),
-            onPressed: _showAddAssetDialog,
-          ),
-          FloatingActionButton.extended(
-            heroTag: 'addCategory',
-            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-            label: Text("Tambah Kategori",
-                style: TextStyle(
-                    fontFamily: 'Inter',
-                    color: const Color.fromARGB(255, 0, 0, 0))),
-            onPressed: _addCategoryDialog,
-          ),
-        ],
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: !isBulkMode
+          ? ElevatedButton.icon(
+              icon: Icon(Icons.add, size: 18),
+              label: Text('Tambah Asset',
+                  style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF405189),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+              ),
+              onPressed: _showAddAssetDialog,
+            )
+          : null,
     );
   }
 }
+
+// ... CompactAssetCard dan DetailPage tetap sama}
 
 class CompactAssetCard extends StatelessWidget {
   final Asset asset;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onTap;
+  final bool isBulkMode;
+  final bool isSelected;
+  final VoidCallback? onSelect;
 
   const CompactAssetCard({
     Key? key,
@@ -586,15 +741,18 @@ class CompactAssetCard extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onTap,
+    this.isBulkMode = false,
+    this.isSelected = false,
+    this.onSelect,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isBulkMode ? (onSelect ?? () {}) : onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? Colors.orange[50] : Colors.white,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
@@ -608,6 +766,15 @@ class CompactAssetCard extends StatelessWidget {
           padding: EdgeInsets.all(12),
           child: Row(
             children: [
+              if (isBulkMode)
+                Padding(
+                  padding: EdgeInsets.only(right: 8),
+                  child: Checkbox(
+                    value: isSelected,
+                    onChanged: (_) => onSelect?.call(),
+                    activeColor: Colors.orange,
+                  ),
+                ),
               // Asset Image
               Container(
                 width: 48,
@@ -689,38 +856,39 @@ class CompactAssetCard extends StatelessWidget {
               ),
 
               // Action Buttons
-              Container(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                      onTap: onEdit,
-                      borderRadius: BorderRadius.circular(4),
-                      child: Padding(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
-                          Icons.edit_outlined,
-                          color: const Color(0xFF405189),
-                          size: 16,
+              if (!isBulkMode)
+                Container(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        onTap: onEdit,
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.edit_outlined,
+                            color: const Color(0xFF405189),
+                            size: 16,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 4),
-                    InkWell(
-                      onTap: onDelete,
-                      borderRadius: BorderRadius.circular(4),
-                      child: Padding(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
-                          Icons.delete_outline,
-                          color: Colors.red,
-                          size: 16,
+                      SizedBox(width: 4),
+                      InkWell(
+                        onTap: onDelete,
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                            size: 16,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -755,7 +923,8 @@ class DetailPage extends StatelessWidget {
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.7,
                 errorBuilder: (context, error, stackTrace) => Center(
-                  child: Icon(Icons.broken_image, color: Colors.white, size: 48),
+                  child:
+                      Icon(Icons.broken_image, color: Colors.white, size: 48),
                 ),
               ),
             ),
@@ -836,14 +1005,17 @@ class DetailPage extends StatelessWidget {
                                   ),
                                   child: Center(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Container(
                                           width: 80,
                                           height: 80,
                                           decoration: BoxDecoration(
-                                            color: Color(0xFF405189).withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(20),
+                                            color: Color(0xFF405189)
+                                                .withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
                                           ),
                                           child: Center(
                                             child: Text(

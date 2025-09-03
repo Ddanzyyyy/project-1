@@ -1,3 +1,5 @@
+import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
+import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'screens/login/login_splash_page.dart';
 import 'screens/login/login_page.dart';
@@ -25,6 +27,8 @@ class SimbaApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/forgot-password': (context) => ForgotPasswordPage(),
         '/welcome': (context) => WelcomePage(),
+        '/scan-assets': (context) => ScanAssetPage(),
+        '/settings': (context) => SettingsPage(),
       },
     );
   }

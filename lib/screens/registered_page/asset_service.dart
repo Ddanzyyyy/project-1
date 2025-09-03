@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'asset_model.dart';
 
-const String apiUrl = "http://192.168.8.131:8000/api/assets";
+const String apiUrl = "http://192.168.1.8:8000/api/assets";
 
 class AssetService {
   static Future<List<Asset>> getAssets({String? search, String? category}) async {

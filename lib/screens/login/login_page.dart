@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String getBaseUrl() {
     if (Platform.isAndroid) {
-      return 'http://192.168.8.131:8000/api/login';
+      return 'http://192.168.1.8:8000/api/login';
     } else {
       return 'http://127.0.0.1:8000/api/login'; // If IOS Console
     }
@@ -192,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                       'Goods and Asset Management\nInformation System',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         color: Color(0xFF27519D),
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -207,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text(
                             'Username',
                             style: TextStyle(
-                              fontFamily: 'Inter',
+                              fontFamily: 'Maison Bold',
                               color: blueDark,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -235,13 +235,13 @@ class _LoginPageState extends State<LoginPage> {
                                 child: TextField(
                                   controller: usernameController,
                                   style: const TextStyle(
-                                    fontFamily: 'Inter',
+                                    fontFamily: 'Maison Book',
                                     fontSize: 13,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Enter Username',
                                     hintStyle: const TextStyle(
-                                      fontFamily: 'Inter',
+                                      fontFamily: 'Maison Book',
                                       color: Colors.grey,
                                     ),
                                     prefixIcon: const Padding(
@@ -263,7 +263,7 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Text(
                                     usernameWarning,
                                     style: const TextStyle(
-                                      fontFamily: 'Inter',
+                                      fontFamily: 'Maison Book',
                                       color: Colors.red,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
@@ -279,7 +279,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Text(
                             'Password',
                             style: const TextStyle(
-                              fontFamily: 'Inter',
+                              fontFamily: 'Maison Bold',
                               color: Color(0xFF405189),
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -308,13 +308,13 @@ class _LoginPageState extends State<LoginPage> {
                                   controller: passwordController,
                                   obscureText: true,
                                   style: const TextStyle(
-                                    fontFamily: 'Inter',
+                                    fontFamily: 'Maison Book',
                                     fontSize: 13,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Enter Password',
                                     hintStyle: const TextStyle(
-                                      fontFamily: 'Inter',
+                                      fontFamily: 'Maison Book',
                                       color: Colors.grey,
                                     ),
                                     prefixIcon: const Padding(
@@ -336,7 +336,7 @@ class _LoginPageState extends State<LoginPage> {
                                   child: Text(
                                     passwordWarning,
                                     style: const TextStyle(
-                                      fontFamily: 'Inter',
+                                      fontFamily: 'Maison Bold',
                                       color: Colors.red,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
@@ -354,7 +354,7 @@ class _LoginPageState extends State<LoginPage> {
                             child: Text(
                               apiWarning,
                               style: const TextStyle(
-                                fontFamily: 'Inter',
+                                fontFamily: 'Maison Bold',
                                 color: Colors.red,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -387,7 +387,7 @@ class _LoginPageState extends State<LoginPage> {
                                 : const Text(
                                     'Login',
                                     style: TextStyle(
-                                      fontFamily: 'Inter',
+                                      fontFamily: 'Maison Bold',
                                       color: Colors.white,
                                       fontSize: 17,
                                       fontWeight: FontWeight.w600,

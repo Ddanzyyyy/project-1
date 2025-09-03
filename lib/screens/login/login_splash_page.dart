@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart'; // pastikan package lottie sudah di pubspec.yaml
-
+// import 'package:lottie/lottie.dart'; 
 class LoginSplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

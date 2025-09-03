@@ -12,7 +12,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   bool _notificationsEnabled = true;
   bool _pushNotifications = true;
-  // bool _emailNotifications = false;
   String _selectedLanguage = 'English';
   
   final List<Map<String, String>> _languages = [

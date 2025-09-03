@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-const String categoryUrl = "http://192.168.8.131:8000/api/categories/";
+const String categoryUrl = "http://192.168.1.8:8000/api/categories/";
 
 class CategoryService {
   static Future<List<String>> getCategories() async {

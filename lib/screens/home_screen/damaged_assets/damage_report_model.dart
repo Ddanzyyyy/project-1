@@ -7,11 +7,9 @@ class DamageReport {
   final String dateReported;
   final List<RepairHistory> repairHistory;
 
-  // Tambahan field untuk multi-gambar
   final List<String> additionalImages;
 
-  // Tambahan field untuk notes dokumentasi
-  final List<String> additionalImagesNotes; // <-- Tambahkan field ini
+  final List<String> additionalImagesNotes; 
 
   DamageReport({
     required this.id,
@@ -22,10 +20,9 @@ class DamageReport {
     required this.dateReported,
     required this.repairHistory,
     this.additionalImages = const [],
-    this.additionalImagesNotes = const [], // <-- Tambahkan di konstruktor
+    this.additionalImagesNotes = const [], 
   });
 
-  // Factory untuk parsing dari JSON (sesuai Laravel API)
   factory DamageReport.fromJson(Map<String, dynamic> json) {
     return DamageReport(
       id: json['id'].toString(),

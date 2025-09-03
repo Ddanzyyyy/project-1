@@ -17,12 +17,14 @@ dependencies:
   flutter_expandable_fab: ^2.5.2
   shimmer: ^3.0.0
   carousel_slider: ^5.1.1
-  # url_launcher: ^6.3.1
-  # flutter_barcode_scanner: ^2.0.0
   mobile_scanner: ^5.1.1
   flutter_slidable: ^3.1.2
-  lottie: ^3.2.0
+  card_loading: ^0.3.0
+  flutter_card_swiper: ^7.0.2
+  # lottie: ^3.2.0
   # custom_refresh_indicator: ^4.0.1
+  # url_launcher: ^6.3.1
+  # flutter_barcode_scanner: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -50,3 +52,15 @@ flutter:
     - family: Inter
       fonts:
         - asset: assets/fonts/Inter_28pt-Light.ttf
+
+    - family: Telkomsel Batik Sans
+      fonts:
+        - asset: assets/fonts/Telkomsel Batik Sans Regular.otf
+
+    - family: Maison Bold
+      fonts:
+        - asset: assets/fonts/fonnts.com-Maison_Neue_Bold.ttf
+
+    - family: Maison Book
+      fonts:
+        - asset: assets/fonts/fonnts.com-Maison_Neue_Book.ttf

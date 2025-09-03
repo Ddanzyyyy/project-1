@@ -1,8 +1,11 @@
+import 'package:Simba/screens/home_screen/lost_assets/lost_asset_detail.dart';
+import 'package:Simba/screens/home_screen/lost_assets/lost_asset_form.dart';
 import 'package:Simba/screens/home_screen/lost_assets/lost_asset_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'lost_asset_form.dart';
-import 'lost_asset_detail.dart';
+// import 'lost_asset_service.dart';
+// import 'lost_asset_form.dart';
+// import 'lost_asset_detail.dart';
 
 const primaryColor = Color(0xFF405189);
 const secondaryColor = Color(0xFFF8F9FA);
@@ -247,7 +250,6 @@ class _LostAssetPageState extends State<LostAssetPage>
                                         ),
                                       ),
                                     );
-                                    // Jika asset ditemukan, refresh list agar tidak double
                                     if (result == 'found') {
                                       await fetchLostAssets();
                                       ScaffoldMessenger.of(context).showSnackBar(

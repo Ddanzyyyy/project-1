@@ -3,14 +3,15 @@ import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_assets.dart';
-import 'package:Simba/screens/home_screen/search_page.dart';
+import 'package:Simba/screens/home_screen/search_page/search_page.dart';
 import 'package:Simba/screens/registered_page/asset_list_page.dart';
-import 'package:Simba/screens/registered_page/asset_service.dart';
+import 'package:Simba/screens/registered_page/asset_service.dart' as registered_asset_service;
 import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_service.dart';
+import 'package:shimmer/shimmer.dart';
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -21,17 +22,18 @@ class _WelcomePageState extends State<WelcomePage> {
   String currentUserName = "Loading...";
   String currentUsername = "Loading...";
   bool isProfileLoading = true;
-    int assetCount = 0;
-    bool isAssetLoading = true;
-    int unscannedAssetCount = 0;
-    bool isUnscannedLoading = true;
+  int assetCount = 0;
+  bool isAssetLoading = true;
+  int unscannedAssetCount = 0;
+  bool isUnscannedLoading = true;
+  List<dynamic> assets = [];
 
   @override
   void initState() {
     super.initState();
     _loadProfileData();
     fetchAssetCount();
-  fetchUnscannedAssetCount();
+    fetchUnscannedAssetCount();
   }
 
   Future<void> _loadProfileData() async {
@@ -60,8 +62,9 @@ class _WelcomePageState extends State<WelcomePage> {
 
   Future<void> fetchAssetCount() async {
     try {
-      final assets = await AssetService.getAssets();
+      final fetchedAssets = await registered_asset_service.AssetService.getAssets();
       setState(() {
+        assets = fetchedAssets;
         assetCount = assets.length;
         isAssetLoading = false;
       });
@@ -74,9 +77,9 @@ class _WelcomePageState extends State<WelcomePage> {
 
   Future<void> fetchUnscannedAssetCount() async {
     try {
-      // Ganti auditId sesuai kebutuhan, misal dari SharedPreferences atau default
       final auditId = '1';
-      final assets = await UnscannedAssetService.fetchUnscannedAssets(auditId: auditId);
+      final assets =
+          await UnscannedAssetService.fetchUnscannedAssets(auditId: auditId);
       setState(() {
         unscannedAssetCount = assets.length;
         isUnscannedLoading = false;
@@ -88,6 +91,20 @@ class _WelcomePageState extends State<WelcomePage> {
     }
   }
 
+  Future<void> _refreshPage() async {
+    setState(() {
+      isProfileLoading = true;
+      isAssetLoading = true;
+      isUnscannedLoading = true;
+    });
+
+    await Future.wait([
+      _loadProfileData(),
+      fetchAssetCount(),
+      fetchUnscannedAssetCount(),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -96,7 +113,6 @@ class _WelcomePageState extends State<WelcomePage> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // HEADER & PROFILE CARD (TIDAK DIUBAH)
           Positioned(
             top: 0,
             left: 0,
@@ -125,116 +141,133 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // PROFILE CARD (TIDAK DIUBAH)
+                // PROFILE CARD (SHIMMER LOADING)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: GestureDetector(
-                    onTap: () async {
-                      try {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditProfilePage(
-                              initialName: currentUserName,
-                              initialUsername: currentUsername,
-                              onProfileUpdated: _updateUserProfile,
-                            ),
-                          ),
-                        );
-                        if (result != null && result is Map<String, String>) {
-                          setState(() {
-                            currentUserName = result['name'] ?? currentUserName;
-                            currentUsername =
-                                result['username'] ?? currentUsername;
-                          });
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Error: ${e.toString()}',
-                              style: TextStyle(fontFamily: 'Inter'),
-                            ),
-                            backgroundColor: Colors.red,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            margin: EdgeInsets.all(16),
-                          ),
-                        );
-                      }
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          // Profile Picture
-                          Container(
-                            width: 48,
-                            height: 48,
+                  child: isProfileLoading
+                      ? Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF405189),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              Icons.person,
                               color: Colors.white,
-                              size: 24,
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-
-                          // Profile Info
-                          Expanded(
-                            child: isProfileLoading
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF405189),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         width: 120,
                                         height: 16,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[300],
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
+                                        color: Colors.grey[300],
                                       ),
                                       SizedBox(height: 4),
                                       Container(
                                         width: 80,
                                         height: 14,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[300],
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
+                                        color: Colors.grey[300],
                                       ),
                                     ],
-                                  )
-                                : Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.grey[400],
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () async {
+                            try {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProfilePage(
+                                    initialName: currentUserName,
+                                    initialUsername: currentUsername,
+                                    onProfileUpdated: _updateUserProfile,
+                                  ),
+                                ),
+                              );
+                              if (result != null && result is Map<String, String>) {
+                                setState(() {
+                                  currentUserName = result['name'] ?? currentUserName;
+                                  currentUsername = result['username'] ?? currentUsername;
+                                });
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Error: ${e.toString()}',
+                                    style: TextStyle(fontFamily: 'Inter'),
+                                  ),
+                                  backgroundColor: Colors.red,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                  margin: EdgeInsets.all(16),
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF405189),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         currentUserName,
@@ -261,22 +294,19 @@ class _WelcomePageState extends State<WelcomePage> {
                                       ),
                                     ],
                                   ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.grey[400],
+                                  size: 16,
+                                ),
+                              ],
+                            ),
                           ),
-
-                          // Arrow Icon
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.grey[400],
-                            size: 16,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                        ),
                 ),
                 const SizedBox(height: 16),
-
-                // SEARCH BAR (DIPERBARUI AGAR MINIMALIS)
+                // SEARCH BAR (TIDAK DIUBAH)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: GestureDetector(
@@ -322,73 +352,116 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                 ),
                 const SizedBox(height: 22),
-
-                // ASSET CARDS (DIPERBARUI AGAR MINIMALIS)
+                // ASSET CARDS (SHIMMER LOADING on assets)
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ListView(
-                      children: [
-                        AssetCardMinimalist(
-                          title: 'Registered Assets',
-                          icon: Icons.inventory_2_rounded,
-                          count: isAssetLoading ? '...' : assetCount.toString(),
-                          description: 'Has been registered',
-                          color: Color(0xFF405189),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AssetListPage()));
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        AssetCardMinimalist(
-                          title: 'Unscanned Assets',
-                          icon: Icons.qr_code_2_rounded,
-                          count: isUnscannedLoading ? '...' : unscannedAssetCount.toString(),
-                          description: 'Have not been scanned',
-                          color: Colors.orange,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UnscannedAssetsPage(
-                                    auditId: '1'),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        AssetCardMinimalist(
-                          title: 'Damaged Assets',
-                          icon: Icons.warning_amber_rounded,
-                          count: '12',
-                          description: 'Already Damaged',
-                          color: Colors.red,
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DamagedAssetPage()));
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        AssetCardMinimalist(
-                          title: 'Lost Assets',
-                          icon: Icons.error_outline_rounded,
-                          count: '4',
-                          description: 'Assets that are missing',
-                          color: Colors.grey,
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LostAsset()));
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                      ],
+                    child: RefreshIndicator(
+                      onRefresh: _refreshPage,
+                      child: isAssetLoading && isUnscannedLoading
+                          ? Column(
+                              children: List.generate(5, (index) {
+                                return Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            )
+                          : ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                AssetCardMinimalist(
+                                  title: 'Registered Assets',
+                                  icon: Icons.inventory_2_rounded,
+                                  count: isAssetLoading
+                                      ? '...'
+                                      : assetCount.toString(),
+                                  description: 'Has been registered',
+                                  color: Color(0xFF405189),
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AssetListPage()));
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                                AssetCardMinimalist(
+                                  title: 'Unscanned Assets',
+                                  icon: Icons.qr_code_2_rounded,
+                                  count: isUnscannedLoading
+                                      ? '...'
+                                      : unscannedAssetCount.toString(),
+                                  description: 'Have not been scanned',
+                                  color: Colors.orange,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            UnscannedAssetsPage(auditId: '1'),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                                AssetCardMinimalist(
+                                  title: 'Damaged Assets',
+                                  icon: Icons.warning_amber_rounded,
+                                  count: isAssetLoading
+                                      ? '...'
+                                      : assets
+                                          .where((a) => a.status == 'damaged')
+                                          .length
+                                          .toString(),
+                                  description: 'Already Damaged',
+                                  color: Colors.red,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            DamagedAssetPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                                AssetCardMinimalist(
+                                  title: 'Lost Assets',
+                                  icon: Icons.error_outline_rounded,
+                                  count: isAssetLoading
+                                      ? '...'
+                                      : assets
+                                          .where((a) => a.status == 'lost')
+                                          .length
+                                          .toString(),
+                                  description: 'Assets that are missing',
+                                  color: Colors.grey,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LostAssetPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+                            ),
                     ),
                   ),
                 ),
@@ -408,7 +481,7 @@ class _WelcomePageState extends State<WelcomePage> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Color(0x1A000000),
               blurRadius: 10,
               offset: const Offset(0, -2),
             )
@@ -457,7 +530,6 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 }
 
-// AssetCardMinimalist: Card asset lebih simple dan segar
 class AssetCardMinimalist extends StatelessWidget {
   final String title;
   final IconData icon;

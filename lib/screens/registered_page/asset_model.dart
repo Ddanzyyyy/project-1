@@ -38,6 +38,8 @@ class Asset {
     );
   }
 
+  get updatedAt => null;
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
@@ -50,4 +52,6 @@ class Asset {
     'pic': pic,
     'status': status,
   };
+
+  copyWith({required String name, required String category, required String location, required String description, required String status}) {}
 }

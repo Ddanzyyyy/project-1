@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'asset.dart';
 
 class AssetDetailsModal extends StatefulWidget {
@@ -22,14 +23,83 @@ class AssetDetailsModal extends StatefulWidget {
 }
 
 class _AssetDetailsModalState extends State<AssetDetailsModal> {
-  String getCurrentTime() {
-    return '2025-09-03 04:54:19';
+  String? scanTime;
+  Asset? updatedAsset;
+
+  @override
+  void initState() {
+    super.initState();
+    updatedAsset = widget.asset;
+    _initializeScanTime();
+  }
+
+  void _initializeScanTime() {
+    if (widget.isNewScan) {
+      scanTime = _formatCurrentTime();
+
+      final now = DateTime.now();
+      updatedAsset = widget.asset.copyWith(
+        lastScannedAt: now,
+        status: 'registered',
+      );
+
+      widget.onUpdate(updatedAsset!);
+    } else {
+      scanTime = _getScanTimeFromDatabase();
+    }
+  }
+
+  String _formatCurrentTime() {
+    final now = DateTime.now();
+    return DateFormat('dd MMM yyyy HH:mm').format(now) + ' WIB';
+  }
+
+  String? _getScanTimeFromDatabase() {
+    if (updatedAsset?.lastScannedAt != null) {
+      final scanDateTime = updatedAsset!.lastScannedAt!;
+      return DateFormat('dd MMM yyyy HH:mm').format(scanDateTime) + ' WIB';
+    }
+    return null;
+  }
+
+  String _getDisplayScanTime() {
+    if (widget.isNewScan) {
+      return scanTime ?? _formatCurrentTime();
+    } else {
+      return scanTime ?? '-';
+    }
+  }
+
+  String _getScannedByText() {
+    if (widget.isNewScan) {
+      return widget.currentUser;
+    } else {
+      if (widget.asset.lastScannedAt != null) {
+        return widget.currentUser;
+      } else {
+        return '-';
+      }
+    }
+  }
+
+  // Tambahan: Format dateAdded agar tampil dengan WIB dan tanpa "T00:00:00.000000Z"
+  String _getFormattedDateAdded(String dateAdded) {
+    try {
+      // Coba parse ISO string
+      DateTime dt = DateTime.parse(dateAdded);
+      return DateFormat('dd MMM yyyy').format(dt) + ' WIB';
+    } catch (_) {
+      // Jika bukan ISO, tampilkan apa adanya
+      return dateAdded;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final displayAsset = updatedAsset ?? widget.asset;
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75, // Lebih kecil
+      height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -55,7 +125,6 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
             child: Row(
               children: [
-                // Status Badge
                 if (widget.isNewScan)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -75,7 +144,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                         Text(
                           'Scanned',
                           style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: 'Maison Book',
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xFF405189),
@@ -85,7 +154,6 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                     ),
                   ),
                 const Spacer(),
-                // Close Button
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(
@@ -98,17 +166,14 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
             ),
           ),
 
-          // Content - Simplified
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Asset Header - Compact
                   Row(
                     children: [
-                      // Asset Image - Smaller
                       Container(
                         width: 60,
                         height: 60,
@@ -120,29 +185,29 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                             width: 1,
                           ),
                         ),
-                        child: widget.asset.imagePath != null && widget.asset.imagePath!.isNotEmpty
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(11),
-                              child: Image.network(
-                                widget.asset.imagePath!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return _buildAssetIcon();
-                                },
-                              ),
-                            )
-                          : _buildAssetIcon(),
+                        child: displayAsset.imagePath != null &&
+                                displayAsset.imagePath!.isNotEmpty
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(11),
+                                child: Image.network(
+                                  displayAsset.imagePath!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return _buildAssetIcon();
+                                  },
+                                ),
+                              )
+                            : _buildAssetIcon(),
                       ),
                       const SizedBox(width: 12),
-                      // Asset Basic Info - Compact
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.asset.name,
+                              displayAsset.name,
                               style: const TextStyle(
-                                fontFamily: 'Inter',
+                                fontFamily: 'Maison Bold',
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
                                 color: Color(0xFF1A1A1A),
@@ -153,15 +218,16 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                             ),
                             const SizedBox(height: 4),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: Colors.grey[100],
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                widget.asset.assetCode,
+                                displayAsset.assetCode,
                                 style: TextStyle(
-                                  fontFamily: 'Inter',
+                                  fontFamily: 'Maison Book',
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.grey[700],
@@ -169,18 +235,17 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                               ),
                             ),
                             const SizedBox(height: 6),
-                            // Status - Compact
                             Row(
                               children: [
-                                _buildStatusIndicator(widget.asset.status),
+                                _buildStatusIndicator(displayAsset.status),
                                 const SizedBox(width: 6),
                                 Text(
-                                  _getStatusText(widget.asset.status),
+                                  _getStatusText(displayAsset.status),
                                   style: TextStyle(
-                                    fontFamily: 'Inter',
+                                    fontFamily: 'Maison Book',
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: _getStatusColor(widget.asset.status),
+                                    color: _getStatusColor(displayAsset.status),
                                   ),
                                 ),
                               ],
@@ -193,14 +258,12 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
 
                   const SizedBox(height: 24),
 
-                  // Asset Details - Read Only
-                  _buildDetailRow('Category', widget.asset.category),
-                  _buildDetailRow('Location', widget.asset.location),
-                  _buildDetailRow('Description', widget.asset.description),
+                  _buildDetailRow('Category', displayAsset.category),
+                  _buildDetailRow('Location', displayAsset.location),
+                  _buildDetailRow('Description', displayAsset.description),
 
                   const SizedBox(height: 24),
 
-                  // Asset Information - Simplified
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -225,7 +288,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                             Text(
                               'Asset Information',
                               style: TextStyle(
-                                fontFamily: 'Inter',
+                                fontFamily: 'Maison Bold',
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.grey[900],
@@ -234,13 +297,17 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        _buildInfoRow('Asset Code', widget.asset.assetCode),
-                        _buildInfoRow('Date Added', widget.asset.dateAdded),
-                        _buildInfoRow('Person in Charge', widget.asset.pic),
-                        _buildInfoRow('Scanned By', widget.currentUser),
-                        _buildInfoRow('Scan Time', getCurrentTime()),
-                        if (widget.asset.id != 0)
-                          _buildInfoRow('Database ID', widget.asset.id.toString()),
+                        _buildInfoRow('Asset Code', displayAsset.assetCode),
+                        // Ubah di sini agar format dateAdded rapi dan WIB
+                        _buildInfoRow(
+                          'Date Added',
+                          _getFormattedDateAdded(displayAsset.dateAdded),
+                        ),
+                        _buildInfoRow('Person in Charge', displayAsset.pic),
+                        _buildInfoRow('Scanned By', _getScannedByText()),
+                        _buildInfoRow('Scan Time', _getDisplayScanTime()),
+                        if (displayAsset.id != 0)
+                          _buildInfoRow('Database ID', displayAsset.id.toString()),
                       ],
                     ),
                   ),
@@ -312,7 +379,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Bold',
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: Colors.grey[600],
@@ -333,7 +400,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
             child: Text(
               value.isNotEmpty ? value : '-',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Book',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey[800],
@@ -356,7 +423,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Bold',
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey[600],
@@ -368,7 +435,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
             child: Text(
               value,
               style: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Book',
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF1A1A1A),

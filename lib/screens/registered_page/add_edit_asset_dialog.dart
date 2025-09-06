@@ -35,7 +35,6 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
   // Improved color scheme
   static const Color primaryColor = Color(0xFF2B4C7E);
   static const Color secondaryColor = Color(0xFFF8FAFC);
-  static const Color accentColor = Color(0xFFE2E8F0);
   static const Color successColor = Color(0xFF059669);
   static const Color errorColor = Color(0xFFDC2626);
   static const Color textPrimary = Color(0xFF1E293B);
@@ -82,7 +81,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImageGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
         source: ImageSource.gallery, maxWidth: 800, maxHeight: 800);
@@ -91,6 +90,62 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
         _pickedImage = File(pickedFile.path);
       });
     }
+  }
+
+  Future<void> _pickImageCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+        source: ImageSource.camera, maxWidth: 800, maxHeight: 800);
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: Icon(Icons.camera_alt, color: primaryColor),
+              title: Text('Ambil Foto', style: TextStyle(fontFamily: 'Maison Book')),
+              onTap: () async {
+                Navigator.pop(context);
+                await _pickImageCamera();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.photo_library, color: primaryColor),
+              title: Text('Pilih dari galeri', style: TextStyle(fontFamily: 'Maison Book')),
+              onTap: () async {
+                Navigator.pop(context);
+                await _pickImageGallery();
+              },
+            ),
+            if (_pickedImage != null)
+              ListTile(
+                leading: Icon(Icons.delete, color: errorColor),
+                title: Text('Hapus Foto', style: TextStyle(fontFamily: 'Maison Book')),
+                onTap: () {
+                  setState(() => _pickedImage = null);
+                  Navigator.pop(context);
+                },
+              ),
+            ListTile(
+              leading: Icon(Icons.close, color: textSecondary),
+              title: Text('Batal', style: TextStyle(fontFamily: 'Maison Book')),
+              onTap: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _saveAsset() async {
@@ -107,6 +162,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
         assetCode: _assetCodeController.text.trim(),
         location: _locationController.text.trim(),
         pic: _picController.text.trim(),
+        createdAt: widget.asset?.createdAt ?? DateTime.now().toIso8601String(),
         status: _status,
       );
 
@@ -130,7 +186,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                   ? 'Aset berhasil ditambahkan'
                   : 'Aset berhasil diperbarui',
               style:
-                  TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600),
+                  TextStyle(fontFamily: 'Maison Bold', fontWeight: FontWeight.w600),
             ),
             behavior: SnackBarBehavior.floating,
             shape:
@@ -145,7 +201,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
               content: Text(
                 'Gagal menyimpan aset: $e',
                 style:
-                    TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600),
+                    TextStyle(fontFamily: 'Maison Bold', fontWeight: FontWeight.w600),
               ),
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
@@ -219,8 +275,8 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                 Text(
                   widget.asset != null ? 'Edit Aset' : 'Tambah Aset Baru',
                   style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 20,
+                    fontFamily: 'Maison Bold',
+                    fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: textPrimary,
                     height: 1.2,
@@ -232,7 +288,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                       ? 'Perbarui informasi aset yang sudah ada'
                       : 'Masukkan detail aset yang akan ditambahkan',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Book',
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
                     color: textSecondary,
@@ -263,7 +319,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
         alignment: Alignment.center,
         children: [
           GestureDetector(
-            onTap: _pickImage,
+            onTap: _showImageSourceDialog,
             child: Container(
               width: 120,
               height: 120,
@@ -294,15 +350,15 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                                 color: primaryColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: Icon(Icons.add,
-                                  color: primaryColor, size: 23), // plus icon
+                              child: Icon(Icons.add_a_photo,
+                                  color: primaryColor, size: 23),
                             ),
                             SizedBox(height: 8),
                             Text(
                               'Tambah Foto',
                               style: TextStyle(
                                 color: textSecondary,
-                                fontFamily: 'Inter',
+                                fontFamily: 'Maison Book',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -378,7 +434,6 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
           ],
         ),
         SizedBox(height: 16),
-        // <-- Ubah bagian ini jadi Column
         Column(
           children: [
             _buildStatusDropdown(),
@@ -413,7 +468,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
         Text(
           label,
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: textPrimary,
@@ -424,7 +479,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
           controller: controller,
           maxLines: maxLines,
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Book',
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: textPrimary,
@@ -443,7 +498,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
         Text(
           'Status',
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: textPrimary,
@@ -459,7 +514,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
               child: Text(
                 status['label'],
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Book',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: textPrimary,
@@ -482,7 +537,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
         Text(
           'Kategori',
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: textPrimary,
@@ -498,7 +553,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
               child: Text(
                 category,
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Book',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: textPrimary,
@@ -531,7 +586,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
             child: Text(
               'Batal',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Bold',
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
@@ -568,7 +623,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                       Text(
                         'Menyimpan...',
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Bold',
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -578,7 +633,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
                 : Text(
                     widget.asset != null ? 'Perbarui Aset' : 'Tambah Aset',
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'Maison Bold',
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                     ),
@@ -593,7 +648,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: 'Maison Book',
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: textSecondary,

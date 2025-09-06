@@ -5,7 +5,7 @@ import 'category_service.dart';
 import 'add_edit_asset_dialog.dart';
 import 'asset_detail_page.dart';
 import 'asset_card.dart';
-import 'lost_asset_page.dart'; 
+import 'lost_asset_page.dart';
 
 class AssetListPage extends StatefulWidget {
   @override
@@ -57,7 +57,8 @@ class _AssetListPageState extends State<AssetListPage>
       setState(() => isLoadingAssets = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to load assets'),
+          content: Text('Failed to load assets',
+              style: TextStyle(fontFamily: 'Maison Book')),
           backgroundColor: Colors.red,
         ),
       );
@@ -76,7 +77,8 @@ class _AssetListPageState extends State<AssetListPage>
       setState(() => isLoadingCategories = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Failed to load categories'),
+            content: Text('Failed to load categories',
+                style: TextStyle(fontFamily: 'Maison Book')),
             backgroundColor: Colors.red),
       );
     }
@@ -93,17 +95,17 @@ class _AssetListPageState extends State<AssetListPage>
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                fontFamily: 'Inter')),
+                fontFamily: 'Maison Bold')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: controller,
               autofocus: true,
-              style: TextStyle(fontSize: 14, fontFamily: 'Inter'),
+              style: TextStyle(fontSize: 14, fontFamily: 'Maison Bold'),
               decoration: InputDecoration(
                 labelText: 'Category Name',
-                labelStyle: TextStyle(fontSize: 12, fontFamily: 'Inter'),
+                labelStyle: TextStyle(fontSize: 12, fontFamily: 'Maison Book'),
                 errorText: error,
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -123,7 +125,7 @@ class _AssetListPageState extends State<AssetListPage>
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel',
-                style: TextStyle(fontSize: 12, fontFamily: 'Inter')),
+                style: TextStyle(fontSize: 12, fontFamily: 'Maison Book')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -139,13 +141,15 @@ class _AssetListPageState extends State<AssetListPage>
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text('Category added'),
+                      content: Text('Category added',
+                          style: TextStyle(fontFamily: 'Maison Bold')),
                       backgroundColor: Colors.green),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                      content: Text('Failed to add category'),
+                      content: Text('Failed to add category',
+                          style: TextStyle(fontFamily: 'Maison Book')),
                       backgroundColor: Colors.red),
                 );
               }
@@ -156,7 +160,7 @@ class _AssetListPageState extends State<AssetListPage>
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
             child: Text('Add',
-                style: TextStyle(fontSize: 12, fontFamily: 'Inter')),
+                style: TextStyle(fontSize: 12, fontFamily: 'Maison Bold')),
           ),
         ],
       ),
@@ -164,41 +168,12 @@ class _AssetListPageState extends State<AssetListPage>
   }
 
   void _showAddAssetDialog() {
-    final parentContext = context;
     showDialog(
       context: context,
       builder: (context) => AddEditAssetDialog(
         onSave: (asset) async {
           await loadAssets();
-          if (mounted) {
-            showDialog(
-              context: parentContext,
-              builder: (context) => AlertDialog(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                content: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.check_circle, color: Colors.green, size: 48),
-                      SizedBox(height: 12),
-                      Text(
-                        'Asset ditambah',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }
+          // Hapus modal asset ditambah, cukup reload dan update UI saja.
         },
         categories: categories.where((cat) => cat != 'All').toList(),
       ),
@@ -242,16 +217,16 @@ class _AssetListPageState extends State<AssetListPage>
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
-                    fontFamily: 'Inter')),
+                    fontFamily: 'Maison Bold')),
           ],
         ),
         content: Text('Are you sure you want to delete "${asset.name}"?',
-            style: TextStyle(fontFamily: 'Inter', fontSize: 14)),
+            style: TextStyle(fontFamily: 'Maison Book', fontSize: 14)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text('Cancel',
-                style: TextStyle(fontFamily: 'Inter', fontSize: 12)),
+                style: TextStyle(fontFamily: 'Maison Book', fontSize: 12)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -264,7 +239,7 @@ class _AssetListPageState extends State<AssetListPage>
             ),
             child: Text('Delete',
                 style: TextStyle(
-                    fontFamily: 'Inter', color: Colors.white, fontSize: 12)),
+                    fontFamily: 'Maison Bold', color: Colors.white, fontSize: 12)),
           ),
         ],
       ),
@@ -279,7 +254,7 @@ class _AssetListPageState extends State<AssetListPage>
         SnackBar(
           content: const Text(
             'Asset deleted successfully',
-            style: TextStyle(fontFamily: 'Inter'),
+            style: TextStyle(fontFamily: 'Maison Bold'),
           ),
           backgroundColor: Colors.green,
         ),
@@ -289,7 +264,7 @@ class _AssetListPageState extends State<AssetListPage>
         SnackBar(
           content: const Text(
             'Failed to delete asset',
-            style: TextStyle(fontFamily: 'Inter'),
+            style: TextStyle(fontFamily: 'Maison Book'),
           ),
           backgroundColor: Colors.red,
         ),
@@ -328,16 +303,16 @@ class _AssetListPageState extends State<AssetListPage>
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
-                    fontFamily: 'Inter')),
+                    fontFamily: 'Maison Bold')),
           ],
         ),
         content: Text('Are you sure you want to delete selected assets?',
-            style: TextStyle(fontFamily: 'Inter', fontSize: 14)),
+            style: TextStyle(fontFamily: 'Maison Book', fontSize: 14)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Cancel',
-                style: TextStyle(fontFamily: 'Inter', fontSize: 12)),
+                style: TextStyle(fontFamily: 'Maison Book', fontSize: 12)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -346,7 +321,7 @@ class _AssetListPageState extends State<AssetListPage>
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
             child: Text('Delete',
                 style: TextStyle(
-                    fontFamily: 'Inter', color: Colors.white, fontSize: 12)),
+                    fontFamily: 'Maison Bold', color: Colors.white, fontSize: 12)),
           ),
         ],
       ),
@@ -362,7 +337,8 @@ class _AssetListPageState extends State<AssetListPage>
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Selected assets deleted'),
+            content: Text('Selected assets deleted',
+                style: TextStyle(fontFamily: 'Maison Bold')),
             backgroundColor: Colors.green),
       );
     }
@@ -411,9 +387,9 @@ class _AssetListPageState extends State<AssetListPage>
           'Asset Management',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             fontSize: 16,
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
           ),
         ),
         actions: [
@@ -431,7 +407,7 @@ class _AssetListPageState extends State<AssetListPage>
                   color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                 ),
               ),
             ),
@@ -476,13 +452,13 @@ class _AssetListPageState extends State<AssetListPage>
                           });
                           loadAssets();
                         },
-                        style: TextStyle(fontSize: 14),
+                        style: TextStyle(fontSize: 14, fontFamily: 'Maison Book'),
                         decoration: InputDecoration(
                           hintText: 'Search assets...',
                           hintStyle: TextStyle(
                               fontSize: 13,
                               color: Colors.grey[500],
-                              fontFamily: 'Inter'),
+                              fontFamily: 'Maison Book'),
                           prefixIcon: Padding(
                             padding: EdgeInsets.all(8),
                             child: Icon(Icons.search,
@@ -545,13 +521,13 @@ class _AssetListPageState extends State<AssetListPage>
                                             child: Text(
                                               category,
                                               style: TextStyle(
-                                                fontFamily: 'Inter',
+                                                fontFamily: 'Maison Book',
                                                 fontSize: 11,
                                                 color: isSelected
                                                     ? Color(0xFF405189)
                                                     : Colors.white,
                                                 fontWeight: isSelected
-                                                    ? FontWeight.w600
+                                                    ? FontWeight.w700
                                                     : FontWeight.w500,
                                               ),
                                             ),
@@ -568,7 +544,7 @@ class _AssetListPageState extends State<AssetListPage>
                               size: 16, color: Color(0xFF405189)),
                           label: Text('Kategori',
                               style: TextStyle(
-                                  fontFamily: 'Inter',
+                                  fontFamily: 'Maison Bold',
                                   fontSize: 12,
                                   color: Color(0xFF405189))),
                           style: ElevatedButton.styleFrom(
@@ -598,15 +574,15 @@ class _AssetListPageState extends State<AssetListPage>
                   children: [
                     Text('Bulk Mode: ${selectedAssetIds.length} selected',
                         style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: 'Maison Bold',
                             fontSize: 13,
                             color: Colors.orange[900],
-                            fontWeight: FontWeight.w600)),
+                            fontWeight: FontWeight.w700)),
                     Spacer(),
                     ElevatedButton.icon(
                       icon: Icon(Icons.delete, size: 16),
                       label: Text('Delete',
-                          style: TextStyle(fontFamily: 'Inter', fontSize: 12)),
+                          style: TextStyle(fontFamily: 'Maison Bold', fontSize: 12)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
@@ -646,16 +622,16 @@ class _AssetListPageState extends State<AssetListPage>
                                     Text(
                                       'No assets found',
                                       style: TextStyle(
-                                          fontFamily: 'Inter',
+                                          fontFamily: 'Maison Bold',
                                           fontSize: 16,
                                           color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500),
+                                          fontWeight: FontWeight.w700),
                                     ),
                                     SizedBox(height: 6),
                                     Text(
                                       'Try adjusting your search',
                                       style: TextStyle(
-                                          fontFamily: 'Inter',
+                                          fontFamily: 'Maison Book',
                                           fontSize: 13,
                                           color: Colors.grey[500]),
                                     ),
@@ -703,9 +679,9 @@ class _AssetListPageState extends State<AssetListPage>
               icon: Icon(Icons.add, size: 18),
               label: Text('Tambah Asset',
                   style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'Maison Bold',
                       fontSize: 14,
-                      fontWeight: FontWeight.w600)),
+                      fontWeight: FontWeight.w700)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF405189),
                 foregroundColor: Colors.white,

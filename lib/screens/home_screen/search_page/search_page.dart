@@ -54,7 +54,7 @@ class _SearchPageState extends State<SearchPage> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.1.8:8000/api/assets?search=$query');
+      final url = Uri.parse('http://192.168.1.9:8000/api/assets?search=$query');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {

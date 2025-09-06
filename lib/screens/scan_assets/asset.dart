@@ -11,6 +11,7 @@ class Asset {
   final String status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final DateTime? lastScannedAt; 
 
   Asset({
     required this.id,
@@ -25,6 +26,7 @@ class Asset {
     required this.status,
     this.createdAt,
     this.updatedAt,
+    this.lastScannedAt, // Tambahan ke constructor
   });
 
   factory Asset.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class Asset {
       status: json['status'] ?? '',
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
       updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+      lastScannedAt: json['last_scanned_at'] != null ? DateTime.parse(json['last_scanned_at']) : null, // Tambahan
     );
   }
 
@@ -54,6 +57,7 @@ class Asset {
       'location': location,
       'pic': pic,
       'status': status,
+      'last_scanned_at': lastScannedAt?.toIso8601String(), // Tambahan
     };
   }
 
@@ -70,6 +74,7 @@ class Asset {
     String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? lastScannedAt, 
   }) {
     return Asset(
       id: id ?? this.id,
@@ -84,6 +89,7 @@ class Asset {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      lastScannedAt: lastScannedAt ?? this.lastScannedAt,
     );
   }
 }

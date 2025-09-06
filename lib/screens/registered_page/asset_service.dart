@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:Simba/screens/setting_screen/notification_service.dart';
 import 'package:http/http.dart' as http;
 import 'asset_model.dart';
 
-const String apiUrl = "http://192.168.1.8:8000/api/assets";
+const String apiUrl = "http://192.168.1.9:8000/api/assets";
 
 class AssetService {
   static Future<List<Asset>> getAssets({String? search, String? category}) async {
@@ -42,18 +43,22 @@ class AssetService {
     var response = await request.send();
     final respStr = await response.stream.bytesToString();
     if (response.statusCode == 201) {
-      return Asset.fromJson(jsonDecode(respStr));
+      final newAsset = Asset.fromJson(jsonDecode(respStr));
+      if (newAsset.status == 'damaged' || newAsset.status == 'lost') {
+        await NotificationService.notifyAssetStatusChange(newAsset.name, newAsset.status);
+      }
+      return newAsset;
     } else {
       throw Exception('Failed to add asset: ${response.statusCode} - $respStr');
     }
   }
 
-  /// Update asset ke API (support gambar baru)
   static Future<Asset> updateAsset(Asset asset, {File? imageFile}) async {
     if (asset.id.isEmpty) {
       throw Exception('Asset ID cannot be empty');
     }
     var uri = Uri.parse('$apiUrl/${asset.id}');
+    Asset updatedAsset;
     if (imageFile != null) {
       var request = http.MultipartRequest('POST', uri);
       request.fields['_method'] = 'PATCH';
@@ -69,14 +74,13 @@ class AssetService {
       var response = await request.send();
       final respStr = await response.stream.bytesToString();
       if (response.statusCode == 200) {
-        return Asset.fromJson(jsonDecode(respStr));
+        updatedAsset = Asset.fromJson(jsonDecode(respStr));
       } else {
         throw Exception('Failed to update asset: ${response.statusCode} - $respStr');
       }
     } else {
-      // Jika tidak ada gambar baru, gunakan PATCH biasa
+      // PATCH biasa
       final Map<String, dynamic> updateBody = asset.toJson();
-      // Make sure only fields needed by backend are sent
       updateBody.remove('id');
       final response = await http.patch(
         uri,
@@ -84,11 +88,16 @@ class AssetService {
         body: jsonEncode(updateBody),
       );
       if (response.statusCode == 200) {
-        return Asset.fromJson(jsonDecode(response.body));
+        updatedAsset = Asset.fromJson(jsonDecode(response.body));
       } else {
         throw Exception('Failed to update asset: ${response.body}');
       }
     }
+    // Notif jika status critical
+    if (updatedAsset.status == 'damaged' || updatedAsset.status == 'lost') {
+      await NotificationService.notifyAssetStatusChange(updatedAsset.name, updatedAsset.status);
+    }
+    return updatedAsset;
   }
 
   /// Hapus asset dari API
@@ -99,6 +108,45 @@ class AssetService {
     final response = await http.delete(Uri.parse('$apiUrl/$id'));
     if (response.statusCode != 200) {
       throw Exception('Failed to delete asset: ${response.body}');
+    }
+  }
+
+  static Future<Asset> updateAssetStatus(String assetId, String newStatus, {String? assetName}) async {
+    try {
+      final assets = await getAssets();
+      final asset = assets.firstWhere((a) => a.id == assetId);
+      final updatedAsset = Asset(
+        id: asset.id,
+        name: asset.name,
+        category: asset.category,
+        description: asset.description,
+        imagePath: asset.imagePath,
+        dateAdded: asset.dateAdded,
+        assetCode: asset.assetCode,
+        location: asset.location,
+        createdAt: asset.createdAt,
+        pic: asset.pic,
+        status: newStatus,
+      );
+      final result = await updateAsset(updatedAsset);
+      if (newStatus == 'damaged' || newStatus == 'lost') {
+        final name = assetName ?? result.name;
+        await NotificationService.notifyAssetStatusChange(name, newStatus);
+      }
+      return result;
+    } catch (e) {
+      print('Error updating asset status: $e');
+      throw Exception('Failed to update asset status: $e');
+    }
+  }
+
+  static Future<List<Asset>> getAssetsByStatus(String status) async {
+    try {
+      final assets = await getAssets();
+      return assets.where((asset) => asset.status.toLowerCase() == status.toLowerCase()).toList();
+    } catch (e) {
+      print('Error getting assets by status: $e');
+      return [];
     }
   }
 }

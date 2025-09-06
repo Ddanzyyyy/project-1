@@ -2,16 +2,29 @@ import 'package:Simba/screens/activity_screen/activity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AssetDetailCard extends StatefulWidget {
+String parseAndFormatToWIB(String raw) {
+  if (raw.isEmpty) return '-';
+  try {
+    DateTime dt = DateTime.parse(raw); // Assume UTC
+    final dtWib = dt.toUtc().add(const Duration(hours: 7));
+    return '${dtWib.year}-${dtWib.month.toString().padLeft(2, '0')}-${dtWib.day.toString().padLeft(2, '0')} '
+        '${dtWib.hour.toString().padLeft(2, '0')}:${dtWib.minute.toString().padLeft(2, '0')}:${dtWib.second.toString().padLeft(2, '0')}';
+  } catch (e) {
+    return '-';
+  }
+}
+  
+
+class ActivityDetailCard extends StatefulWidget {
   final AssetDetail asset;
 
-  const AssetDetailCard({Key? key, required this.asset}) : super(key: key);
+  const ActivityDetailCard({Key? key, required this.asset}) : super(key: key);
 
   @override
-  _AssetDetailCardState createState() => _AssetDetailCardState();
+  _ActivityDetailCardState createState() => _ActivityDetailCardState();
 }
 
-class _AssetDetailCardState extends State<AssetDetailCard> {
+class _ActivityDetailCardState extends State<ActivityDetailCard> {
   String currentUser = 'caccarehana';
   String currentUserName = 'Loading...';
   bool isLoadingUserInfo = true;
@@ -22,66 +35,42 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
     _loadUserSession();
   }
 
-  // Load user session data from login
   Future<void> _loadUserSession() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
-      // Get user data from SharedPreferences (saved during login)
       final username = prefs.getString('username') ?? 'caccarehana';
       final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'Caccarehana';
-      
       setState(() {
         currentUser = username;
         currentUserName = fullName;
         isLoadingUserInfo = false;
       });
-      
-      print('👤 User session loaded: $currentUser ($currentUserName)');
     } catch (e) {
-      print('⚠️ Error loading user session: $e');
-      // Fallback to default based on current date/time provided
       setState(() {
-        currentUser = 'caccarehana';
-        currentUserName = 'Caccarehana';
+        currentUser = 'user';
+        currentUserName = 'user';
         isLoadingUserInfo = false;
       });
     }
   }
 
-  // Get current formatted time based on provided current date/time
-  String getCurrentTime() {
-    return '2025-09-03 13:43:16'; // Current date/time as provided
+  /// Ambil waktu activity (current time dari database) dan format ke WIB
+  String getCurrentTimeFromActivity() {
+    return parseAndFormatToWIB(widget.asset.activityTime ?? '');
   }
 
-  // Get asset creation/last modified time from asset data
-  String getAssetTime() {
-    // Try to get time from various asset fields
-    if (widget.asset.activityTime != null && widget.asset.activityTime!.isNotEmpty) {
-      return formatActivityTime(widget.asset.activityTime);
-    }
-    
-    // If no activity time, use current time as fallback
-    return getCurrentTime();
+  /// Ambil waktu created_at dari database dan format ke WIB
+  String getAssetCreatedTimeWIB() {
+    return parseAndFormatToWIB(widget.asset.createdAt ?? '');
   }
 
-  String formatActivityTime(String? raw) {
-    if (raw == null || raw.isEmpty) return '-';
-    String cleaned = raw.replaceAll(RegExp(r'\.\d+Z$'), '');
-    try {
-      DateTime dt = DateTime.parse(cleaned);
-      return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
-             '${dt.hour.toString().padLeft(2, '0')}:'
-             '${dt.minute.toString().padLeft(2, '0')}:'
-             '${dt.second.toString().padLeft(2, '0')}';
-    } catch (e) {
-      return cleaned;
-    }
+  /// Ambil waktu updated_at dari database dan format ke WIB
+  String getAssetUpdatedTimeWIB() {
+    return parseAndFormatToWIB(widget.asset.updatedAt ?? '');
   }
 
   void _showFullScreenImage(BuildContext context) {
     if (widget.asset.imageUrl == null) return;
-    
     showDialog(
       context: context,
       builder: (context) => FullScreenImageDialog(imageUrl: widget.asset.imageUrl!),
@@ -93,7 +82,7 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
     const primaryColor = Color(0xFF405189);
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75, // Reduced height
+      height: MediaQuery.of(context).size.height * 0.75,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -103,7 +92,6 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
       ),
       child: Column(
         children: [
-          // Drag Handle - Smaller
           Container(
             width: 32,
             height: 3,
@@ -113,15 +101,13 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // Header with Close Button - Compact
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Asset Details',
+                  'Activity Details',
                   style: TextStyle(
                     fontFamily: 'Maison Bold',
                     fontSize: 16,
@@ -140,20 +126,17 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
               ],
             ),
           ),
-
-          // Content - Compact
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Asset Image - Smaller
                   GestureDetector(
                     onTap: () => _showFullScreenImage(context),
                     child: Container(
                       width: double.infinity,
-                      height: 160, // Reduced height
+                      height: 160,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
@@ -184,7 +167,6 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
                                 )
                               : _buildPlaceholderImage(),
                           ),
-                          // Fullscreen Icon Overlay - Smaller
                           if (widget.asset.imageUrl != null)
                             Positioned(
                               top: 8,
@@ -207,8 +189,6 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Asset Header Info - Compact
                   Text(
                     widget.asset.assetName,
                     style: const TextStyle(
@@ -237,8 +217,6 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Asset Details Section - Compact
                   const Text(
                     'Information',
                     style: TextStyle(
@@ -249,8 +227,6 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Details - Compact rows
                   _buildDetailRow(
                     icon: Icons.category_outlined,
                     label: 'Category',
@@ -274,13 +250,18 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
                   const SizedBox(height: 10),
                   _buildDetailRow(
                     icon: Icons.access_time_outlined,
-                    label: 'Last Activity',
-                    value: formatActivityTime(widget.asset.activityTime),
-                    iconColor: const Color(0xFF10B981),
+                    label: 'Created At',
+                    value: getAssetCreatedTimeWIB(),
+                    iconColor: const Color(0xFF6366F1),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildDetailRow(
+                    icon: Icons.update_outlined,
+                    label: 'Updated At',
+                    value: getAssetUpdatedTimeWIB(),
+                    iconColor: const Color(0xFFF59E0B),
                   ),
                   const SizedBox(height: 20),
-
-                  // System Information - Compact
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
@@ -322,13 +303,10 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
                           ],
                         ),
                         const SizedBox(height: 12),
-                        // Dynamic user info
-                        _buildInfoRow(
-                          'Current User', 
-                          isLoadingUserInfo ? 'Loading...' : currentUserName
-                        ),
-                        _buildInfoRow('Current Time', getCurrentTime()),
-                        _buildInfoRow('Asset Time', getAssetTime()),
+                        _buildInfoRow('Current User', isLoadingUserInfo ? 'Loading...' : currentUserName),
+                        _buildInfoRow('Current Time (Activity)', getCurrentTimeFromActivity()),
+                        _buildInfoRow('Created At', getAssetCreatedTimeWIB()),
+                        _buildInfoRow('Updated At', getAssetUpdatedTimeWIB()),
                         _buildInfoRow('Action', 'View Asset Details'),
                       ],
                     ),
@@ -391,7 +369,6 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
     );
   }
 
-  // Compact detail row
   Widget _buildDetailRow({
     required IconData icon,
     required String label,
@@ -507,7 +484,6 @@ class _AssetDetailCardState extends State<AssetDetailCard> {
   }
 }
 
-// Full Screen Image Dialog - Compact
 class FullScreenImageDialog extends StatelessWidget {
   final String imageUrl;
 
@@ -520,7 +496,6 @@ class FullScreenImageDialog extends StatelessWidget {
       insetPadding: EdgeInsets.zero,
       child: Stack(
         children: [
-          // Background
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(
@@ -529,8 +504,6 @@ class FullScreenImageDialog extends StatelessWidget {
               color: Colors.black87,
             ),
           ),
-          
-          // Image
           Center(
             child: InteractiveViewer(
               minScale: 0.5,
@@ -591,8 +564,6 @@ class FullScreenImageDialog extends StatelessWidget {
               ),
             ),
           ),
-          
-          // Close Button - Compact
           Positioned(
             top: MediaQuery.of(context).padding.top + 12,
             right: 12,
@@ -612,8 +583,6 @@ class FullScreenImageDialog extends StatelessWidget {
               ),
             ),
           ),
-          
-          // Instructions - Compact
           Positioned(
             bottom: MediaQuery.of(context).padding.bottom + 20,
             left: 0,

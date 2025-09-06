@@ -198,7 +198,6 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
               ),
             ),
             SizedBox(height: 24),
-            
             // Title Shimmer
             Container(
               width: 120,
@@ -209,7 +208,6 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
               ),
             ),
             SizedBox(height: 16),
-            
             // Image Carousel Shimmer
             Container(
               width: double.infinity,
@@ -220,7 +218,6 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
               ),
             ),
             SizedBox(height: 32),
-            
             // Add Photos Section Shimmer
             Container(
               width: double.infinity,
@@ -242,6 +239,11 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
       if (report.imageUrl != null && report.imageUrl!.isNotEmpty) report.imageUrl!,
       ...report.additionalImages,
     ];
+
+    final bool isPlaceholder = allImages.isEmpty;
+    final List<String> displayImages = allImages.isNotEmpty
+        ? allImages
+        : ['assets/placeholder.png'];
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -348,7 +350,6 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                             ),
                           ),
                           SizedBox(height: 16),
-                          
                           // Description
                           Text(
                             'Deskripsi Kerusakan',
@@ -371,7 +372,6 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                             ),
                           ),
                           SizedBox(height: 16),
-                          
                           // Date
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -403,40 +403,81 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                     SizedBox(height: 24),
 
                     // Dokumentasi Section
-                    if (allImages.isNotEmpty) ...[
-                      Text(
-                        'Dokumentasi',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.grey[900],
-                        ),
+                    Text(
+                      'Dokumentasi',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Colors.grey[900],
                       ),
-                      SizedBox(height: 16),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 12,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Column(
-                            children: [
-                              CarouselSlider(
-                                items: allImages
-                                    .map(
-                                      (url) => GestureDetector(
-                                        onTap: () => _showFullScreenImage(url, allImages),
-                                        child: Container(
-                                          width: double.infinity,
+                    ),
+                    SizedBox(height: 16),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 12,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Column(
+                          children: [
+                            CarouselSlider(
+                              items: displayImages.map(
+                                (url) {
+                                  if (isPlaceholder) {
+                                    return Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.symmetric(vertical: 24),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            url,
+                                            height: 120,
+                                            width: 120,
+                                            fit: BoxFit.contain,
+                                          ),
+                                          SizedBox(height: 16),
+                                          Text(
+                                            'Belum ada dokumentasi gambar',
+                                            style: TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontSize: 16,
+                                              color: Colors.grey[600],
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text(
+                                            'Silahkan upload gambar kerusakan',
+                                            style: TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontSize: 13,
+                                              color: Colors.grey[400],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    return GestureDetector(
+                                      onTap: () => _showFullScreenImage(url, displayImages),
+                                      child: Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(16),
                                           child: Image.network(
                                             url,
                                             height: 280,
@@ -468,88 +509,90 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                           ),
                                         ),
                                       ),
-                                    )
-                                    .toList(),
-                                options: CarouselOptions(
-                                  height: 280,
-                                  enlargeCenterPage: false,
-                                  enableInfiniteScroll: allImages.length > 1,
-                                  viewportFraction: 1.0,
-                                  onPageChanged: (index, reason) {
-                                    setState(() {
-                                      _carouselIndex = index;
-                                    });
-                                  },
-                                ),
+                                    );
+                                  }
+                                },
+                              ).toList(),
+                              options: CarouselOptions(
+                                height: 280,
+                                enlargeCenterPage: true,
+                                enableInfiniteScroll: !isPlaceholder && displayImages.length > 1,
+                                viewportFraction: 0.9,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    _carouselIndex = index;
+                                  });
+                                },
                               ),
-                              if (allImages.length > 1)
-                                Container(
-                                  padding: EdgeInsets.symmetric(vertical: 16),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(
-                                      allImages.length,
-                                      (idx) => AnimatedContainer(
-                                        duration: Duration(milliseconds: 200),
-                                        width: idx == _carouselIndex ? 24 : 8,
-                                        height: 8,
-                                        margin: EdgeInsets.symmetric(horizontal: 3),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(4),
-                                          color: idx == _carouselIndex 
-                                              ? Color(0xFF405189) 
-                                              : Colors.grey[300],
-                                        ),
+                            ),
+                            // Indicator bullets
+                            if (!isPlaceholder && displayImages.length > 1)
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(
+                                    displayImages.length,
+                                    (idx) => AnimatedContainer(
+                                      duration: Duration(milliseconds: 200),
+                                      width: idx == _carouselIndex ? 24 : 8,
+                                      height: 8,
+                                      margin: EdgeInsets.symmetric(horizontal: 3),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(4),
+                                        color: idx == _carouselIndex
+                                            ? Color(0xFF405189)
+                                            : Colors.grey[300],
                                       ),
                                     ),
                                   ),
                                 ),
-                              // CATATAN DOKUMENTASI
-                              if (report.additionalImagesNotes.isNotEmpty) ...[
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10, left: 6, right: 6, bottom: 4),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Catatan Dokumentasi:',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          color: Color(0xFF405189),
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 15,
-                                        ),
+                              ),
+                            // CATATAN DOKUMENTASI
+                            if (!isPlaceholder && report.additionalImagesNotes.isNotEmpty) ...[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10, left: 6, right: 6, bottom: 4),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Catatan Dokumentasi:',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        color: Color(0xFF405189),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
                                       ),
-                                      SizedBox(height: 8),
-                                      ...report.additionalImagesNotes.map((note) => Padding(
-                                            padding: const EdgeInsets.only(bottom: 5),
-                                            child: Container(
-                                              width: double.infinity,
-                                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFF405189).withOpacity(0.05),
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
-                                              child: Text(
-                                                note,
-                                                style: TextStyle(
-                                                  fontFamily: 'Inter',
-                                                  fontSize: 13,
-                                                  color: Colors.grey[900],
-                                                ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    ...report.additionalImagesNotes.map((note) => Padding(
+                                          padding: const EdgeInsets.only(bottom: 5),
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFF405189).withOpacity(0.05),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              note,
+                                              style: TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontSize: 13,
+                                                color: Colors.grey[900],
                                               ),
                                             ),
-                                          )),
-                                    ],
-                                  ),
+                                          ),
+                                        )),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ],
-                          ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 32),
-                    ],
+                    ),
+                    SizedBox(height: 32),
 
                     // Add Photos Section
                     Container(
@@ -611,9 +654,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                               ),
                             ],
                           ),
-                          
                           SizedBox(height: 20),
-                          
                           // Image Picker Button
                           GestureDetector(
                             onTap: _pickMultipleImages,
@@ -637,7 +678,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    selectedImages.isEmpty 
+                                    selectedImages.isEmpty
                                         ? 'Ketuk untuk pilih foto'
                                         : '${selectedImages.length} foto dipilih',
                                     style: TextStyle(
@@ -651,7 +692,6 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                               ),
                             ),
                           ),
-                          
                           // Selected Images Preview
                           if (selectedImages.isNotEmpty) ...[
                             SizedBox(height: 16),
@@ -711,9 +751,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                               ),
                             ),
                           ],
-                          
                           SizedBox(height: 16),
-                          
                           // Notes Input
                           Container(
                             decoration: BoxDecoration(
@@ -741,9 +779,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                               ),
                             ),
                           ),
-                          
                           SizedBox(height: 20),
-                          
                           // Upload Button
                           SizedBox(
                             width: double.infinity,

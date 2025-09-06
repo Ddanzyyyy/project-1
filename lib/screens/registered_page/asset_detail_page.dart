@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'asset_model.dart';
 
 class AssetDetailPage extends StatefulWidget {
@@ -10,6 +11,19 @@ class AssetDetailPage extends StatefulWidget {
 }
 
 class _AssetDetailPageState extends State<AssetDetailPage> {
+  /// Format created_at (from DB) to Indonesia date and WIB time
+  String _formatWIBDate(String? createdAt) {
+    if (createdAt == null || createdAt.isEmpty) return "-";
+    try {
+      // Parse as UTC then add 7 hours for WIB
+      DateTime utcDate = DateTime.parse(createdAt);
+      DateTime wibDate = utcDate.add(Duration(hours: 7));
+      return DateFormat('dd MMM yyyy HH:mm', 'id_ID').format(wibDate) + ' WIB';
+    } catch (e) {
+      return createdAt;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final asset = widget.asset;
@@ -35,7 +49,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Bold',
             ),
           ),
           centerTitle: true,
@@ -45,7 +59,6 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            // Asset Image with full screen feature
             GestureDetector(
               onTap: () {
                 if (images.isNotEmpty) {
@@ -57,7 +70,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                       child: GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(10),
                           child: Image.network(
                             images[0],
                             fit: BoxFit.contain,
@@ -75,7 +88,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                 width: double.infinity,
                 height: 200,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   color: Color(0xFF405189).withOpacity(0.1),
                   boxShadow: [
                     BoxShadow(
@@ -87,7 +100,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                 ),
                 child: images.isNotEmpty
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         child: Image.network(
                           images[0],
                           fit: BoxFit.cover,
@@ -106,7 +119,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -121,7 +134,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   Text(
                     asset.name,
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'Maison Bold',
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF405189),
@@ -137,7 +150,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     child: Text(
                       asset.assetCode,
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Book',
                         fontSize: 12,
                         color: Color(0xFF405189),
                         fontWeight: FontWeight.w600,
@@ -150,8 +163,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   _buildInfoRow('Lokasi', asset.location),
                   _buildInfoRow('PIC', asset.pic),
                   _buildInfoRow('Status', asset.status, status: true),
-                  if (asset.dateAdded.isNotEmpty)
-                    _buildInfoRow('Tanggal Input', asset.dateAdded),
+                  // Tanggal input dari created_at
+                  _buildInfoRow('Tanggal Input', _formatWIBDate(asset.createdAt)),
 
                   if (asset.description.isNotEmpty) ...[
                     SizedBox(height: 12),
@@ -160,7 +173,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     Text(
                       'Deskripsi',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF405189),
@@ -170,7 +183,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     Text(
                       asset.description,
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Book',
                         fontSize: 13,
                         color: Colors.grey[700],
                         height: 1.4,
@@ -199,7 +212,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     return Container(
       decoration: BoxDecoration(
         color: Color(0xFF405189).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Center(
         child: Column(
@@ -214,7 +227,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               child: Text(
                 asset.name.substring(0, 1).toUpperCase(),
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF405189),
@@ -225,7 +238,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             Text(
               'Tidak ada gambar',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Book',
                 fontSize: 12,
                 color: Colors.grey[600],
               ),
@@ -247,7 +260,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             child: Text(
               label,
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Bold',
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF405189),
@@ -257,7 +270,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
           Text(
             ': ',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 13,
               color: Color(0xFF405189),
             ),
@@ -272,7 +285,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'Maison Bold',
                       color: _colorStatus(value),
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -283,7 +296,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                   child: Text(
                     value,
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'Maison Book',
                       fontSize: 13,
                       color: Colors.grey[700],
                     ),
@@ -330,7 +343,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.red[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: Colors.red[200]!,
           width: 1,
@@ -350,7 +363,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               Text(
                 'Panduan Asset Hilang',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.red[700],
@@ -364,7 +377,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             '• Laporkan temuan asset dengan prosedur.\n'
             '• Update status asset bila ditemukan atau diinput ulang.',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 12,
               color: Colors.red[600],
               height: 1.4,
@@ -381,7 +394,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.orange[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: Colors.orange[200]!,
           width: 1,
@@ -401,7 +414,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               Text(
                 'Panduan Damaged Asset',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.orange[700],
@@ -415,7 +428,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             'Laporkan kerusakan di halaman Damaged.\n'
             'Asset Status Otomatis Terupdate.',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 10,
               color: Colors.orange[700],
               height: 1.4,
@@ -432,7 +445,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.blueGrey[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: Colors.blueGrey[200]!,
           width: 1,
@@ -452,7 +465,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               Text(
                 'Panduan Scan Asset',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.blueGrey[700],
@@ -466,7 +479,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
             'Pastikan data asset di Registered.\n'
             'Update status asset Otomatis bila proses scan berhasil.',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 10,
               color: Colors.blueGrey[700],
               height: 1.4,

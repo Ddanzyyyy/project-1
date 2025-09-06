@@ -5,6 +5,7 @@ class Asset {
   final String description;
   final String imagePath;
   final String dateAdded;
+  final String createdAt;    // <--- Tambahan field createdAt
   final String assetCode; 
   final String location;  
   final String pic;      
@@ -17,6 +18,7 @@ class Asset {
     required this.description,
     required this.imagePath,
     required this.dateAdded,
+    required this.createdAt,   // <--- Tambahan di constructor
     required this.assetCode,
     required this.location,
     required this.pic,
@@ -31,6 +33,7 @@ class Asset {
       description: json['description'] ?? '',
       imagePath: json['image_path'] ?? '',
       dateAdded: json['date_added'] ?? '',
+      createdAt: json['created_at'] ?? '',    // <--- Ambil dari json
       assetCode: json['asset_code'] ?? '',
       location: json['location'] ?? '',
       pic: json['pic'] ?? '',
@@ -39,6 +42,7 @@ class Asset {
   }
 
   get updatedAt => null;
+  get lastScanned => null;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -47,6 +51,7 @@ class Asset {
     'description': description,
     'image_path': imagePath,
     'date_added': dateAdded,
+    'created_at': createdAt,      // <--- Tambahkan ke JSON
     'asset_code': assetCode,
     'location': location,
     'pic': pic,

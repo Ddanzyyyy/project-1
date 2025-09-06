@@ -3,8 +3,7 @@ import 'package:Simba/screens/scan_assets/asset.dart';
 import 'package:http/http.dart' as http;
 
 class AssetApiService {
-  // Ganti dengan URL backend Laravel kamu
-  static const String baseUrl = 'http://192.168.1.8:8000/api';
+  static const String baseUrl = 'http://192.168.1.9:8000/api';
   
   static Map<String, String> get headers => {
     'Content-Type': 'application/json',
@@ -263,7 +262,7 @@ class AssetApiService {
         throw Exception('Failed to delete asset: $errorMessage');
       }
     } catch (e) {
-      print('💥 Exception in deleteAsset: $e');
+      print('Exception in deleteAsset: $e');
       throw Exception('Error deleting asset: $e');
     }
   }

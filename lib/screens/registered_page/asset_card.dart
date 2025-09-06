@@ -88,7 +88,7 @@ class AssetCard extends StatelessWidget {
                     Text(
                       asset.name,
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -106,7 +106,7 @@ class AssetCard extends StatelessWidget {
                       child: Text(
                         asset.category,
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Bold',
                           fontSize: 10,
                           color: Color(0xFF405189),
                           fontWeight: FontWeight.w500,
@@ -117,7 +117,7 @@ class AssetCard extends StatelessWidget {
                     Text(
                       asset.description,
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Book',
                         color: Colors.grey[600],
                         fontSize: 11,
                         height: 1.2,

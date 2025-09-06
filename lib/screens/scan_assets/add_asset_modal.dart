@@ -52,7 +52,7 @@ class _AddAssetModalState extends State<AddAssetModal> {
       dateAdded: DateTime.now().toString(),
       assetCode: _assetCodeController.text,
       location: _locationController.text.isEmpty ? 'Citeureup' : _locationController.text,
-      pic: 'caccarehana',
+      pic: 'User',
       status: _selectedStatus,
       updatedAt: null,
     );

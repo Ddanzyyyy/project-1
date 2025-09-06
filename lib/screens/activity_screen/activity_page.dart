@@ -1,8 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
 import 'activity_service.dart';
 import 'activity_detail_card.dart';
+import 'package:Simba/screens/welcome_page/welcome_page.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
+import 'package:Simba/screens/setting_screen/settings_page.dart';
+
+// ==== REUSABLE NAVBAR ====
+class AppBottomNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTap;
+
+  const AppBottomNavBar({required this.selectedIndex, required this.onTap, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 65,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavItem(context, Icons.home_rounded, "Home", 0),
+            _buildNavItem(context, Icons.timeline_rounded, "Activity", 1),
+            _buildNavItem(context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
+            _buildNavItem(context, Icons.settings_rounded, "Setting", 3),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+    final selected = index == selectedIndex;
+    return GestureDetector(
+      onTap: () => onTap(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          Icon(icon, color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
+          const SizedBox(height: 4),
+          Text(label,
+            style: TextStyle(
+              fontFamily: 'Maison Bold',
+              color: selected ? Color(0xFF405189) : Colors.grey,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+// ==== END NAVBAR WIDGET ====
+
 
 class ActivityPage extends StatefulWidget {
   @override
@@ -22,47 +92,39 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   void initState() {
     super.initState();
-    activityService = ActivityService(baseUrl: 'http://192.168.1.8:8000');
+    activityService = ActivityService(baseUrl: 'http://192.168.1.9:8000');
     _loadUserData();
   }
 
-  // Get current formatted time (UTC) - Real-time function
-  String getCurrentTime() {
-    return '2025-09-03 14:15:27'; // Current date/time as provided
+  String getCurrentWibTime() {
+    final nowUtc = DateTime.now().toUtc();
+    final wibTime = nowUtc.add(const Duration(hours: 7));
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(wibTime);
   }
 
   Future<void> _loadUserData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
-      // Load comprehensive user data
+
       final username = prefs.getString('username') ?? 'caccarehana';
       final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'User';
       final firstName = prefs.getString('first_name') ?? '';
       final lastName = prefs.getString('last_name') ?? '';
-      
-      // Build display name
+
       String displayName = fullName;
       if (displayName == 'User' && firstName.isNotEmpty) {
         displayName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
       }
-      
+
       setState(() {
         userName = displayName;
         currentUser = username;
         userId = prefs.getString('user_id') ?? '1';
         isLoadingUserInfo = false;
       });
-      
-      print('Activity Page - User session loaded:');
-      print('   - Username: $currentUser');
-      print('   - Display Name: $userName');
-      print('   - User ID: $userId');
-      print('   - Current Time: ${getCurrentTime()}');
-      
+
       await fetchActivities();
     } catch (e) {
-      print('Error loading user session: $e');
       setState(() {
         userName = 'User';
         currentUser = 'User';
@@ -83,9 +145,7 @@ class _ActivityPageState extends State<ActivityPage> {
         activities = result;
         isLoading = false;
       });
-      print('Loaded ${result.length} activities successfully');
     } catch (e) {
-      print('Error loading activities: $e');
       setState(() {
         isLoading = false;
       });
@@ -113,7 +173,6 @@ class _ActivityPageState extends State<ActivityPage> {
         highlightColor: Colors.grey[100]!,
         child: Row(
           children: [
-            // Activity type icon placeholder
             Container(
               width: 38,
               height: 38,
@@ -123,7 +182,6 @@ class _ActivityPageState extends State<ActivityPage> {
               ),
             ),
             const SizedBox(width: 10),
-            
             Container(
               width: 38,
               height: 38,
@@ -133,8 +191,6 @@ class _ActivityPageState extends State<ActivityPage> {
               ),
             ),
             const SizedBox(width: 12),
-            
-            // Text content placeholder
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +243,6 @@ class _ActivityPageState extends State<ActivityPage> {
     );
   }
 
-  // Build shimmer loading for activities list
   Widget _buildShimmerActivitiesList() {
     return ListView.builder(
       itemCount: 8,
@@ -195,7 +250,6 @@ class _ActivityPageState extends State<ActivityPage> {
     );
   }
 
-  // Build shimmer for header info
   Widget _buildShimmerHeader() {
     return Shimmer.fromColors(
       baseColor: Colors.white.withOpacity(0.3),
@@ -223,6 +277,22 @@ class _ActivityPageState extends State<ActivityPage> {
         ],
       ),
     );
+  }
+
+  // ==== NAVIGATION HANDLER ====
+  void _onNavTap(int index) {
+    if (index == 0) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => WelcomePage()));
+    }
+    if (index == 1) {
+      // Already on ActivityPage
+    }
+    if (index == 2) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
+    }
+    if (index == 3) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsPage()));
+    }
   }
 
   @override
@@ -259,7 +329,6 @@ class _ActivityPageState extends State<ActivityPage> {
       ),
       body: Column(
         children: [
-          // Header with user info
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -273,7 +342,6 @@ class _ActivityPageState extends State<ActivityPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // User greeting with loading state
                 if (isLoadingUserInfo)
                   _buildShimmerHeader()
                 else
@@ -292,7 +360,7 @@ class _ActivityPageState extends State<ActivityPage> {
                       const SizedBox(height: 8),
                       Text(
                         activities.isNotEmpty
-                            ? 'Last activity: ${_formatDate(activities.first.activityTime)}'
+                            ? 'Last activity: ${_formatWibDate(activities.first.activityTime)}'
                             : 'No activity yet',
                         style: const TextStyle(
                           fontFamily: 'Maison Book',
@@ -303,7 +371,7 @@ class _ActivityPageState extends State<ActivityPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Current Time: ${getCurrentTime()}',
+                        'Current Time: ${getCurrentWibTime()}',
                         style: const TextStyle(
                           fontFamily: 'Maison Book',
                           color: Colors.white60,
@@ -316,8 +384,6 @@ class _ActivityPageState extends State<ActivityPage> {
               ],
             ),
           ),
-
-          // Content
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(20),
@@ -325,8 +391,6 @@ class _ActivityPageState extends State<ActivityPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  
-                  // Section header with activity count
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -359,8 +423,6 @@ class _ActivityPageState extends State<ActivityPage> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
-                  // Activities list with shimmer loading
                   Expanded(
                     child: isLoading
                         ? _buildShimmerActivitiesList()
@@ -380,11 +442,13 @@ class _ActivityPageState extends State<ActivityPage> {
           ),
         ],
       ),
-      bottomNavigationBar: _bottomBar(context),
+      bottomNavigationBar: AppBottomNavBar(
+        selectedIndex: 1,
+        onTap: _onNavTap,
+      ),
     );
   }
 
-  // Enhanced empty state
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -399,7 +463,7 @@ class _ActivityPageState extends State<ActivityPage> {
           Text(
             'No activities found',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Bold',
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.grey[700],
@@ -409,7 +473,7 @@ class _ActivityPageState extends State<ActivityPage> {
           Text(
             'Start scanning assets to view activities',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 14,
               color: Colors.grey[500],
             ),
@@ -430,7 +494,7 @@ class _ActivityPageState extends State<ActivityPage> {
             label: const Text(
               'Refresh',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Bold',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -451,7 +515,7 @@ class _ActivityPageState extends State<ActivityPage> {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          builder: (context) => AssetDetailCard(asset: activity.assetDetail),
+          builder: (context) => ActivityDetailCard(asset: activity.assetDetail),
         );
       },
       borderRadius: BorderRadius.circular(10),
@@ -472,7 +536,6 @@ class _ActivityPageState extends State<ActivityPage> {
         ),
         child: Row(
           children: [
-            // Activity type icon
             Container(
               width: 40,
               height: 40,
@@ -489,8 +552,6 @@ class _ActivityPageState extends State<ActivityPage> {
               ),
             ),
             const SizedBox(width: 12),
-            
-            // Asset image
             Container(
               width: 40,
               height: 40,
@@ -537,8 +598,6 @@ class _ActivityPageState extends State<ActivityPage> {
               ),
             ),
             const SizedBox(width: 12),
-            
-            // Activity info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,7 +618,7 @@ class _ActivityPageState extends State<ActivityPage> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        _formatDate(activity.activityTime),
+                        _formatWibDate(activity.activityTime),
                         style: TextStyle(
                           fontFamily: 'Maison Book',
                           fontSize: 10,
@@ -584,8 +643,6 @@ class _ActivityPageState extends State<ActivityPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
-                  
-                  // Asset code badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -605,8 +662,6 @@ class _ActivityPageState extends State<ActivityPage> {
                 ],
               ),
             ),
-            
-            // Arrow indicator
             Icon(
               Icons.arrow_forward_ios,
               size: 12,
@@ -614,61 +669,6 @@ class _ActivityPageState extends State<ActivityPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _bottomBar(BuildContext context) {
-    return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          )
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          NavItem(
-            icon: Icons.home_rounded,
-            label: 'Home',
-            selected: false,
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/welcome');
-            },
-          ),
-          NavItem(
-            icon: Icons.timeline_rounded,
-            label: 'Activity',
-            selected: true,
-            onTap: () {},
-          ),
-          NavItem(
-            icon: Icons.qr_code_scanner_rounded,
-            label: 'Scan Asset',
-            selected: false,
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/scan-assets');
-            },
-          ),
-          NavItem(
-            icon: Icons.settings_rounded,
-            label: 'Setting',
-            selected: false,
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/settings');
-            },
-          ),
-        ],
       ),
     );
   }
@@ -736,51 +736,10 @@ class _ActivityPageState extends State<ActivityPage> {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')} / ${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
-  }
-}
-
-class NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  const NavItem({
-    Key? key,
-    required this.icon,
-    required this.label,
-    required this.selected,
-    this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 8),
-          Icon(
-            icon,
-            color: selected ? const Color(0xFF405189) : Colors.grey,
-            size: 26,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Maison Book',
-              color: selected ? const Color(0xFF405189) : Colors.grey,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
+  // Format DateTime (from DB or API) into WIB for display
+  String _formatWibDate(DateTime dt) {
+    // Jika waktu dari backend UTC, konversi ke WIB (tambah 7 jam)
+    DateTime wib = dt.toUtc().add(const Duration(hours: 7));
+    return '${wib.hour.toString().padLeft(2, '0')}:${wib.minute.toString().padLeft(2, '0')} / ${wib.day.toString().padLeft(2, '0')}-${wib.month.toString().padLeft(2, '0')}-${wib.year}';
   }
 }

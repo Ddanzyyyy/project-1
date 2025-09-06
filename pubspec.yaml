@@ -21,6 +21,9 @@ dependencies:
   flutter_slidable: ^3.1.2
   card_loading: ^0.3.0
   flutter_card_swiper: ^7.0.2
+  flutter_local_notifications: ^17.2.2
+  intl: ^0.20.2
+  # intl: ^0.18.0
   # lottie: ^3.2.0
   # custom_refresh_indicator: ^4.0.1
   # url_launcher: ^6.3.1
@@ -40,8 +43,14 @@ flutter:
     - assets/images/icons/warning.png
     - assets/images/dummy_logo_indocemenet.png
     - assets/images/logo_she.png
+    - assets/images/placeholder.png
     - assets/images/icons/BOX.png
     - assets/images/icons/alert.png
+    - assets/images/icons/welcome_page/registered_asset.png
+    - assets/images/icons/welcome_page/unscanned_asset.png
+    - assets/images/icons/welcome_page/damage_asset.png
+    - assets/images/icons/welcome_page/lost_asset.png
+    - assets/images/indocement_logo.jpg
     # - assets/lottie/idea.gif
     # - assets/images/icons/registered_assets.png
     # - assets/images/icons/unscanned_assets.png

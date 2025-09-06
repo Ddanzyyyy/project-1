@@ -5,9 +5,75 @@ import 'package:Simba/screens/scan_assets/qr_scanner_page.dart';
 import 'package:flutter/material.dart';
 import 'package:Simba/screens/activity_screen/activity_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
-import 'package:Simba/screens/welcome_page.dart';
+import 'package:Simba/screens/welcome_page/welcome_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
+
+// ==== REUSABLE NAVBAR ====
+class AppBottomNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTap;
+
+  const AppBottomNavBar({required this.selectedIndex, required this.onTap, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 65,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavItem(context, Icons.home_rounded, "Home", 0),
+            _buildNavItem(context, Icons.timeline_rounded, "Activity", 1),
+            _buildNavItem(context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
+            _buildNavItem(context, Icons.settings_rounded, "Setting", 3),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+    final selected = index == selectedIndex;
+    return GestureDetector(
+      onTap: () => onTap(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          Icon(icon, color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
+          const SizedBox(height: 4),
+          Text(label,
+            style: TextStyle(
+              fontFamily: 'Maison Bold',
+              color: selected ? Color(0xFF405189) : Colors.grey,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+// ==== END NAVBAR WIDGET ====
 
 class ScanAssetPage extends StatefulWidget {
   @override
@@ -23,7 +89,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   String selectedTab = 'Scan';
   bool isLoading = false;
 
-  String currentUser = 'caccarehana';
+  String currentUser = 'User';
   String currentUserName = 'Loading...';
   String currentUserFullName = 'User';
   bool isLoadingUserInfo = true;
@@ -42,36 +108,28 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     super.dispose();
   }
 
-  // Load user session data from login
   Future<void> _loadUserSession() async {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      final username = prefs.getString('username') ?? 'caccarehana';
+      final username = prefs.getString('username') ?? 'User';
       final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'Caccarehana';
       final firstName = prefs.getString('first_name') ?? '';
       final lastName = prefs.getString('last_name') ?? '';
-      
+
       // Build display name
       String displayName = fullName;
       if (displayName == 'User' && firstName.isNotEmpty) {
         displayName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
       }
-      
+
       setState(() {
         currentUser = username;
         currentUserName = displayName;
         currentUserFullName = fullName;
         isLoadingUserInfo = false;
       });
-      
-      print('👤 User session loaded:');
-      print('   - Username: $currentUser');
-      print('   - Display Name: $currentUserName');
-      print('   - Full Name: $currentUserFullName');
-      
     } catch (e) {
-      print('⚠️ Error loading user session: $e');
       setState(() {
         currentUser = 'caccarehana';
         currentUserName = 'Caccarehana';
@@ -81,12 +139,24 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     }
   }
 
-  // Get current formatted time (UTC) - Real-time function
+  // Get current time (WIB) in proper format
   String getCurrentTime() {
-    return '2025-09-03 14:09:48'; // Current date/time as provided
+    final nowUtc = DateTime.now().toUtc();
+    final nowWib = nowUtc.add(const Duration(hours: 7));
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(nowWib);
   }
 
-  // Load assets from backend
+  // Format Updated At (WIB) from database UTC
+  String formatUpdatedTimeWIB(String? updatedAt) {
+    if (updatedAt == null || updatedAt.isEmpty) return "-";
+    try {
+      final dt = DateTime.parse(updatedAt).toUtc().add(const Duration(hours: 7));
+      return DateFormat('HH:mm').format(dt);
+    } catch (e) {
+      return "-";
+    }
+  }
+
   Future<void> _loadAssets([String? search]) async {
     setState(() => isLoading = true);
     try {
@@ -95,9 +165,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         assets = loadedAssets;
         filteredAssets = loadedAssets;
       });
-      print('✅ Loaded ${loadedAssets.length} assets successfully');
     } catch (e) {
-      print('💥 Error loading assets: $e');
       _showErrorSnackBar('Failed to load assets: $e');
     } finally {
       setState(() => isLoading = false);
@@ -112,7 +180,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     }
   }
 
-  // Open Mobile Scanner QR Scanner
   Future<void> _openQRScanner() async {
     try {
       await Navigator.push(
@@ -127,7 +194,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       );
     } catch (e) {
       _showErrorSnackBar('Scanner temporarily unavailable. Please use manual input.');
-      print('Scanner error: $e');
     }
   }
 
@@ -139,42 +205,26 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     _processScannedQr(_qrController.text);
   }
 
-  // Enhanced process scanned QR with multiple search strategies
   Future<void> _processScannedQr(String qrCode) async {
     setState(() {
       _qrController.text = qrCode;
       isLoading = true;
     });
 
-    final currentTime = getCurrentTime();
-    print('🎯 Processing QR Code: $qrCode');
-    print('⏰ Current UTC Time: $currentTime');
-    print('👤 Current User: $currentUser ($currentUserName)');
-
     try {
       Asset? foundAsset;
-      
-      // Strategy 1: Try direct QR lookup
-      print('🔍 Strategy 1: Direct QR lookup');
+
       try {
         foundAsset = await AssetApiService.getAssetByQr(qrCode);
-      } catch (e) {
-        print('⚠️ Strategy 1 failed: $e');
-      }
-      
+      } catch (e) {}
+
       if (foundAsset == null) {
-        // Strategy 2: Try asset code lookup
-        print('🔍 Strategy 2: Asset code lookup');
         try {
           foundAsset = await AssetApiService.getAssetByAssetCode(qrCode);
-        } catch (e) {
-          print('⚠️ Strategy 2 failed: $e');
-        }
+        } catch (e) {}
       }
-      
+
       if (foundAsset == null) {
-        // Strategy 3: Try search in all assets
-        print('🔍 Strategy 3: Search in all assets');
         try {
           final allAssets = await AssetApiService.getAssets(search: qrCode);
           if (allAssets.isNotEmpty) {
@@ -183,42 +233,27 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                   asset.id.toString() == qrCode ||
                   asset.name.toLowerCase().contains(qrCode.toLowerCase())) {
                 foundAsset = asset;
-                print('✅ Found asset via search: ${asset.name}');
                 break;
               }
             }
           }
-        } catch (e) {
-          print('⚠️ Strategy 3 failed: $e');
-        }
+        } catch (e) {}
       }
-      
+
       if (foundAsset != null) {
-        // Asset found - show details with scan success
-        print('🎉 Asset found successfully!');
-        print('📋 Asset Details:');
-        print('   - ID: ${foundAsset.id}');
-        print('   - Name: ${foundAsset.name}');
-        print('   - Code: ${foundAsset.assetCode}');
-        print('   - Status: ${foundAsset.status}');
-        
         _showAssetDetailsWithAnimation(foundAsset, isNewScan: true);
         _showSuccessSnackBar('Asset found! ${foundAsset.name} (${foundAsset.assetCode})');
       } else {
-        // Asset not found - show notification "Asset tidak terdaftar"
-        print('❌ Asset not found anywhere');
         _showAssetNotRegisteredDialog(qrCode);
         _showErrorSnackBar('Asset tidak terdaftar');
       }
     } catch (e) {
-      print('💥 Critical error processing QR: $e');
       _showErrorSnackBar('Scan error: ${e.toString()}');
     } finally {
       setState(() => isLoading = false);
     }
   }
 
-  // Show dialog when asset is not registered
   void _showAssetNotRegisteredDialog(String qrCode) {
     showDialog(
       context: context,
@@ -239,7 +274,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               const Text(
                 'Asset Tidak Terdaftar',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF1A1A1A),
@@ -247,106 +282,107 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               ),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Asset dengan kode QR berikut tidak ditemukan dalam sistem:',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  qrCode,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Asset dengan kode QR berikut tidak ditemukan dalam sistem:',
+                  style: TextStyle(
+                    fontFamily: 'Maison Book',
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF405189),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.blue[200]!,
-                    width: 1,
+                    color: Colors.grey[700],
+                    height: 1.5,
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 16,
-                          color: Colors.blue[700],
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Informasi Scan:',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.grey[300]!,
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    qrCode,
+                    style: const TextStyle(
+                      fontFamily: 'Maison Bold',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF405189),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.blue[200]!,
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
                             color: Colors.blue[700],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    _buildScanInfoRow('Waktu Scan', getCurrentTime()),
-                    _buildScanInfoRow('User', currentUserName),
-                    _buildScanInfoRow('Status', 'Tidak Terdaftar'),
-                  ],
+                          const SizedBox(width: 6),
+                          Text(
+                            'Informasi Scan:',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      _buildScanInfoRow('Waktu Scan', getCurrentTime()),
+                      _buildScanInfoRow('User', currentUserName),
+                      _buildScanInfoRow('Status', 'Tidak Terdaftar'),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Silakan hubungi administrator atau verifikasi kembali kode QR yang dipindai.',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
+                const SizedBox(height: 12),
+                Text(
+                  'Silakan hubungi administrator atau verifikasi kembali kode QR yang dipindai.',
+                  style: TextStyle(
+                    fontFamily: 'Maison Book',
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Clear QR input after closing dialog
                 _qrController.clear();
                 setState(() {});
               },
               child: Text(
                 'Tutup',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF405189),
@@ -356,7 +392,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Open scanner again for retry
                 _openQRScanner();
               },
               style: ElevatedButton.styleFrom(
@@ -370,7 +405,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               child: const Text(
                 'Scan Ulang',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -391,7 +426,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           Text(
             label,
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 11,
               fontWeight: FontWeight.w500,
               color: Colors.grey[600],
@@ -400,7 +435,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           Text(
             value,
             style: const TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 11,
               fontWeight: FontWeight.w600,
               color: Color(0xFF1A1A1A),
@@ -411,7 +446,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     );
   }
 
-  // Build shimmer loading effect for asset cards
   Widget _buildShimmerAssetCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -495,14 +529,12 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     );
   }
 
-  // Build shimmer loading for recent assets section
   Widget _buildShimmerRecentAssets() {
     return Column(
       children: List.generate(3, (index) => _buildShimmerAssetCard()),
     );
   }
 
-  // Build shimmer loading for assets list
   Widget _buildShimmerAssetsList() {
     return ListView.builder(
       padding: EdgeInsets.zero,
@@ -511,7 +543,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     );
   }
 
-  // Show asset details with enhanced animation for scanned assets
   void _showAssetDetailsWithAnimation(Asset asset, {bool isNewScan = false}) {
     showModalBottomSheet(
       context: context,
@@ -527,15 +558,14 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           try {
             if (updatedAsset.id > 0) {
               await AssetApiService.updateAsset(updatedAsset.id, updatedAsset);
-              _showSuccessSnackBar(isNewScan 
-                ? 'Scanned asset saved successfully!' 
-                : 'Asset updated successfully!');
+              _showSuccessSnackBar(isNewScan
+                  ? 'Scanned asset saved successfully!'
+                  : 'Asset updated successfully!');
             } else {
               _showErrorSnackBar('Cannot save unknown asset. Please contact administrator.');
             }
-            _loadAssets(); 
+            _loadAssets();
           } catch (e) {
-            print('Error saving asset: $e');
             _showErrorSnackBar('Failed to save asset: $e');
           }
         },
@@ -548,7 +578,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               _showSuccessSnackBar('Asset deleted successfully!');
             }
           } catch (e) {
-            print('💥 Error deleting asset: $e');
             _showErrorSnackBar('Failed to delete asset: $e');
           }
         },
@@ -563,7 +592,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => AssetDetailsModal(
         asset: asset,
-        isNewScan: false, 
+        isNewScan: false,
         currentUser: currentUser,
         onUpdate: (updatedAsset) async {
           try {
@@ -573,7 +602,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             }
             _loadAssets();
           } catch (e) {
-            print('💥 Error updating asset: $e');
             _showErrorSnackBar('Failed to save asset: $e');
           }
         },
@@ -586,7 +614,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               _showSuccessSnackBar('Asset deleted successfully!');
             }
           } catch (e) {
-            print('💥 Error deleting asset: $e');
             _showErrorSnackBar('Failed to delete asset: $e');
           }
         },
@@ -602,7 +629,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             children: [
               const Icon(Icons.error_outline, color: Colors.white, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(message, style: TextStyle(fontFamily: 'Inter'))),
+              Expanded(child: Text(message, style: TextStyle(fontFamily: 'Maison Book'))),
             ],
           ),
           backgroundColor: Colors.red,
@@ -622,7 +649,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             children: [
               const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(message, style: TextStyle(fontFamily: 'Inter'))),
+              Expanded(child: Text(message, style: TextStyle(fontFamily: 'Maison Book'))),
             ],
           ),
           backgroundColor: const Color(0xFF405189),
@@ -631,6 +658,22 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
+    }
+  }
+
+  // ==== NAVIGATION HANDLER ====
+  void _onNavTap(int index) {
+    if (index == 0) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => WelcomePage()));
+    }
+    if (index == 1) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => ActivityPage()));
+    }
+    if (index == 2) {
+      // Already on ScanAssetPage
+    }
+    if (index == 3) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsPage()));
     }
   }
 
@@ -645,173 +688,118 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Scan Assets',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white, size: 22),
-            onPressed: () {
-              _loadAssets();
-              _loadUserSession();
-            },
-            tooltip: 'Refresh Assets',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Header with tabs
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 15),
-            decoration: const BoxDecoration(
-              color: Color(0xFF405189),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Scan Assets',
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            child: Column(
-              children: [
-                // Tab buttons (only Scan and Assets)
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTabButton('Scan', Icons.qr_code_scanner),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _buildTabButton('Assets', Icons.inventory),
-                    ),
-                  ],
+            const SizedBox(width: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: Image.asset(
+                'assets/images/indocement_logo.jpg',
+                width: 44,
+                height: 44,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: false,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await _loadAssets();
+          await _loadUserSession();
+        },
+        child: Column(
+          children: [
+            // Header with tabs
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 15),
+              decoration: const BoxDecoration(
+                color: Color(0xFF405189),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
-                const SizedBox(height: 15),
-
-                // Current user info - Real data from login session
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isLoadingUserInfo) ...[
-                          SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildTabButton('Scan', Icons.qr_code_scanner),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildTabButton('Assets', Icons.inventory),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (isLoadingUserInfo) ...[
+                            SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            isLoadingUserInfo ? 'Loading user...' : 'Logged in as: $currentUserName',
+                            style: const TextStyle(
+                              fontFamily: 'Maison Book',
                               color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
                             ),
                           ),
-                          const SizedBox(width: 8),
                         ],
-                        Text(
-                          isLoadingUserInfo ? 'Loading user...' : 'Logged in as: $currentUserName',
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            color: Colors.white70,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Current Time: ${getCurrentTime()}',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        color: Colors.white70,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w400,
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(height: 2),
+                      Text(
+                        'Current Time: ${getCurrentTime()}',
+                        style: const TextStyle(
+                          fontFamily: 'Maison Book',
+                          color: Colors.white70,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
-              child: _buildTabContent(),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
+                child: _buildTabContent(),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            )
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            NavItem(
-              icon: Icons.home_rounded,
-              label: 'Home',
-              selected: false,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => WelcomePage()),
-                );
-              },
-            ),
-            NavItem(
-              icon: Icons.timeline_rounded,
-              label: 'Activity',
-              selected: false,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ActivityPage()),
-                );
-              },
-            ),
-            NavItem(
-              icon: Icons.qr_code_scanner_rounded,
-              label: 'Scan Asset',
-              selected: true,
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => ScanAssetPage()),
-                );
-              },
-            ),
-            NavItem(
-              icon: Icons.settings_rounded,
-              label: 'Setting',
-              selected: false,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()),
-                );
-              },
-            ),
-          ],
-        ),
+      bottomNavigationBar: AppBottomNavBar(
+        selectedIndex: 2,
+        onTap: _onNavTap,
       ),
     );
   }
@@ -846,7 +834,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Bold',
                 color: isSelected ? const Color(0xFF405189) : Colors.white,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -877,14 +865,13 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           const Text(
             'Scan Asset QR Code',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Bold',
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Color(0xFF405189),
             ),
           ),
           const SizedBox(height: 12),
-
           Container(
             width: double.infinity,
             height: 170,
@@ -946,7 +933,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                     const Text(
                       'Tap to Open Mobile Scanner',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF405189),
@@ -956,7 +943,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                     Text(
                       'Smart QR detection with auto-focus',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Book',
                         fontSize: 11,
                         color: const Color(0xFF757575),
                       ),
@@ -972,7 +959,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                       child: const Text(
                         'Enhanced Scanner v5.1.1',
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Book',
                           fontSize: 9,
                           color: Colors.green,
                           fontWeight: FontWeight.w500,
@@ -985,19 +972,16 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             ),
           ),
           const SizedBox(height: 10),
-
-          // Manual QR input
           Text(
             'Or enter asset code manually:',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 13,
               color: Colors.grey[600],
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 10),
-
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -1016,7 +1000,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                 prefixIcon: const Icon(Icons.qr_code, color: Color(0xFF405189), size: 20),
                 hintText: 'Enter asset code...',
                 hintStyle: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Book',
                   color: Colors.grey[500],
                   fontSize: 13,
                 ),
@@ -1032,13 +1016,11 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                       )
                     : null,
               ),
-              style: const TextStyle(fontSize: 14, fontFamily: 'Inter'),
+              style: const TextStyle(fontSize: 14, fontFamily: 'Maison Bold'),
               onChanged: (value) => setState(() {}),
             ),
           ),
           const SizedBox(height: 12),
-
-          // Manual scan button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -1047,7 +1029,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               label: const Text(
                 'Search Asset',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -1066,15 +1048,13 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             ),
           ),
           const SizedBox(height: 20),
-
-          // Recent scans
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
                 'Recent Assets',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF405189),
@@ -1089,7 +1069,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                 child: Text(
                   'View All (${assets.length})',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Book',
                     fontSize: 12,
                     color: Colors.grey[600],
                   ),
@@ -1098,8 +1078,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             ],
           ),
           const SizedBox(height: 10),
-
-          // Recent scans list with shimmer loading
           SizedBox(
             height: 200,
             child: isLoading
@@ -1118,7 +1096,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                         Text(
                           'No assets found',
                           style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: 'Maison Bold',
                             color: Colors.grey[600],
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -1128,7 +1106,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                         Text(
                           'Scan QR codes to view assets',
                           style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: 'Maison Book',
                             color: Colors.grey[500],
                             fontSize: 12,
                           ),
@@ -1154,12 +1132,11 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Search bar
         Container(
           height: 50,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.1),
@@ -1175,7 +1152,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               prefixIcon: const Icon(Icons.search, color: Color(0xFF405189), size: 20),
               hintText: 'Search assets...',
               hintStyle: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Book',
                 color: Colors.grey[500],
                 fontSize: 14,
               ),
@@ -1185,14 +1162,13 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           ),
         ),
         const SizedBox(height: 15),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'Assets (${filteredAssets.length})',
               style: const TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Bold',
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF405189),
@@ -1208,7 +1184,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                 child: Text(
                   'Filtered',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Bold',
                     fontSize: 10,
                     color: const Color(0xFF405189),
                     fontWeight: FontWeight.w500,
@@ -1218,8 +1194,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           ],
         ),
         const SizedBox(height: 10),
-
-        // Assets list with shimmer loading
         Expanded(
           child: isLoading
             ? _buildShimmerAssetsList()
@@ -1241,7 +1215,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                           ? 'No assets found for "${_searchController.text}"'
                           : 'No assets found',
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Bold',
                           color: Colors.grey[600],
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -1254,7 +1228,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                           ? 'Try different search terms'
                           : 'Start by scanning QR codes to view assets',
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Bold',
                           color: Colors.grey[500],
                           fontSize: 12,
                         ),
@@ -1279,7 +1253,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   Widget _buildAssetCard(Asset asset, {bool showScanTime = false}) {
     Color statusColor;
     IconData statusIcon;
-    
+
     switch (asset.status.toLowerCase()) {
       case 'registered':
         statusColor = Colors.green;
@@ -1334,41 +1308,41 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: asset.imagePath != null && asset.imagePath!.isNotEmpty
-              ? Image.network(
-                  asset.imagePath!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
-                      Icons.inventory,
-                      color: Color(0xFF405189),
-                      size: 22,
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                        strokeWidth: 2,
-                        color: const Color(0xFF405189),
-                      ),
-                    );
-                  },
-                )
-              : const Icon(
-                  Icons.inventory,
-                  color: Color(0xFF405189),
-                  size: 22,
-                ),
+                ? Image.network(
+                    asset.imagePath!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.inventory,
+                        color: Color(0xFF405189),
+                        size: 22,
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                          strokeWidth: 2,
+                          color: const Color(0xFF405189),
+                        ),
+                      );
+                    },
+                  )
+                : const Icon(
+                    Icons.inventory,
+                    color: Color(0xFF405189),
+                    size: 22,
+                  ),
           ),
         ),
         title: Text(
           asset.name,
           style: const TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
@@ -1381,7 +1355,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             Text(
               '${asset.assetCode} • ${asset.category}',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Book',
                 fontSize: 11,
                 color: Colors.grey[600],
               ),
@@ -1407,7 +1381,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                       Text(
                         asset.status.toUpperCase(),
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Book',
                           fontSize: 9,
                           color: statusColor,
                           fontWeight: FontWeight.w600,
@@ -1425,9 +1399,10 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    'Updated: ${asset.updatedAt!.toString().substring(11, 16)}',
+                    // asset.updatedAt assumed to be DateTime? type, so use .toIso8601String()
+                    'Updated: ${formatUpdatedTimeWIB(asset.updatedAt?.toIso8601String())}',
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'Maison Book',
                       fontSize: 9,
                       color: Colors.grey[500],
                     ),
@@ -1443,50 +1418,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           size: 14,
         ),
         onTap: () => _showAssetDetails(asset),
-      ),
-    );
-  }
-}
-
-class NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  const NavItem({
-    Key? key,
-    required this.icon,
-    required this.label,
-    required this.selected,
-    this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 6),
-          Icon(
-            icon,
-            color: selected ? const Color(0xFF405189) : Colors.grey,
-            size: 24,
-          ),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Inter',
-              color: selected ? const Color(0xFF405189) : Colors.grey,
-              fontSize: 9,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 6),
-        ],
       ),
     );
   }

@@ -11,6 +11,8 @@ class AssetDetail {
   final String? status;
   final String? dateAdded;
   final String? activityTime;
+  final String? createdAt;
+  final String? updatedAt;
 
   AssetDetail({
     required this.assetCode,
@@ -21,6 +23,8 @@ class AssetDetail {
     this.status,
     this.dateAdded,
     this.activityTime,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory AssetDetail.fromJson(Map<String, dynamic> json) {
@@ -33,6 +37,8 @@ class AssetDetail {
       status: json['status'],
       dateAdded: json['date_added'],
       activityTime: json['activity_time'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
     );
   }
 }

@@ -13,6 +13,73 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_service.dart';
 import 'package:shimmer/shimmer.dart';
 
+// ==== REUSABLE NAVBAR ====
+class AppBottomNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTap;
+
+  const AppBottomNavBar({required this.selectedIndex, required this.onTap, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 65,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavItem(context, Icons.home_rounded, "Home", 0),
+            _buildNavItem(context, Icons.timeline_rounded, "Activity", 1),
+            _buildNavItem(context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
+            _buildNavItem(context, Icons.settings_rounded, "Setting", 3),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+    final selected = index == selectedIndex;
+    return GestureDetector(
+      onTap: () => onTap(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 8),
+          Icon(icon, color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
+          const SizedBox(height: 4),
+          Text(label,
+            style: TextStyle(
+              fontFamily: 'Maison Bold',
+              color: selected ? Color(0xFF405189) : Colors.grey,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+// ==== END NAVBAR WIDGET ====
+
+
 class WelcomePage extends StatefulWidget {
   @override
   _WelcomePageState createState() => _WelcomePageState();
@@ -105,6 +172,20 @@ class _WelcomePageState extends State<WelcomePage> {
     ]);
   }
 
+  // ==== NAVIGATION HANDLER ====
+  void _onNavTap(int index) {
+    if (index == 0) return; // Home
+    if (index == 1) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => ActivityPage()));
+    }
+    if (index == 2) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
+    }
+    if (index == 3) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsPage()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -141,7 +222,6 @@ class _WelcomePageState extends State<WelcomePage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // PROFILE CARD (SHIMMER LOADING)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: isProfileLoading
@@ -217,7 +297,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                 SnackBar(
                                   content: Text(
                                     'Error: ${e.toString()}',
-                                    style: TextStyle(fontFamily: 'Inter'),
+                                    style: TextStyle(fontFamily: 'Maison Bold'),
                                   ),
                                   backgroundColor: Colors.red,
                                   behavior: SnackBarBehavior.floating,
@@ -272,7 +352,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                       Text(
                                         currentUserName,
                                         style: TextStyle(
-                                          fontFamily: 'Inter',
+                                          fontFamily: 'Maison Bold',
                                           color: const Color(0xFF405189),
                                           fontWeight: FontWeight.w600,
                                           fontSize: 16,
@@ -284,7 +364,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                       Text(
                                         '@$currentUsername',
                                         style: TextStyle(
-                                          fontFamily: 'Inter',
+                                          fontFamily: 'Maison Book',
                                           color: Colors.grey[600],
                                           fontWeight: FontWeight.w400,
                                           fontSize: 13,
@@ -340,7 +420,7 @@ class _WelcomePageState extends State<WelcomePage> {
                             child: Text(
                               'Find Place, Division, or Assets',
                               style: TextStyle(
-                                fontFamily: 'Inter',
+                                fontFamily: 'Maison Book',
                                 color: Colors.grey[500],
                                 fontSize: 14,
                               ),
@@ -383,12 +463,16 @@ class _WelcomePageState extends State<WelcomePage> {
                               children: [
                                 AssetCardMinimalist(
                                   title: 'Registered Assets',
-                                  icon: Icons.inventory_2_rounded,
+                                  image: Image.asset(
+                                    'assets/images/icons/welcome_page/registered_asset.png',
+                                    width: 28,
+                                    height: 28,
+                                  ),
                                   count: isAssetLoading
                                       ? '...'
                                       : assetCount.toString(),
                                   description: 'Has been registered',
-                                  color: Color(0xFF405189),
+                                  color: Color(0xFF2F9022),
                                   onTap: () {
                                     Navigator.push(
                                         context,
@@ -400,7 +484,11 @@ class _WelcomePageState extends State<WelcomePage> {
                                 const SizedBox(height: 10),
                                 AssetCardMinimalist(
                                   title: 'Unscanned Assets',
-                                  icon: Icons.qr_code_2_rounded,
+                                  image: Image.asset(
+                                    'assets/images/icons/welcome_page/unscanned_asset.png',
+                                    width: 28,
+                                    height: 28,
+                                  ),
                                   count: isUnscannedLoading
                                       ? '...'
                                       : unscannedAssetCount.toString(),
@@ -419,7 +507,11 @@ class _WelcomePageState extends State<WelcomePage> {
                                 const SizedBox(height: 10),
                                 AssetCardMinimalist(
                                   title: 'Damaged Assets',
-                                  icon: Icons.warning_amber_rounded,
+                                  image: Image.asset(
+                                    'assets/images/icons/welcome_page/damage_asset.png',
+                                    width: 28,
+                                    height: 28,
+                                  ),
                                   count: isAssetLoading
                                       ? '...'
                                       : assets
@@ -441,7 +533,11 @@ class _WelcomePageState extends State<WelcomePage> {
                                 const SizedBox(height: 10),
                                 AssetCardMinimalist(
                                   title: 'Lost Assets',
-                                  icon: Icons.error_outline_rounded,
+                                  image: Image.asset(
+                                    'assets/images/icons/welcome_page/lost_asset.png',
+                                    width: 28,
+                                    height: 28,
+                                  ),
                                   count: isAssetLoading
                                       ? '...'
                                       : assets
@@ -470,61 +566,9 @@ class _WelcomePageState extends State<WelcomePage> {
           ),
         ],
       ),
-      // NAVBAR (TIDAK DIUBAH)
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x1A000000),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            )
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            NavItem(
-              icon: Icons.home_rounded,
-              label: 'Home',
-              selected: true,
-              onTap: () {},
-            ),
-            NavItem(
-              icon: Icons.timeline_rounded,
-              label: 'Activity',
-              selected: false,
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ActivityPage()));
-              },
-            ),
-            NavItem(
-              icon: Icons.qr_code_scanner_rounded,
-              label: 'Scan Asset',
-              selected: false,
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ScanAssetPage()));
-              },
-            ),
-            NavItem(
-              icon: Icons.settings_rounded,
-              label: 'Setting',
-              selected: false,
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SettingsPage()));
-              },
-            ),
-          ],
-        ),
+      bottomNavigationBar: AppBottomNavBar(
+        selectedIndex: 0,
+        onTap: _onNavTap,
       ),
     );
   }
@@ -532,7 +576,8 @@ class _WelcomePageState extends State<WelcomePage> {
 
 class AssetCardMinimalist extends StatelessWidget {
   final String title;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? image;
   final String count;
   final String description;
   final Color color;
@@ -541,7 +586,8 @@ class AssetCardMinimalist extends StatelessWidget {
   const AssetCardMinimalist({
     Key? key,
     required this.title,
-    required this.icon,
+    this.icon,
+    this.image,
     required this.count,
     required this.description,
     required this.color,
@@ -555,9 +601,9 @@ class AssetCardMinimalist extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: Material(
         color: cardBg,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(10),
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
@@ -569,7 +615,10 @@ class AssetCardMinimalist extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(12),
-                  child: Icon(icon, color: color, size: 28),
+                  child: image ??
+                      (icon != null
+                          ? Icon(icon, color: color, size: 28)
+                          : null),
                 ),
                 const SizedBox(width: 18),
                 Expanded(
@@ -579,7 +628,7 @@ class AssetCardMinimalist extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Bold',
                           fontWeight: FontWeight.w600,
                           color: Colors.black87,
                           fontSize: 15,
@@ -588,7 +637,7 @@ class AssetCardMinimalist extends StatelessWidget {
                       Text(
                         description,
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Book',
                           color: Colors.grey[600],
                           fontSize: 12,
                         ),
@@ -600,7 +649,7 @@ class AssetCardMinimalist extends StatelessWidget {
                 Text(
                   count,
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Bold',
                     fontWeight: FontWeight.bold,
                     color: color,
                     fontSize: 22,
@@ -610,51 +659,6 @@ class AssetCardMinimalist extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-// NavItem (TIDAK DIUBAH)
-class NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  const NavItem({
-    Key? key,
-    required this.icon,
-    required this.label,
-    required this.selected,
-    this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 8),
-          Icon(
-            icon,
-            color: selected ? const Color(0xFF405189) : Colors.grey,
-            size: 28,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Inter',
-              color: selected ? const Color(0xFF405189) : Colors.grey,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_detail_page.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_service.dart';
-import 'package:Simba/screens/welcome_page.dart';
+import 'package:Simba/screens/welcome_page/welcome_page.dart';
 import 'asset_item.dart';
 
 class UnscannedAssetsPage extends StatefulWidget {
@@ -55,206 +55,39 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
     });
   }
 
-  Future<void> scanAsset(AssetItem asset) async {
-    try {
-      final success = await UnscannedAssetService.scanAsset(
-        widget.auditId.toString(),
-        asset.asset_code,
-      );
-      if (success) {
-        await fetchAssets();
-        await fetchScannedHistory();
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) {
-            bool allScanned = assets.isEmpty;
-            return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Color(0xFF405189).withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.check_circle, color: Color(0xFF405189), size: 24),
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    allScanned ? 'Audit Selesai!' : 'Berhasil!',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF405189),
-                    ),
-                  ),
-                ],
-              ),
-              content: Text(
-                allScanned
-                    ? 'Semua asset sudah di-scan. Audit selesai!'
-                    : 'Asset "${asset.name}" berhasil di-scan!',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                ),
-              ),
-              actions: [
-                if (!allScanned)
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                    },
-                    child: Text(
-                      'Scan Lagi',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF405189),
-                      ),
-                    ),
-                  ),
-                if (allScanned)
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Audit selesai, semua asset sudah di-scan!'),
-                          backgroundColor: Color(0xFF405189),
-                        ),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => WelcomePage()),
-                      );
-                    },
-                    child: Text(
-                      'Audit Selesai',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF405189),
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(e.toString().replaceFirst('Exception: ', ''),
-            style: TextStyle(fontFamily: 'Inter', fontSize: 12))));
-    }
+  void onSearch(String val) {
+    setState(() {
+      searchQuery = val;
+    });
+    fetchAssets();
+    fetchScannedHistory();
   }
 
-  Future<void> manualScan(AssetItem asset) async {
+  List<AssetItem> filterAssets(List<AssetItem> list) {
+    return list.where((asset) {
+      final q = searchQuery.toLowerCase();
+      final name = asset.name.toLowerCase();
+      final code = asset.asset_code.toLowerCase();
+      final cat = asset.category.toLowerCase();
+      final loc = asset.location.toLowerCase();
+      final match = name.contains(q) ||
+          code.contains(q) ||
+          cat.contains(q) ||
+          loc.contains(q);
+      final catMatch =
+          selectedCategory == "All" || asset.category == selectedCategory;
+      return match && catMatch;
+    }).toList();
+  }
+
+  Future<Map<String, dynamic>?> fetchTempStatusNotes(AssetItem asset) async {
     try {
-      final success = await UnscannedAssetService.manualScanAsset(
-        widget.auditId.toString(), asset.id.toString()
+      return await UnscannedAssetService.getTemporaryStatus(
+        widget.auditId,
+        asset.id.toString(),
       );
-      if (success) {
-        await fetchAssets();
-        await fetchScannedHistory();
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) {
-            bool allScanned = assets.isEmpty;
-            return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.edit, color: Colors.orange, size: 24),
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    allScanned ? 'Audit Selesai!' : 'Manual!',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.orange,
-                    ),
-                  ),
-                ],
-              ),
-              content: Text(
-                allScanned
-                    ? 'Semua asset sudah di-scan. Audit selesai!'
-                    : 'Asset "${asset.name}" ditandai manual!',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                ),
-              ),
-              actions: [
-                if (!allScanned)
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                    },
-                    child: Text(
-                      'Scan Lagi',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF405189),
-                      ),
-                    ),
-                  ),
-                if (allScanned)
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Audit selesai, semua asset sudah di-scan!'),
-                          backgroundColor: Color(0xFF405189),
-                        ),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => WelcomePage()),
-                      );
-                    },
-                    child: Text(
-                      'Audit Selesai',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF405189),
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          },
-        );
-      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(e.toString().replaceFirst('Exception: ', ''),
-            style: TextStyle(fontFamily: 'Inter', fontSize: 12))));
+      return null;
     }
   }
 
@@ -271,7 +104,7 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
           ),
         ),
         centerTitle: true,
@@ -305,23 +138,21 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
                 ],
               ),
               child: TextField(
-                style: TextStyle(fontFamily: 'Inter', fontSize: 14),
+                style: TextStyle(fontFamily: 'Maison Book', fontSize: 14),
                 decoration: InputDecoration(
                   hintText: "Cari aset...",
                   hintStyle: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Book',
                     fontSize: 13,
                     color: Colors.grey[400],
                   ),
-                  prefixIcon: Icon(Icons.search, color: Color(0xFF405189), size: 20),
+                  prefixIcon:
+                      Icon(Icons.search, color: Color(0xFF405189), size: 20),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                 ),
-                onChanged: (val) {
-                  searchQuery = val;
-                  fetchAssets();
-                  fetchScannedHistory();
-                },
+                onChanged: onSearch,
               ),
             ),
           ),
@@ -334,9 +165,9 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
               labelColor: Color(0xFF405189),
               unselectedLabelColor: Colors.grey,
               labelStyle: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Bold',
                 fontWeight: FontWeight.w600,
-                fontSize: 14,
+                fontSize: 12,
               ),
               tabs: [
                 Tab(text: 'Asset Belum di Scan'),
@@ -344,10 +175,12 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Riwayat Scan'),
+                      Text('Riwayat Scan',
+                          style: TextStyle(fontFamily: 'Maison Bold')),
                       SizedBox(width: 8),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Color(0xFF405189),
                           borderRadius: BorderRadius.circular(12),
@@ -357,7 +190,7 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 12,
-                            fontFamily: 'Inter',
+                            fontFamily: 'Maison Bold',
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -372,19 +205,33 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                // Tab Asset Belum di Scan
+                // Asset Belum di Scan Tab
                 RefreshIndicator(
                   onRefresh: () async {
                     await fetchAssets();
                   },
-                  child: _buildUnscannedAssetsTab(),
+                  child: _buildAssetsList(
+                    assets: filterAssets(assets),
+                    isLoading: isLoading,
+                    isScanned: false,
+                    onScan: (asset) async {
+                      // Implement scan logic if needed
+                    },
+                    onManualScan: (asset) async {
+                      // Implement manual logic if needed
+                    },
+                  ),
                 ),
-                // Tab Riwayat Scan
+                // Riwayat Scan Tab (pencarian dan kategori filter juga berlaku!)
                 RefreshIndicator(
                   onRefresh: () async {
                     await fetchScannedHistory();
                   },
-                  child: _buildScannedHistoryTab(),
+                  child: _buildAssetsList(
+                    assets: filterAssets(scannedAssets),
+                    isLoading: isLoadingHistory,
+                    isScanned: true,
+                  ),
                 ),
               ],
             ),
@@ -394,42 +241,28 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
     );
   }
 
-  Widget _buildUnscannedAssetsTab() {
+  Widget _buildAssetsList({
+    required List<AssetItem> assets,
+    required bool isLoading,
+    required bool isScanned,
+    Function(AssetItem)? onScan,
+    Function(AssetItem)? onManualScan,
+  }) {
     if (isLoading) {
-      // shimmer loading asset belum di scan
       return ListView.builder(
         padding: EdgeInsets.all(12),
         itemCount: 5,
         itemBuilder: (context, idx) => Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            margin: EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListTile(
-              leading: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              title: Container(
-                height: 14,
-                width: 100,
-                color: Colors.grey[200],
-              ),
-              subtitle: Padding(
-                padding: EdgeInsets.only(top: 4),
-                child: Container(
-                  height: 10,
-                  width: 80,
-                  color: Colors.grey[200],
-                ),
+          highlightColor: Colors.white,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Container(
+              height: 70,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
           ),
@@ -437,487 +270,511 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
       );
     }
 
-    return assets.isEmpty
-      ? Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Color(0xFF405189).withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.qr_code_2,
-                    size: 40, color: Color(0xFF405189)),
+    if (assets.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Color(0xFF405189).withOpacity(0.1),
+                shape: BoxShape.circle,
               ),
-              SizedBox(height: 16),
-              Text("Tidak ada aset belum di-scan",
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF405189),
-                  )),
-              SizedBox(height: 4),
-              Text("Semua aset sudah terscan",
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                  )),
-            ],
-          ),
-        )
-      : ListView.builder(
-          padding: EdgeInsets.all(12),
-          itemCount: assets.length,
-          itemBuilder: (context, idx) {
-            final asset = assets[idx];
-            return Container(
-              margin: EdgeInsets.only(bottom: 8),
+              child: Icon(
+                isScanned ? Icons.history_rounded : Icons.qr_code_2,
+                size: 40,
+                color: Color(0xFF405189),
+              ),
+            ),
+            SizedBox(height: 16),
+            Text(
+              isScanned
+                  ? "Belum ada asset yang di-scan"
+                  : "Tidak ada aset belum di-scan",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF405189),
+              ),
+            ),
+            SizedBox(height: 4),
+            Text(
+              isScanned
+                  ? "Mulai scan asset untuk melihat riwayat"
+                  : "Semua aset sudah terscan",
+              style: TextStyle(
+                fontFamily: 'Maison Book',
+                fontSize: 12,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.all(12),
+      itemCount: assets.length,
+      itemBuilder: (context, idx) {
+        final asset = assets[idx];
+        return Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: () async {
+              if (!isScanned) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UnscannedAssetDetailPage(
+                      asset: asset,
+                      auditId: widget.auditId,
+                      onAssetScanned: () => fetchAssets(),
+                    ),
+                  ),
+                );
+              } else {
+                // Ambil temp_status dan notes dari backend
+                showDialog(
+                  context: context,
+                  builder: (ctx) {
+                    return FutureBuilder<Map<String, dynamic>?>(
+                      future: fetchTempStatusNotes(asset),
+                      builder: (context, snapshot) {
+                        final tempStatus = snapshot.data;
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          title: Text(
+                            asset.name,
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF405189),
+                            ),
+                          ),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.qr_code_2,
+                                        color: Color(0xFF405189), size: 18),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Barcode: ",
+                                      style: TextStyle(
+                                          fontFamily: 'Maison Bold',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        asset.asset_code,
+                                        style: TextStyle(
+                                            fontFamily: 'Maison Book',
+                                            fontSize: 12),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Icon(Icons.schedule,
+                                        color: Colors.orange, size: 18),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Tanggal Scan: ",
+                                      style: TextStyle(
+                                          fontFamily: 'Maison Bold',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        asset.scanned_at ??
+                                            asset.last_scanned_at ??
+                                            '-',
+                                        style: TextStyle(
+                                            fontFamily: 'Maison Book',
+                                            fontSize: 12),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Icon(Icons.person,
+                                        color: Colors.green, size: 18),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Scanned By: ",
+                                      style: TextStyle(
+                                          fontFamily: 'Maison Bold',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        asset.pic,
+                                        style: TextStyle(
+                                            fontFamily: 'Maison Book',
+                                            fontSize: 12),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green[100],
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        "Scanned",
+                                        style: TextStyle(
+                                          fontFamily: 'Maison Bold',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 11,
+                                          color: Colors.green[800],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Divider(),
+                                // Info temp_status dan notes
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting)
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2)),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          "Memuat status & catatan...",
+                                          style: TextStyle(
+                                              fontFamily: 'Maison Book',
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                else if (tempStatus != null)
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.assignment_turned_in,
+                                              color: Color(0xFF405189),
+                                              size: 18),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            "Status Sementara: ",
+                                            style: TextStyle(
+                                                fontFamily: 'Maison Bold',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              tempStatus['temp_status'] ??
+                                                  "Belum ada",
+                                              style: TextStyle(
+                                                  fontFamily: 'Maison Book',
+                                                  fontSize: 12,
+                                                  color: Colors.blue[700]),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 4),
+                                      if ((tempStatus['notes'] ?? '')
+                                          .isNotEmpty)
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.notes,
+                                                color: Colors.blue, size: 18),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "Catatan: ",
+                                              style: TextStyle(
+                                                  fontFamily: 'Maison Bold',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                tempStatus['notes'],
+                                                style: TextStyle(
+                                                    fontFamily: 'Maison Book',
+                                                    fontSize: 12,
+                                                    color: Colors.grey[700]),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      else
+                                        Row(
+                                          children: [
+                                            Icon(Icons.notes,
+                                                color: Colors.blue, size: 18),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "Catatan: ",
+                                              style: TextStyle(
+                                                  fontFamily: 'Maison Bold',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                "Belum ada",
+                                                style: TextStyle(
+                                                    fontFamily: 'Maison Book',
+                                                    fontSize: 12,
+                                                    color: Colors.grey[500]),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  )
+                                else
+                                  Text(
+                                    "Tidak ada data status/catatan untuk asset ini.",
+                                    style: TextStyle(
+                                        fontFamily: 'Maison Book',
+                                        fontSize: 12,
+                                        color: Colors.grey[500]),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              child: Text(
+                                'Tutup',
+                                style: TextStyle(
+                                  fontFamily: 'Maison Bold',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                  color: Color(0xFF405189),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+              }
+            },
+            child: Container(
+              height: 70,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: Color(0xFF405189).withOpacity(0.1),
+                  color: Color(0xFF405189).withOpacity(0.08),
                   width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.03),
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
+                    blurRadius: 3,
+                    offset: Offset(0, 1),
                   ),
                 ],
               ),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UnscannedAssetDetailPage(
-                        asset: asset,
-                        auditId: widget.auditId,
-                        onAssetScanned: () => fetchAssets(),
-                      ),
+              child: Row(
+                children: [
+                  // Asset Image
+                  Container(
+                    width: 48,
+                    height: 48,
+                    margin: EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Color(0xFF405189).withOpacity(0.1),
                     ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      // Asset Image
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: Color(0xFF405189).withOpacity(0.1),
-                        ),
-                        child: asset.image_path.isNotEmpty
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  asset.image_path.split(',')[0],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF405189).withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        asset.name.substring(0, 1).toUpperCase(),
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF405189),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                    child: asset.image_path.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              asset.image_path.split(',')[0],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF405189).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              )
-                            : Center(
-                                child: Text(
-                                  asset.name.substring(0, 1).toUpperCase(),
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF405189),
+                                child: Center(
+                                  child: Text(
+                                    asset.name.substring(0, 1).toUpperCase(),
+                                    style: TextStyle(
+                                      fontFamily: 'Maison Bold',
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF405189),
+                                    ),
                                   ),
                                 ),
                               ),
-                      ),
-                      SizedBox(width: 12),
-                      // Asset Info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              asset.name,
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              asset.name.substring(0, 1).toUpperCase(),
                               style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 14,
+                                fontFamily: 'Maison Bold',
+                                fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF405189),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                            SizedBox(height: 2),
-                            Text(
-                              asset.asset_code,
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontSize: 12,
-                                color: Colors.grey[600],
+                          ),
+                  ),
+                  // Asset Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          asset.name,
+                          style: TextStyle(
+                            fontFamily: 'Maison Bold',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF405189),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          asset.asset_code,
+                          style: TextStyle(
+                            fontFamily: 'Maison Book',
+                            fontSize: 11,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Color(0xFF405189).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                asset.category,
+                                style: TextStyle(
+                                  fontFamily: 'Maison Bold',
+                                  fontSize: 10,
+                                  color: Color(0xFF405189),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF405189).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    asset.category,
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontSize: 10,
-                                      color: Color(0xFF405189),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
+                            SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                asset.location,
+                                style: TextStyle(
+                                  fontFamily: 'Maison Book',
+                                  fontSize: 10,
+                                  color: Colors.grey[600],
                                 ),
-                                SizedBox(width: 6),
-                                Text(
-                                  asset.location,
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 11,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      // Action Buttons
-                      Column(
+                      ],
+                    ),
+                  ),
+                  // Action Buttons or Status
+                  if (!isScanned)
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _actionButton(
                             label: "Scan",
                             color: Color(0xFF405189),
-                            onPressed: () => scanAsset(asset),
+                            onPressed: () => onScan?.call(asset),
                           ),
                           SizedBox(height: 4),
                           _actionButton(
                             label: "Manual",
                             color: Colors.orange,
-                            onPressed: () => manualScan(asset),
+                            onPressed: () => onManualScan?.call(asset),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-  }
-
-  Widget _buildScannedHistoryTab() {
-    if (isLoadingHistory) {
-      // shimmer loading riwayat scan
-      return ListView.builder(
-        padding: EdgeInsets.all(12),
-        itemCount: 5,
-        itemBuilder: (context, idx) => Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            margin: EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListTile(
-              leading: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              title: Container(
-                height: 12,
-                width: 90,
-                color: Colors.grey[200],
-              ),
-              subtitle: Padding(
-                padding: EdgeInsets.only(top: 4),
-                child: Container(
-                  height: 9,
-                  width: 70,
-                  color: Colors.grey[200],
-                ),
+                    )
+                  else
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.green[100],
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          "Scanned",
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontFamily: 'Maison Bold',
+                            color: Colors.green[800],
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
-        ),
-      );
-    }
-
-    return scannedAssets.isEmpty
-      ? ListView(
-          physics: AlwaysScrollableScrollPhysics(),
-          children: [
-            SizedBox(height: 100),
-            Center(
-              child: Text(
-                "Belum ada asset yang di-scan.",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF405189),
-                ),
-              ),
-            ),
-          ],
-        )
-      : ListView.builder(
-          padding: EdgeInsets.all(12),
-          itemCount: scannedAssets.length,
-          itemBuilder: (context, idx) {
-            final asset = scannedAssets[idx];
-            return Container(
-              margin: EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Color(0xFF405189).withOpacity(0.1),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ListTile(
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        title: Text(
-                          asset.name,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF405189),
-                          ),
-                        ),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.qr_code_2, color: Color(0xFF405189), size: 18),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Barcode: ",
-                                  style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w600),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    asset.asset_code,
-                                    style: TextStyle(fontFamily: 'Inter', fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Icon(Icons.schedule, color: Colors.orange, size: 18),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Tanggal Scan: ",
-                                  style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w600),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    asset.scanned_at ?? asset.last_scanned_at ?? '-',
-                                    style: TextStyle(fontFamily: 'Inter', fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Icon(Icons.person, color: Colors.green, size: 18),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Scanned By: ",
-                                  style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w600),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    asset.pic,
-                                    style: TextStyle(fontFamily: 'Inter', fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green[100],
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    "Scanned",
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 11,
-                                      color: Colors.green[800],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(),
-                            child: Text(
-                              'Tutup',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
-                                color: Color(0xFF405189),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-                leading: asset.image_path.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          asset.image_path.split(',')[0],
-                          width: 44,
-                          height: 44,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Color(0xFF405189).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            asset.name.substring(0, 1).toUpperCase(),
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF405189),
-                            ),
-                          ),
-                        ),
-                      ),
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        asset.name,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                          color: Color(0xFF405189),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.green[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        "Scanned",
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                          color: Colors.green[800],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Barcode: ${asset.asset_code}",
-                      style: TextStyle(fontFamily: 'Inter', fontSize: 11),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      "Tanggal Scan: ${asset.scanned_at ?? asset.last_scanned_at ?? '-'}",
-                      style: TextStyle(fontFamily: 'Inter', fontSize: 11),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-                trailing: Icon(Icons.chevron_right, color: Color(0xFF405189), size: 18),
-              ),
-            );
-          },
         );
+      },
+    );
   }
 
   Widget _actionButton({
@@ -929,7 +786,7 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
       onTap: onPressed,
       borderRadius: BorderRadius.circular(6),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
           borderRadius: BorderRadius.circular(6),
@@ -938,7 +795,7 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
         child: Text(
           label,
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
             fontSize: 10,
             fontWeight: FontWeight.w600,
             color: color,

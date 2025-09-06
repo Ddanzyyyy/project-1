@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'asset_item.dart'; 
 
 class UnscannedAssetService {
-  static String baseUrl = "http://192.168.1.8:8000/api";
+  static String baseUrl = "http://192.168.1.9:8000/api";
 
   static Future<List<AssetItem>> fetchUnscannedAssets({
     required String auditId,
@@ -59,11 +59,28 @@ class UnscannedAssetService {
     }
   }
 
+  // Versi lama (untuk backward compatibility)
   static Future<bool> scanAsset(String auditId, String assetCode) async {
+    return scanAssetWithStatus(auditId, assetCode, "pending", "");
+  }
+
+  static Future<bool> manualScanAsset(String auditId, String assetId) async {
+    return manualScanAssetWithStatus(auditId, assetId, "pending", "");
+  }
+
+  // Versi baru dengan status & notes
+  static Future<bool> scanAssetWithStatus(
+    String auditId, 
+    String assetCode, 
+    String tempStatus, 
+    String notes
+  ) async {
     try {
       final url = "$baseUrl/audit/$auditId/scan";
       print("Scan URL: $url");
       print("Asset Code: $assetCode");
+      print("Temp Status: $tempStatus");
+      print("Notes: $notes");
 
       final response = await http.post(
         Uri.parse(url),
@@ -71,7 +88,12 @@ class UnscannedAssetService {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: json.encode({"asset_code": assetCode}),
+        body: json.encode({
+          "asset_code": assetCode,
+          "scanned_at": DateTime.now().toIso8601String(),
+          "temp_status": tempStatus,
+          "notes": notes,
+        }),
       );
 
       print("Scan Status Code: ${response.statusCode}");
@@ -102,16 +124,23 @@ class UnscannedAssetService {
         throw Exception('Server error: $errorMessage');
       }
     } catch (e) {
-      print("Error in scanAsset: $e");
+      print("Error in scanAssetWithStatus: $e");
       rethrow;
     }
   }
 
-  static Future<bool> manualScanAsset(String auditId, String assetId) async {
+  static Future<bool> manualScanAssetWithStatus(
+    String auditId, 
+    String assetId, 
+    String tempStatus, 
+    String notes
+  ) async {
     try {
       final url = "$baseUrl/audit/$auditId/manual-scan";
       print("Manual Scan URL: $url");
       print("Asset ID: $assetId");
+      print("Temp Status: $tempStatus");
+      print("Notes: $notes");
 
       final response = await http.post(
         Uri.parse(url),
@@ -119,7 +148,12 @@ class UnscannedAssetService {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: json.encode({"asset_id": assetId}),
+        body: json.encode({
+          "asset_id": assetId,
+          "scanned_at": DateTime.now().toIso8601String(),
+          "temp_status": tempStatus,
+          "notes": notes,
+        }),
       );
 
       print("Manual Scan Status Code: ${response.statusCode}");
@@ -152,8 +186,135 @@ class UnscannedAssetService {
         throw Exception('Server error: $errorMessage');
       }
     } catch (e) {
-      print("Error in manualScanAsset: $e");
+      print("Error in manualScanAssetWithStatus: $e");
       rethrow;
+    }
+  }
+
+  // Save temporary status & notes
+  static Future<bool> saveTemporaryStatus(
+    String auditId,
+    String assetId,
+    String tempStatus,
+    String notes,
+  ) async {
+    try {
+      final url = '$baseUrl/audit/$auditId/temp-status';
+      print('Save temp status - URL: $url');
+      print('Save temp status - Payload: ${json.encode({
+        'asset_id': assetId,
+        'status': tempStatus,
+        'notes': notes,
+      })}');
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode({
+          'asset_id': assetId,
+          'status': tempStatus,
+          'notes': notes,
+        }),
+      );
+      
+      print('Save temp status - Response Code: ${response.statusCode}');
+      print('Save temp status - Response Body: ${response.body}');
+      
+      if (_isJsonResponse(response)) {
+        final body = json.decode(response.body);
+        
+        if (response.statusCode == 200) {
+          if (body['success'] == true) {
+            return true;
+          } else {
+            throw Exception(body['message'] ?? 'Gagal menyimpan status sementara');
+          }
+        } else if (response.statusCode == 422) {
+          String errorMsg = _extractValidationErrors(body);
+          throw Exception(errorMsg);
+        } else {
+          throw Exception(body['message'] ?? 'Gagal menyimpan status sementara (${response.statusCode})');
+        }
+      } else {
+        String errorMessage = _extractErrorMessage(response);
+        throw Exception('Server error: $errorMessage');
+      }
+    } catch (e) {
+      print('Save temp status exception: $e');
+      rethrow;
+    }
+  }
+
+  // Get temporary status for asset
+  static Future<Map<String, dynamic>?> getTemporaryStatus(
+    String auditId,
+    String assetId,
+  ) async {
+    try {
+      final url = '$baseUrl/audit/$auditId/temp-status/$assetId';
+      print('Get temp status - URL: $url');
+      
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+      
+      print('Get temp status - Response Code: ${response.statusCode}');
+      print('Get temp status - Response Body: ${response.body}');
+      
+      if (response.statusCode == 200) {
+        if (_isJsonResponse(response)) {
+          final body = json.decode(response.body);
+          if (body['success'] == true && body['data'] != null) {
+            return body['data'];
+          }
+        }
+      } else if (response.statusCode == 404) {
+        // No temporary status found, return null
+        return null;
+      }
+      
+      return null;
+    } catch (e) {
+      print('Get temp status exception: $e');
+      return null;
+    }
+  }
+
+  static Future<List<AssetItem>> fetchScannedHistory({required String auditId}) async {
+    final url = "$baseUrl/audit/$auditId/scanned-history";
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+      
+      if (response.statusCode == 200) {
+        if (_isJsonResponse(response)) {
+          final parsed = json.decode(response.body);
+          if (parsed is List) {
+            return parsed.map<AssetItem>((e) => AssetItem.fromJson(e)).toList();
+          } else {
+            throw Exception('Format response tidak valid');
+          }
+        } else {
+          throw Exception('Server mengembalikan HTML, bukan JSON');
+        }
+      } else {
+        throw Exception('Gagal mengambil riwayat: ${response.statusCode}');
+      }
+    } catch (e) {
+      print("Error in fetchScannedHistory: $e");
+      throw Exception('Error mengambil riwayat: $e');
     }
   }
 
@@ -198,23 +359,4 @@ class UnscannedAssetService {
     }
     return body['message'] ?? 'Validation error';
   }
-  static Future<List<AssetItem>> fetchScannedHistory({required String auditId}) async {
-  final url = "$baseUrl/audit/$auditId/scanned-history";
-  try {
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final parsed = json.decode(response.body);
-      if (parsed is List) {
-        return parsed.map<AssetItem>((e) => AssetItem.fromJson(e)).toList();
-      } else {
-        throw Exception('Format response tidak valid');
-      }
-    } else {
-      throw Exception('Gagal mengambil riwayat: ${response.statusCode}');
-    }
-  } catch (e) {
-    throw Exception('Error mengambil riwayat: $e');
-  }
 }
-}
-

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:Simba/screens/welcome_page/welcome_page.dart'; // Import WelcomePage
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -23,10 +24,28 @@ class _LoginPageState extends State<LoginPage> {
 
   String getBaseUrl() {
     if (Platform.isAndroid) {
-      return 'http://192.168.1.8:8000/api/login';
+      return 'http://192.168.1.9:8000/api/login';
     } else {
-      return 'http://127.0.0.1:8000/api/login'; // If IOS Console
+      return 'http://127.0.0.1:8000/api/login'; // If IOS Console 
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfLoggedIn();
+  }
+
+  Future<void> _checkIfLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null && token.isNotEmpty) {
+      // Sudah login, langsung ke WelcomePage
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => WelcomePage()),
+      );
+    }
+    // Jika belum login, tetap di halaman login
   }
 
   Future<void> handleLogin(BuildContext context) async {
@@ -77,8 +96,11 @@ class _LoginPageState extends State<LoginPage> {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setString('name', data['user']['name']);
             prefs.setString('username', data['user']['username']);
-            prefs.setString('token', data['token']); 
-            Navigator.pushNamed(context, '/welcome');
+            prefs.setString('token', data['token']);
+            // Setelah simpan token, arahkan ke WelcomePage (bukan '/welcome' by name)
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => WelcomePage()),
+            );
           } else {
             setState(() {
               apiWarning = data['message'] ?? 'Login gagal';

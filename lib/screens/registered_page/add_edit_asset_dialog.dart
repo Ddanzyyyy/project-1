@@ -43,7 +43,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
   static const Color cardBackground = Color(0xFFFFFFFF);
 
   final List<Map<String, dynamic>> statusOptions = [
-    {'value': 'registered', 'label': 'Registered', 'color': successColor},
+    {'value': 'registered', 'label': 'Registered', 'color': const Color(0xFF059669)},
     {'value': 'unscanned', 'label': 'Unscanned', 'color': Color(0xFFF59E0B)},
     {'value': 'damaged', 'label': 'Damaged', 'color': Color(0xFFEF4444)},
     {'value': 'lost', 'label': 'Lost', 'color': errorColor},
@@ -107,7 +107,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
       ),
       builder: (context) => SafeArea(
         child: Wrap(
@@ -218,7 +218,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.9,
@@ -226,7 +226,7 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
         ),
         decoration: BoxDecoration(
           color: cardBackground,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -262,8 +262,8 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
         ),
       ),
       child: Row(
@@ -273,10 +273,10 @@ class _AddEditAssetDialogState extends State<AddEditAssetDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.asset != null ? 'Edit Aset' : 'Tambah Aset Baru',
+                  widget.asset != null ? 'Edit Aset' : 'Tambah Asset Baru',
                   style: TextStyle(
                     fontFamily: 'Maison Bold',
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: textPrimary,
                     height: 1.2,

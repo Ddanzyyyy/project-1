@@ -11,7 +11,8 @@ class Asset {
   final String status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
-  final DateTime? lastScannedAt; 
+  final DateTime? lastScannedAt;
+  final String? scannedBy; 
 
   Asset({
     required this.id,
@@ -26,7 +27,8 @@ class Asset {
     required this.status,
     this.createdAt,
     this.updatedAt,
-    this.lastScannedAt, // Tambahan ke constructor
+    this.lastScannedAt,
+    this.scannedBy, // Tambahan ke constructor
   });
 
   factory Asset.fromJson(Map<String, dynamic> json) {
@@ -43,21 +45,27 @@ class Asset {
       status: json['status'] ?? '',
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
       updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
-      lastScannedAt: json['last_scanned_at'] != null ? DateTime.parse(json['last_scanned_at']) : null, // Tambahan
+      lastScannedAt: json['last_scanned_at'] != null ? DateTime.parse(json['last_scanned_at']) : null,
+      scannedBy: json['scanned_by'], // Tambahan field dari API/database
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'category': category,
       'description': description,
+      'image_path': imagePath,
       'date_added': dateAdded,
       'asset_code': assetCode,
       'location': location,
       'pic': pic,
       'status': status,
-      'last_scanned_at': lastScannedAt?.toIso8601String(), // Tambahan
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
+      'last_scanned_at': lastScannedAt?.toIso8601String(),
+      'scanned_by': scannedBy,
     };
   }
 
@@ -74,7 +82,8 @@ class Asset {
     String? status,
     DateTime? createdAt,
     DateTime? updatedAt,
-    DateTime? lastScannedAt, 
+    DateTime? lastScannedAt,
+    String? scannedBy,
   }) {
     return Asset(
       id: id ?? this.id,
@@ -90,6 +99,7 @@ class Asset {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       lastScannedAt: lastScannedAt ?? this.lastScannedAt,
+      scannedBy: scannedBy ?? this.scannedBy,
     );
   }
 }

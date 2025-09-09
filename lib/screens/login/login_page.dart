@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Simba/screens/welcome_page/welcome_page.dart'; // Import WelcomePage
+import 'package:Simba/screens/welcome_page/welcome_page.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -40,12 +40,10 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     if (token != null && token.isNotEmpty) {
-      // Sudah login, langsung ke WelcomePage
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => WelcomePage()),
       );
     }
-    // Jika belum login, tetap di halaman login
   }
 
   Future<void> handleLogin(BuildContext context) async {
@@ -64,12 +62,6 @@ class _LoginPageState extends State<LoginPage> {
 
       try {
         final url = getBaseUrl();
-        print('Mengirim request ke: $url');
-        print('Body: ${jsonEncode({
-          'username': usernameController.text,
-          'password': passwordController.text,
-        })}');
-
         final response = await http.post(
           Uri.parse(url),
           headers: {
@@ -83,9 +75,6 @@ class _LoginPageState extends State<LoginPage> {
           }),
         ).timeout(const Duration(seconds: 3));
 
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
-
         setState(() {
           isLoading = false;
         });
@@ -97,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
             prefs.setString('name', data['user']['name']);
             prefs.setString('username', data['user']['username']);
             prefs.setString('token', data['token']);
-            // Setelah simpan token, arahkan ke WelcomePage (bukan '/welcome' by name)
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => WelcomePage()),
             );
@@ -113,7 +101,6 @@ class _LoginPageState extends State<LoginPage> {
           });
         }
       } catch (e) {
-        print('Error detail: $e');
         setState(() {
           isLoading = false;
           apiWarning = 'Gagal terhubung ke server: $e';
@@ -124,13 +111,27 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final media = MediaQuery.of(context);
+    final screenHeight = media.size.height;
+    final screenWidth = media.size.width;
+    final isPortrait = media.orientation == Orientation.portrait;
+    final isSmallDevice = screenWidth < 400;
+
+    // Responsive paddings and sizes
+    final horizontalPad = isSmallDevice ? 18.0 : 32.0;
+    final logoWidth = isSmallDevice ? 90.0 : 120.0;
+    final logoHeight = isSmallDevice ? 90.0 : 120.0;
+    final simbaWidth = isSmallDevice ? 160.0 : 270.0;
+    final simbaHeight = isSmallDevice ? 18.0 : 30.0;
+    final inputWidth = isSmallDevice ? double.infinity : 300.0;
+    final buttonWidth = isSmallDevice ? double.infinity : 300.0;
+    final inputFontSize = isSmallDevice ? 12.0 : 13.0;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          // Background circles (tidak diubah, tetap sesuai desain awal)
           Positioned(
             top: -100,
             right: -100,
@@ -190,14 +191,13 @@ class _LoginPageState extends State<LoginPage> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
+                padding: EdgeInsets.symmetric(horizontal: horizontalPad),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 120,
-                      height: 120,
-                      decoration: const BoxDecoration(),
+                      width: logoWidth,
+                      height: logoHeight,
                       child: Image.asset(
                         'assets/images/LOGO_INDOCEMENT.jpg',
                       ),
@@ -205,8 +205,8 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 12),
                     Image.asset(
                       'assets/images/SIMBA.png',
-                      width: 270,
-                      height: 30,
+                      width: simbaWidth,
+                      height: simbaHeight,
                       fit: BoxFit.contain,
                     ),
                     const SizedBox(height: 6),
@@ -238,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 4),
                         SizedBox(
-                          width: 300,
+                          width: inputWidth,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -256,9 +256,9 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 child: TextField(
                                   controller: usernameController,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'Maison Book',
-                                    fontSize: 13,
+                                    fontSize: inputFontSize,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Enter Username',
@@ -310,7 +310,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 4),
                         SizedBox(
-                          width: 300,
+                          width: inputWidth,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -329,9 +329,9 @@ class _LoginPageState extends State<LoginPage> {
                                 child: TextField(
                                   controller: passwordController,
                                   obscureText: true,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'Maison Book',
-                                    fontSize: 13,
+                                    fontSize: inputFontSize,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Enter Password',
@@ -385,7 +385,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         const SizedBox(height: 25),
                         SizedBox(
-                          width: 300,
+                          width: buttonWidth,
                           height: 48,
                           child: ElevatedButton(
                             onPressed:
@@ -415,9 +415,9 @@ class _LoginPageState extends State<LoginPage> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                            ),
                           ),
-                        const SizedBox(height: 32),
+                        ),
+                        SizedBox(height: isSmallDevice ? 24 : 32),
                       ],
                     ),
                   ],

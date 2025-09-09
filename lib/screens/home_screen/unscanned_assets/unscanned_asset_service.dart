@@ -59,7 +59,6 @@ class UnscannedAssetService {
     }
   }
 
-  // Versi lama (untuk backward compatibility)
   static Future<bool> scanAsset(String auditId, String assetCode) async {
     return scanAssetWithStatus(auditId, assetCode, "pending", "");
   }
@@ -113,7 +112,6 @@ class UnscannedAssetService {
             throw Exception(body['message'] ?? 'Gagal scan asset');
           }
         } else if (response.statusCode == 422) {
-          // Validation error
           String errorMsg = _extractValidationErrors(body);
           throw Exception(errorMsg);
         } else {
@@ -191,7 +189,6 @@ class UnscannedAssetService {
     }
   }
 
-  // Save temporary status & notes
   static Future<bool> saveTemporaryStatus(
     String auditId,
     String assetId,

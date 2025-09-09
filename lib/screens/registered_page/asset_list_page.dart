@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'asset_model.dart';
 import 'asset_service.dart';
 import 'category_service.dart';
@@ -358,13 +359,63 @@ class _AssetListPageState extends State<AssetListPage>
       itemBuilder: (context, index) {
         return Padding(
           padding: EdgeInsets.only(bottom: 8),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              padding: EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 14,
+                          color: Colors.grey[300],
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: 100,
+                          height: 12,
+                          color: Colors.grey[300],
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: 60,
+                          height: 10,
+                          color: Colors.grey[300],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            height: 70,
-            width: double.infinity,
           ),
         );
       },

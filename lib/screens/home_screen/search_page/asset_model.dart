@@ -10,6 +10,7 @@ class AssetModel {
   final String? description;
   final String? assetCode;
   final String? pic;
+  final String? createdAt;
 
   AssetModel({
     required this.id,
@@ -23,21 +24,23 @@ class AssetModel {
     this.description,
     this.assetCode,
     this.pic,
+    this.createdAt,
   });
 
   factory AssetModel.fromJson(Map<String, dynamic> json) {
     return AssetModel(
-      id: json['id'],
+      id: json['id'] ?? 0,
       name: json['name'] ?? '',
       code: json['code'] ?? '',
       location: json['location'] ?? '',
       division: json['division'] ?? '',
       status: json['status'] ?? '',
-      imageUrl: json['imageUrl'] ?? '',
+      imageUrl: json['image_path'] ?? '',
       category: json['category'],
       description: json['description'],
       assetCode: json['asset_code'],
       pic: json['pic'],
+      createdAt: json['created_at'],
     );
   }
 }

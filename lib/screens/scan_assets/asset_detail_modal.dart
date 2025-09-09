@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'asset.dart';
@@ -24,6 +25,35 @@ class AssetDetailsModal extends StatefulWidget {
 
 class _AssetDetailsModalState extends State<AssetDetailsModal> {
   String? scanTime;
+
+  void _showFullImage(String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: InteractiveViewer(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.white,
+                    height: 300,
+                    child: Center(child: Icon(Icons.broken_image, size: 64, color: Colors.grey)),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
   Asset? updatedAsset;
 
   @override
@@ -40,7 +70,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
       final now = DateTime.now();
       updatedAsset = widget.asset.copyWith(
         lastScannedAt: now,
-        status: 'registered',
+        // status: 'registered', // Jangan ubah status!
       );
 
       widget.onUpdate(updatedAsset!);
@@ -82,16 +112,11 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
     }
   }
 
-  // Tambahan: Format dateAdded agar tampil dengan WIB dan tanpa "T00:00:00.000000Z"
-  String _getFormattedDateAdded(String dateAdded) {
-    try {
-      // Coba parse ISO string
-      DateTime dt = DateTime.parse(dateAdded);
-      return DateFormat('dd MMM yyyy').format(dt) + ' WIB';
-    } catch (_) {
-      // Jika bukan ISO, tampilkan apa adanya
-      return dateAdded;
+  String _getCreatedAtRaw(String createdAt) {
+    if (createdAt.contains('T')) {
+      return createdAt.split('T').first;
     }
+    return createdAt.isNotEmpty ? createdAt : '-';
   }
 
   @override
@@ -120,7 +145,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
             ),
           ),
 
-          // Header - Simple
+          // Header
           Container(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
             child: Row(
@@ -174,30 +199,34 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF405189).withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color(0xFF405189).withOpacity(0.2),
-                            width: 1,
+                      GestureDetector(
+                        onTap: displayAsset.imagePath != null && displayAsset.imagePath!.isNotEmpty
+                            ? () => _showFullImage(displayAsset.imagePath!)
+                            : null,
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF405189).withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFF405189).withOpacity(0.2),
+                              width: 1,
+                            ),
                           ),
+                          child: displayAsset.imagePath != null && displayAsset.imagePath!.isNotEmpty
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(11),
+                                  child: Image.network(
+                                    displayAsset.imagePath!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return _buildAssetIcon();
+                                    },
+                                  ),
+                                )
+                              : _buildAssetIcon(),
                         ),
-                        child: displayAsset.imagePath != null &&
-                                displayAsset.imagePath!.isNotEmpty
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(11),
-                                child: Image.network(
-                                  displayAsset.imagePath!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return _buildAssetIcon();
-                                  },
-                                ),
-                              )
-                            : _buildAssetIcon(),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -218,8 +247,7 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                             ),
                             const SizedBox(height: 4),
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: Colors.grey[100],
                                 borderRadius: BorderRadius.circular(4),
@@ -298,10 +326,9 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                         ),
                         const SizedBox(height: 12),
                         _buildInfoRow('Asset Code', displayAsset.assetCode),
-                        // Ubah di sini agar format dateAdded rapi dan WIB
                         _buildInfoRow(
                           'Date Added',
-                          _getFormattedDateAdded(displayAsset.dateAdded),
+                          _getCreatedAtRaw(displayAsset.createdAt != null ? displayAsset.createdAt!.toIso8601String() : ''),
                         ),
                         _buildInfoRow('Person in Charge', displayAsset.pic),
                         _buildInfoRow('Scanned By', _getScannedByText()),

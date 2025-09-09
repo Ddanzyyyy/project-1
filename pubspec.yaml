@@ -50,7 +50,18 @@ flutter:
     - assets/images/icons/welcome_page/unscanned_asset.png
     - assets/images/icons/welcome_page/damage_asset.png
     - assets/images/icons/welcome_page/lost_asset.png
-    - assets/images/indocement_logo.jpg
+    - assets/images/indocement_logo.png
+    - assets/placeholder.png
+    - assets/images/icons/damaged_page/warning.png
+    - assets/images/icons/damaged_page/warning_mail.png
+    - assets/images/icons/damaged_page/camera.png
+    - assets/images/icons/damaged_page/upload.png
+    - assets/images/icons/activity_page/category.png
+    - assets/images/icons/activity_page/location.png
+    - assets/images/icons/activity_page/status.png
+    - assets/images/icons/activity_page/create_at.png
+    - assets/images/icons/activity_page/update_at.png
+
     # - assets/lottie/idea.gif
     # - assets/images/icons/registered_assets.png
     # - assets/images/icons/unscanned_assets.png

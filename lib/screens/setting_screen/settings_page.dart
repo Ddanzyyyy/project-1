@@ -152,11 +152,11 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(width: 10),
             ClipRRect(
-              borderRadius: BorderRadius.circular(5),
+              // borderRadius: BorderRadius.circular(5),
               child: Image.asset(
-                'assets/images/indocement_logo.jpg',
-                width: 44,
-                height: 44,
+                'assets/images/indocement_logo.png',
+                width: 40,
+                height: 40,
                 fit: BoxFit.cover,
               ),
             ),

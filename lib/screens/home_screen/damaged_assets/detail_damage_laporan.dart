@@ -70,7 +70,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                           children: [
                             Icon(Icons.broken_image_outlined, size: 64, color: Colors.grey[400]),
                             SizedBox(height: 16),
-                            Text('Gambar tidak dapat dimuat', style: TextStyle(color: Colors.white, fontSize: 16)),
+                            Text('Gambar tidak dapat dimuat', style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'Maison Book')),
                           ],
                         ),
                       ),
@@ -128,7 +128,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal refresh laporan'),
+          content: Text('Gagal refresh laporan', style: TextStyle(fontFamily: 'Maison Book')),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -155,7 +155,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Foto tambahan berhasil diunggah'),
+          content: Text('Foto tambahan berhasil diunggah', style: TextStyle(fontFamily: 'Maison Book')),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -169,7 +169,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal upload foto tambahan'),
+          content: Text('Gagal upload foto tambahan', style: TextStyle(fontFamily: 'Maison Book')),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -254,7 +254,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
         title: Text(
           'Detail Laporan Kerusakan',
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
             fontWeight: FontWeight.w600,
             fontSize: 18,
             color: const Color.fromARGB(255, 255, 255, 255),
@@ -295,7 +295,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Status Card dengan design yang lebih clean
+                    // Status Card
                     Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(20),
@@ -339,7 +339,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                 Text(
                                   report.status.toUpperCase(),
                                   style: TextStyle(
-                                    fontFamily: 'Inter',
+                                    fontFamily: 'Maison Bold',
                                     color: _colorStatus(report.status),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
@@ -354,9 +354,9 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                           Text(
                             'Deskripsi Kerusakan',
                             style: TextStyle(
-                              fontFamily: 'Inter',
+                              fontFamily: 'Maison Bold',
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: const Color(0xFF405189),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -364,7 +364,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                           Text(
                             report.description,
                             style: TextStyle(
-                              fontFamily: 'Inter',
+                              fontFamily: 'Maison Book',
                               fontSize: 16,
                               color: Colors.grey[900],
                               fontWeight: FontWeight.w400,
@@ -387,8 +387,8 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                 Text(
                                   'Dilaporkan ${report.dateReported}',
                                   style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontSize: 13,
+                                    fontFamily: 'Maison Book',
+                                    fontSize: 12,
                                     color: Colors.grey[600],
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -402,14 +402,13 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
 
                     SizedBox(height: 24),
 
-                    // Dokumentasi Section
                     Text(
                       'Dokumentasi',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         fontWeight: FontWeight.w600,
                         fontSize: 18,
-                        color: Colors.grey[900],
+                        color: const Color(0xFF405189),
                       ),
                     ),
                     SizedBox(height: 16),
@@ -450,7 +449,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                           Text(
                                             'Belum ada dokumentasi gambar',
                                             style: TextStyle(
-                                              fontFamily: 'Inter',
+                                              fontFamily: 'Maison Bold',
                                               fontSize: 16,
                                               color: Colors.grey[600],
                                               fontWeight: FontWeight.w600,
@@ -460,7 +459,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                           Text(
                                             'Silahkan upload gambar kerusakan',
                                             style: TextStyle(
-                                              fontFamily: 'Inter',
+                                              fontFamily: 'Maison Book',
                                               fontSize: 13,
                                               color: Colors.grey[400],
                                             ),
@@ -502,7 +501,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                                 children: [
                                                   Icon(Icons.broken_image_outlined, size: 48, color: Colors.grey[400]),
                                                   SizedBox(height: 8),
-                                                  Text('Gambar tidak dapat dimuat', style: TextStyle(color: Colors.grey[500], fontSize: 14)),
+                                                  Text('Gambar tidak dapat dimuat', style: TextStyle(color: Colors.grey[500], fontSize: 14, fontFamily: 'Maison Book')),
                                                 ],
                                               ),
                                             ),
@@ -558,7 +557,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                     Text(
                                       'Catatan Dokumentasi:',
                                       style: TextStyle(
-                                        fontFamily: 'Inter',
+                                        fontFamily: 'Maison Bold',
                                         color: Color(0xFF405189),
                                         fontWeight: FontWeight.w600,
                                         fontSize: 15,
@@ -577,7 +576,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                             child: Text(
                                               note,
                                               style: TextStyle(
-                                                fontFamily: 'Inter',
+                                                fontFamily: 'Maison Book',
                                                 fontSize: 13,
                                                 color: Colors.grey[900],
                                               ),
@@ -634,17 +633,17 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                     Text(
                                       'Tambah Dokumentasi',
                                       style: TextStyle(
-                                        fontFamily: 'Inter',
+                                        fontFamily: 'Maison Bold',
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16,
-                                        color: Colors.grey[900],
+                                        color: const Color(0xFF405189),
                                       ),
                                     ),
                                     SizedBox(height: 2),
                                     Text(
                                       'Upload foto kerusakan tambahan',
                                       style: TextStyle(
-                                        fontFamily: 'Inter',
+                                        fontFamily: 'Maison Book',
                                         fontSize: 13,
                                         color: Colors.grey[600],
                                       ),
@@ -671,18 +670,21 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                               ),
                               child: Column(
                                 children: [
-                                  Icon(
-                                    selectedImages.isEmpty ? Icons.cloud_upload_outlined : Icons.check_circle_outline,
-                                    color: selectedImages.isEmpty ? Colors.grey[500] : Color(0xFF405189),
-                                    size: 32,
-                                  ),
+                                  selectedImages.isEmpty
+                                      ? Image.asset(
+                                          'assets/images/icons/damaged_page/upload.png',
+                                          width: 32,
+                                          height: 32,
+                                          fit: BoxFit.contain,
+                                        )
+                                      : 
                                   SizedBox(height: 8),
                                   Text(
                                     selectedImages.isEmpty
                                         ? 'Ketuk untuk pilih foto'
                                         : '${selectedImages.length} foto dipilih',
                                     style: TextStyle(
-                                      fontFamily: 'Inter',
+                                      fontFamily: 'Maison Book',
                                       fontSize: 14,
                                       color: selectedImages.isEmpty ? Colors.grey[600] : Color(0xFF405189),
                                       fontWeight: FontWeight.w500,
@@ -765,7 +767,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                               decoration: InputDecoration(
                                 hintText: 'Tambahkan catatan (opsional)',
                                 hintStyle: TextStyle(
-                                  fontFamily: 'Inter',
+                                  fontFamily: 'Maison Book',
                                   color: Colors.grey[500],
                                   fontSize: 14,
                                 ),
@@ -773,7 +775,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                 contentPadding: EdgeInsets.all(16),
                               ),
                               style: TextStyle(
-                                fontFamily: 'Inter',
+                                fontFamily: 'Maison Book',
                                 fontSize: 14,
                                 color: Colors.grey[900],
                               ),
@@ -812,7 +814,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                         Text(
                                           'Mengupload...',
                                           style: TextStyle(
-                                            fontFamily: 'Inter',
+                                            fontFamily: 'Maison Bold',
                                             fontWeight: FontWeight.w600,
                                             fontSize: 16,
                                           ),
@@ -822,7 +824,7 @@ class _DetailLaporanDamagePageState extends State<DetailLaporanDamagePage> {
                                   : Text(
                                       'Upload Dokumentasi',
                                       style: TextStyle(
-                                        fontFamily: 'Inter',
+                                        fontFamily: 'Maison Bold',
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16,
                                       ),

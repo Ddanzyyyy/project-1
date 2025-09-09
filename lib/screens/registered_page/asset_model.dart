@@ -5,7 +5,7 @@ class Asset {
   final String description;
   final String imagePath;
   final String dateAdded;
-  final String createdAt;    // <--- Tambahan field createdAt
+  final String createdAt;    
   final String assetCode; 
   final String location;  
   final String pic;      
@@ -18,7 +18,7 @@ class Asset {
     required this.description,
     required this.imagePath,
     required this.dateAdded,
-    required this.createdAt,   // <--- Tambahan di constructor
+    required this.createdAt,
     required this.assetCode,
     required this.location,
     required this.pic,

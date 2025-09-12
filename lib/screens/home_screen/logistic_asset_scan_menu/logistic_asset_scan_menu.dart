@@ -1,6 +1,6 @@
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu_page/asset_info_widget.dart';
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu_page/asset_mobile_scanner_page.dart';
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu_page/asset_upload_dialog.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_info_widget.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_mobile_scanner_page.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_upload_dialog.dart';
 import 'package:Simba/screens/home_screen/lost_assets/compact_lost_asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';

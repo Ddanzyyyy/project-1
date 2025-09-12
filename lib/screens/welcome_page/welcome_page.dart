@@ -1,7 +1,7 @@
 import 'package:Simba/screens/activity_screen/activity_page.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_page.dart';
 // import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_scan_page.dart';
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu_page/logistic_asset_scan_menu.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/logistic_asset_scan_menu.dart';
 import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
@@ -12,6 +12,7 @@ import 'package:Simba/screens/registered_page/asset_service.dart'
     as registered_asset_service;
 import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_service.dart';
@@ -479,6 +480,15 @@ class _WelcomePageState extends State<WelcomePage> {
                           : ListView(
                               physics: const AlwaysScrollableScrollPhysics(),
                               children: [
+                                 Text(
+                                  "Const Asset Logistic",
+                                  style: const TextStyle(
+                                    fontFamily: 'Maison Bold',
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
                                 AssetCardMinimalist(
                                   title: 'Logistic Assets',
                                   image: Image.asset(
@@ -500,6 +510,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                   },
                                 ),
                                 const SizedBox(height: 10),
+                               
                                 AssetCardMinimalist(
                                   title: 'Scan Logistic Asset',
                                   image: Image.asset(
@@ -508,7 +519,7 @@ class _WelcomePageState extends State<WelcomePage> {
                                     height: 28,
                                   ),
                                   count: '∞',
-                                  description: 'Scan QR/Barcode asset logistik',
+                                  description: 'Scan Barcode asset logistik',
                                   color: const Color(0xFF0085FF),
                                   onTap: () {
                                     Navigator.push(
@@ -523,13 +534,22 @@ class _WelcomePageState extends State<WelcomePage> {
                                 const SizedBox(height: 10),
                                 Title(
                                   color: Colors.black,
-                                  title: 'Asset Summary',
+                                  // title: 'Asset Summary',
                                   child: Divider(
                                     color: Colors.grey[300],
                                     thickness: 1,
                                   ),
                                 ),
-                                const SizedBox(height: 10),                              
+                                const SizedBox(height: 10), 
+                                Text(
+                                  "Implemented Design UIX Summary",
+                                  style: const TextStyle(
+                                    fontFamily: 'Maison Bold',
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),                             
                                 AssetCardMinimalist(
                                   title: 'Registered Assets',
                                   image: Image.asset(

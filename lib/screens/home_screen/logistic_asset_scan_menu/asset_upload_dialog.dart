@@ -405,7 +405,7 @@ class _AssetUploadDialogState extends State<AssetUploadDialog> {
                     ),
                     SizedBox(height: 20),
                     Text(
-                      'Caption (Optional)',
+                      'Remarks (Optional)',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[700],

@@ -1,4 +1,3 @@
-// import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -10,11 +9,19 @@ class AssetMobileScannerPage extends StatefulWidget {
 class _AssetMobileScannerPageState extends State<AssetMobileScannerPage> {
   MobileScannerController cameraController = MobileScannerController();
   bool _isDetected = false;
+  bool _isFlashOn = false;
 
   @override
   void dispose() {
     cameraController.dispose();
     super.dispose();
+  }
+
+  void _toggleFlash() async {
+    await cameraController.toggleTorch();
+    setState(() {
+      _isFlashOn = !_isFlashOn;
+    });
   }
 
   @override
@@ -25,34 +32,16 @@ class _AssetMobileScannerPageState extends State<AssetMobileScannerPage> {
         backgroundColor: Colors.black,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text("Scan Asset", style: TextStyle(color: Colors.white)),
-        // actions: [
-        //   IconButton(
-        //     icon: ValueListenableBuilder(
-        //       valueListenable: cameraController.torchState,
-        //       builder: (context, state, child) {
-        //         if (state == TorchState.off) {
-        //           return Icon(Icons.flash_off, color: Colors.white);
-        //         } else {
-        //           return Icon(Icons.flash_on, color: Colors.yellow);
-        //         }
-        //       },
-        //     ),
-        //     onPressed: () => cameraController.toggleTorch(),
-        //   ),
-        //   IconButton(
-        //     icon: ValueListenableBuilder(
-        //       valueListenable: cameraController.cameraFacingState,
-        //       builder: (context, state, child) {
-        //         if (state == CameraFacing.front) {
-        //           return Icon(Icons.camera_front, color: Colors.white);
-        //         } else {
-        //           return Icon(Icons.camera_rear, color: Colors.white);
-        //         }
-        //       },
-        //     ),
-        //     onPressed: () => cameraController.switchCamera(),
-        //   ),
-        // ],
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isFlashOn ? Icons.flash_on : Icons.flash_off,
+              color: Colors.white,
+            ),
+            onPressed: _toggleFlash,
+            tooltip: _isFlashOn ? 'Matikan Flash' : 'Nyalakan Flash',
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -70,7 +59,17 @@ class _AssetMobileScannerPageState extends State<AssetMobileScannerPage> {
               }
             },
           ),
-          // Overlay with scanning instructions
+            Center(
+              child: Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white, width: 3),
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.transparent,
+                ),
+              ),
+            ),
           Positioned(
             top: 50,
             left: 20,

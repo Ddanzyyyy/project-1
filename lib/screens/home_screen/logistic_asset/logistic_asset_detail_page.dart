@@ -5,7 +5,8 @@ import 'logistic_asset_model.dart';
 class LogisticAssetDetailPage extends StatelessWidget {
   final LogisticAsset asset;
 
-  const LogisticAssetDetailPage({Key? key, required this.asset}) : super(key: key);
+  const LogisticAssetDetailPage({Key? key, required this.asset})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class LogisticAssetDetailPage extends StatelessWidget {
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(7),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -54,10 +55,11 @@ class LogisticAssetDetailPage extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: Color(0xFF405189).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(7),
                         ),
                         child: Text(
                           asset.assetNo,
@@ -71,10 +73,12 @@ class LogisticAssetDetailPage extends StatelessWidget {
                       ),
                       Spacer(),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(asset.assetStatus).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          color: _getStatusColor(asset.assetStatus)
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(7),
                         ),
                         child: Text(
                           asset.assetStatus,
@@ -114,7 +118,15 @@ class LogisticAssetDetailPage extends StatelessWidget {
             SizedBox(height: 16),
 
             // Basic Information
-            _buildInfoCard('Basic Information', [
+            _buildInfoCard('Information', [
+              // Title(
+              //   color: Colors.black,
+              //   // title: 'Asset Summary',
+              //   child: Divider(
+              //     color: Colors.grey[300],
+              //     thickness: 1,
+              //   ),
+              // ),
               _buildInfoRow('General Account', asset.generalAccount),
               _buildInfoRow('Subsidiary Account', asset.subsidiaryAccount),
               _buildInfoRow('Category', asset.category),
@@ -122,28 +134,33 @@ class LogisticAssetDetailPage extends StatelessWidget {
               _buildInfoRow('Department', asset.department),
               _buildInfoRow('Control Department', asset.controlDepartment),
               _buildInfoRow('Cost Center', asset.costCenter),
-            ]),
-
-            SizedBox(height: 16),
-
-            // Asset Details
-            _buildInfoCard('Asset Details', [
-              _buildInfoRow('Acquisition Date', asset.acquisitionDate != null 
-                  ? DateFormat('dd MMM yyyy').format(asset.acquisitionDate!) 
-                  : '-'),
+              _buildInfoRow(
+                  'Acquisition Date',
+                  asset.acquisitionDate != null
+                      ? DateFormat('dd MMM yyyy').format(asset.acquisitionDate!)
+                      : '-'),
               _buildInfoRow('Aging', '${asset.aging}'),
-              _buildInfoRow('Total Quantity', asset.quantity.toString()),
             ]),
+
+            // SizedBox(height: 16),
+
+            // // Asset Details
+            // _buildInfoCard('Asset Details', [
+            //   _buildInfoRow('Acquisition Date', asset.acquisitionDate != null
+            //       ? DateFormat('dd MMM yyyy').format(asset.acquisitionDate!)
+            //       : '-'),
+            //   _buildInfoRow('Aging', '${asset.aging}'),
+            //   _buildInfoRow('Total Quantity', asset.quantity.toString()),
+            // ]),
 
             SizedBox(height: 16),
 
-            // Status Summary
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(7),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
@@ -168,11 +185,13 @@ class LogisticAssetDetailPage extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildStatusCard('Available', asset.available, Colors.green),
+                        child: _buildStatusCard(
+                            'Available', asset.available, Colors.green),
                       ),
                       SizedBox(width: 12),
                       Expanded(
-                        child: _buildStatusCard('Broken', asset.broken, Colors.orange),
+                        child: _buildStatusCard(
+                            'Broken', asset.broken, Colors.orange),
                       ),
                       SizedBox(width: 12),
                       Expanded(
@@ -193,7 +212,7 @@ class LogisticAssetDetailPage extends StatelessWidget {
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(7),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.05),
@@ -220,7 +239,7 @@ class LogisticAssetDetailPage extends StatelessWidget {
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(7),
                         border: Border.all(color: Colors.grey[200]!),
                       ),
                       child: Text(
@@ -248,7 +267,7 @@ class LogisticAssetDetailPage extends StatelessWidget {
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(7),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -289,7 +308,7 @@ class LogisticAssetDetailPage extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Maison Bold',
                 fontSize: 13,
-                color: Colors.grey[600],
+                color: Colors.black87,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -322,20 +341,26 @@ class LogisticAssetDetailPage extends StatelessWidget {
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(7),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         children: [
-          Text(
-            count.toString(),
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
+          count == 1
+              ? Icon(
+                  Icons.done,
+                  color: color,
+                  size: 30,
+                )
+              : Text(
+                  count.toString(),
+                  style: TextStyle(
+                    fontFamily: 'Maison Bold',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
           SizedBox(height: 4),
           Text(
             label,

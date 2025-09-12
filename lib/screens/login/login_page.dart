@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String getBaseUrl() {
     if (Platform.isAndroid) {
-      return 'http://192.168.8.138:8000/api/login';
+      return 'http://192.168.1.8:8000/api/login';
     } else {
       return 'http://127.0.0.1:8000/api/login'; // If IOS Console 
     }
@@ -114,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
     final media = MediaQuery.of(context);
     final screenHeight = media.size.height;
     final screenWidth = media.size.width;
-    final isPortrait = media.orientation == Orientation.portrait;
+    // final isPortrait = media.orientation == Orientation.portrait;
     final isSmallDevice = screenWidth < 400;
 
     // Responsive paddings and sizes

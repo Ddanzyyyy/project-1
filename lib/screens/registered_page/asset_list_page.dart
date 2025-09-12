@@ -209,10 +209,11 @@ class _AssetListPageState extends State<AssetListPage>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
             SizedBox(width: 8),
             Text('Delete Asset',
                 style: TextStyle(
@@ -221,8 +222,19 @@ class _AssetListPageState extends State<AssetListPage>
                     fontFamily: 'Maison Bold')),
           ],
         ),
-        content: Text('Are you sure you want to delete "${asset.name}"?',
-            style: TextStyle(fontFamily: 'Maison Book', fontSize: 14)),
+        content: RichText(
+          text: TextSpan(
+            style: TextStyle(fontFamily: 'Maison Book', fontSize: 14, color: Colors.black),
+            children: [
+              TextSpan(text: 'Are you sure you want to delete '),
+              TextSpan(
+                text: '"${asset.name}"',
+                style: TextStyle(fontFamily: 'Maison Bold', fontSize: 14, color: Colors.black),
+              ),
+              TextSpan(text: '?'),
+            ],
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

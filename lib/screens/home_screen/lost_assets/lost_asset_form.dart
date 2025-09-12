@@ -1,4 +1,3 @@
-// import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
 import 'package:Simba/screens/home_screen/lost_assets/lost_asset_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -86,7 +85,9 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
               Icon(Icons.check_circle, color: Colors.white, size: 20),
               SizedBox(width: 8),
               Text('Aset berhasil dilaporkan hilang',
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600)),
+                  style: TextStyle(
+                      fontFamily: 'Maison Book',
+                      fontWeight: FontWeight.w600)),
             ],
           ),
           behavior: SnackBarBehavior.floating,
@@ -99,7 +100,9 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
               Icon(Icons.error_outline, color: Colors.white, size: 20),
               SizedBox(width: 8),
               Text('Gagal melaporkan aset', 
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600)),
+                  style: TextStyle(
+                      fontFamily: 'Maison Book',
+                      fontWeight: FontWeight.w600)),
             ],
           ),
           behavior: SnackBarBehavior.floating,
@@ -168,7 +171,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
             Text(
               'Memuat data aset...',
               style: TextStyle(
-                fontFamily: 'Inter',
+                fontFamily: 'Maison Book',
                 fontSize: 16,
                 color: textSecondary,
                 fontWeight: FontWeight.w500,
@@ -209,15 +212,12 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
           children: [
             Container(
               padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.report_problem_outlined,
-                color: primaryColor,
-                size: 24,
-              ),
+                child: Image.asset(
+                  'assets/images/icons/lost_page/warning.png',
+                  width: 35,
+                  height: 35,
+                  // color: primaryColor,
+                ),
             ),
             SizedBox(width: 14),
             Expanded(
@@ -227,8 +227,8 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                   Text(
                     'Lapor Kehilangan Aset',
                     style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 20,
+                      fontFamily: 'Maison Bold',
+                      fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: textPrimary,
                       height: 1.2,
@@ -238,8 +238,8 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                   Text(
                     'Laporkan aset yang hilang dengan detail lengkap',
                     style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 13,
+                      fontFamily: 'Maison Book',
+                      fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: textSecondary,
                       height: 1.3,
@@ -265,7 +265,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
           hint: Text(
             'Pilih aset yang hilang',
             style: TextStyle(
-              fontFamily: 'Inter',
+              fontFamily: 'Maison Book',
               fontSize: 15,
               fontWeight: FontWeight.w400,
               color: textSecondary,
@@ -280,7 +280,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                   child: Text(
                     '${asset['name']} (${asset['asset_code']})',
                     style: TextStyle(
-                      fontFamily: 'Inter',
+                      fontFamily: 'Maison Bold',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: textPrimary,
@@ -317,7 +317,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                     child: Text(
                       e,
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Book',
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: textPrimary,
@@ -342,7 +342,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
             'Jelaskan secara detail',
           ),
           style: TextStyle(
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Book',
             fontSize: 18,
             fontWeight: FontWeight.w400,
             color: textPrimary,
@@ -386,7 +386,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                         child: Text(
                           'Bukti berhasil diupload',
                           style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: 'Maison Book',
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: successColor,
@@ -398,7 +398,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                         child: Text(
                           'Hapus',
                           style: TextStyle(
-                            fontFamily: 'Inter',
+                            fontFamily: 'Maison Bold',
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: errorColor,
@@ -427,7 +427,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                 label: Text(
                   bukti != null ? 'Ganti Bukti' : 'Upload Bukti',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Bold',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -437,9 +437,9 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
               if (bukti == null) ...[
                 SizedBox(height: 8),
                 Text(
-                  'Format: JPG, PNG (Maks. 5MB)',
+                  'Format: JPG, PNG (Maks. 2MB)',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Book',
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: textSecondary,
@@ -477,7 +477,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
                 Text(
                   'Melaporkan...',
                   style: TextStyle(
-                    fontFamily: 'Inter',
+                    fontFamily: 'Maison Bold',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.white,
@@ -502,7 +502,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
               child: Text(
                 'Laporkan Kehilangan',
                 style: TextStyle(
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,
@@ -516,7 +516,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
     return Text(
       label,
       style: TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: 'Maison Bold',
         fontSize: 14,
         fontWeight: FontWeight.w600,
         color: textPrimary,
@@ -528,7 +528,7 @@ class _ReportLostAssetFormState extends State<ReportLostAssetForm> {
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: 'Maison Book',
         fontSize: 15,
         fontWeight: FontWeight.w400,
         color: textSecondary,

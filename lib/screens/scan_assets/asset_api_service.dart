@@ -3,7 +3,7 @@ import 'package:Simba/screens/scan_assets/asset.dart';
 import 'package:http/http.dart' as http;
 
 class AssetApiService {
-  static const String baseUrl = 'http://192.168.1.9:8000/api';
+  static const String baseUrl = 'http://192.168.8.138:8000/api';
   
   static Map<String, String> get headers => {
     'Content-Type': 'application/json',

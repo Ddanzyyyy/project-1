@@ -310,7 +310,7 @@ class CompactLostAssetCard extends StatelessWidget {
             asset['image_path'].toString().isNotEmpty)
         ? (asset['image_path'].toString().startsWith('http')
             ? asset['image_path']
-            : 'http://192.168.1.9:8000/storage/' + asset['image_path'])
+            : 'http://192.168.8.138:8000/storage/' + asset['image_path'])
         : '';
 
     return GestureDetector(

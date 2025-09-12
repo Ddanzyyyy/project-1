@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 const primaryColor = Color(0xFF405189);
 
-class LostAssetCard extends StatelessWidget {
+class CompactLostAssetCard extends StatelessWidget {
   final Map asset;
   final VoidCallback onTap;
 
-  const LostAssetCard({
+  const CompactLostAssetCard({
     Key? key,
     required this.asset,
     required this.onTap,
@@ -39,7 +39,6 @@ class LostAssetCard extends StatelessWidget {
           padding: EdgeInsets.all(12),
           child: Row(
             children: [
-              // Lost Asset Image
               Container(
                 width: 48,
                 height: 48,
@@ -78,8 +77,6 @@ class LostAssetCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 12),
-
-              // Asset Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,9 +84,8 @@ class LostAssetCard extends StatelessWidget {
                     Text(
                       asset['name'] ?? '-',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                       maxLines: 1,
@@ -105,10 +101,9 @@ class LostAssetCard extends StatelessWidget {
                       child: Text(
                         asset['category'] ?? "-",
                         style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Bold',
                           fontSize: 10,
                           color: primaryColor,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -116,7 +111,7 @@ class LostAssetCard extends StatelessWidget {
                     Text(
                       asset['location'] ?? '-',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Book',
                         color: Colors.grey[600],
                         fontSize: 11,
                         height: 1.2,
@@ -127,8 +122,6 @@ class LostAssetCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Date & Status
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -137,10 +130,9 @@ class LostAssetCard extends StatelessWidget {
                         ? _formatDate(asset['lost_date'])
                         : '-',
                     style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         fontSize: 11,
-                        color: Colors.red.shade400,
-                        fontWeight: FontWeight.w700),
+                        color: Colors.red.shade400),
                   ),
                   SizedBox(height: 4),
                   Container(
@@ -152,10 +144,9 @@ class LostAssetCard extends StatelessWidget {
                     child: Text(
                       'Lost',
                       style: TextStyle(
-                          fontFamily: 'Inter',
+                          fontFamily: 'Maison Bold',
                           fontSize: 10,
-                          color: Colors.red[700],
-                          fontWeight: FontWeight.w700),
+                          color: Colors.red[700]),
                     ),
                   ),
                 ],
@@ -171,18 +162,8 @@ class LostAssetCard extends StatelessWidget {
     try {
       final date = DateTime.parse(dateStr);
       final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul',
+        'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
       ];
       return '${date.day} ${months[date.month - 1]} ${date.year}';
     } catch (e) {

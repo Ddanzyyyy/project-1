@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 const primaryColor = Color(0xFF405189);
 
-class LostAssetCard extends StatelessWidget {
+class RegisteredLostAssetCard extends StatelessWidget {
   final Map asset;
   final VoidCallback onTap;
 
-  const LostAssetCard({
+  const RegisteredLostAssetCard({
     Key? key,
     required this.asset,
     required this.onTap,
@@ -39,7 +39,6 @@ class LostAssetCard extends StatelessWidget {
           padding: EdgeInsets.all(12),
           child: Row(
             children: [
-              // Lost Asset Image
               Container(
                 width: 48,
                 height: 48,
@@ -78,8 +77,6 @@ class LostAssetCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 12),
-
-              // Asset Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,39 +84,56 @@ class LostAssetCard extends StatelessWidget {
                     Text(
                       asset['name'] ?? '-',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Bold',
                         fontSize: 14,
-                        fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 2),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        asset['category'] ?? "-",
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 10,
-                          color: primaryColor,
-                          fontWeight: FontWeight.w500,
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            asset['category'] ?? "-",
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 10,
+                              color: primaryColor,
+                            ),
+                          ),
                         ),
-                      ),
+                        SizedBox(width: 6),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'Lost',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 10,
+                              color: Colors.red[700],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 2),
                     Text(
-                      asset['location'] ?? '-',
+                      '${asset['asset_code'] ?? '-'} • ${asset['location'] ?? '-'}',
                       style: TextStyle(
-                        fontFamily: 'Inter',
+                        fontFamily: 'Maison Book',
                         color: Colors.grey[600],
                         fontSize: 11,
-                        height: 1.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -127,66 +141,15 @@ class LostAssetCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Date & Status
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    asset['lost_date'] != null
-                        ? _formatDate(asset['lost_date'])
-                        : '-',
-                    style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 11,
-                        color: Colors.red.shade400,
-                        fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(height: 4),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.red[50],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'Lost',
-                      style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 10,
-                          color: Colors.red[700],
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                ],
+              Icon(
+                Icons.chevron_right,
+                color: Colors.grey[400],
+                size: 20,
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  String _formatDate(String dateStr) {
-    try {
-      final date = DateTime.parse(dateStr);
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
-      return '${date.day} ${months[date.month - 1]} ${date.year}';
-    } catch (e) {
-      return dateStr;
-    }
   }
 }

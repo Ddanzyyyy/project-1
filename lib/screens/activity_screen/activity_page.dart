@@ -8,7 +8,6 @@ import 'package:Simba/screens/welcome_page/welcome_page.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 
-// ==== REUSABLE NAVBAR ====
 class AppBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
@@ -71,7 +70,6 @@ class AppBottomNavBar extends StatelessWidget {
     );
   }
 }
-// ==== END NAVBAR WIDGET ====
 
 
 class ActivityPage extends StatefulWidget {
@@ -92,7 +90,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   void initState() {
     super.initState();
-    activityService = ActivityService(baseUrl: 'http://192.168.1.9:8000');
+    activityService = ActivityService(baseUrl: 'http://192.168.8.138:8000');
     _loadUserData();
   }
 
@@ -279,13 +277,11 @@ class _ActivityPageState extends State<ActivityPage> {
     );
   }
 
-  // ==== NAVIGATION HANDLER ====
   void _onNavTap(int index) {
     if (index == 0) {
       Navigator.push(context, MaterialPageRoute(builder: (_) => WelcomePage()));
     }
     if (index == 1) {
-      // Already on ActivityPage
     }
     if (index == 2) {
       Navigator.push(context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
@@ -306,26 +302,29 @@ class _ActivityPageState extends State<ActivityPage> {
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Activity',
-          style: TextStyle(
-            fontFamily: 'Maison Bold',
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Activity',
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            ClipRRect(
+              child: Image.asset(
+                'assets/images/indocement_logo.png',
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
         ),
         centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white, size: 22),
-            onPressed: () {
-              fetchActivities();
-              _loadUserData();
-            },
-            tooltip: 'Refresh Activities',
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -423,18 +422,24 @@ class _ActivityPageState extends State<ActivityPage> {
                     ],
                   ),
                   const SizedBox(height: 16),
+                  // REFRESHINDICATOR IMPLEMENTATION
                   Expanded(
-                    child: isLoading
-                        ? _buildShimmerActivitiesList()
-                        : activities.isEmpty
-                            ? _buildEmptyState()
-                            : ListView.builder(
-                                itemCount: activities.length,
-                                itemBuilder: (context, idx) {
-                                  final act = activities[idx];
-                                  return _buildActivityCard(act);
-                                },
-                              ),
+                    child: RefreshIndicator(
+                      onRefresh: fetchActivities,
+                      color: Color(0xFF405189),
+                      child: isLoading
+                          ? _buildShimmerActivitiesList()
+                          : activities.isEmpty
+                              ? _buildEmptyState()
+                              : ListView.builder(
+                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  itemCount: activities.length,
+                                  itemBuilder: (context, idx) {
+                                    final act = activities[idx];
+                                    return _buildActivityCard(act);
+                                  },
+                                ),
+                    ),
                   ),
                 ],
               ),
@@ -736,9 +741,7 @@ class _ActivityPageState extends State<ActivityPage> {
     }
   }
 
-  // Format DateTime (from DB or API) into WIB for display
   String _formatWibDate(DateTime dt) {
-    // Jika waktu dari backend UTC, konversi ke WIB (tambah 7 jam)
     DateTime wib = dt.toUtc().add(const Duration(hours: 7));
     return '${wib.hour.toString().padLeft(2, '0')}:${wib.minute.toString().padLeft(2, '0')} / ${wib.day.toString().padLeft(2, '0')}-${wib.month.toString().padLeft(2, '0')}-${wib.year}';
   }

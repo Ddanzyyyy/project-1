@@ -44,7 +44,7 @@ class SettingsAboutCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              'SIMBA v0.0.1',
+              'SIMBA Indocement v0.0.1',
               style: TextStyle(
                 fontFamily: 'Maison Book',
                 fontSize: 11,
@@ -239,7 +239,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            "Syarat dan Ketentuan",
+            "Syarat dan Ketentuan SIMBA Indocement - Sistem Manajemen Barang",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 15,
@@ -249,7 +249,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 16),
           Text(
-            "1. Persetujuan Syarat",
+            "1. Persetujuan Penggunaan",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -258,12 +258,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Dengan mengakses atau menggunakan SIMBA Asset Management App, Anda setuju untuk terikat oleh Syarat dan Ketentuan ini. Jika Anda tidak setuju dengan bagian manapun dari syarat ini, Anda tidak diperbolehkan mengakses layanan.",
+            "Dengan menggunakan SIMBA Indocement, Anda setuju untuk mematuhi seluruh syarat dan ketentuan yang berlaku. Aplikasi ini dirancang khusus untuk kebutuhan manajemen barang dan aset di lingkungan PT Indocement Tunggal Prakarsa Tbk.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "2. Penggunaan Layanan",
+            "2. Hak dan Akses Pengguna",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -272,12 +272,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "SIMBA Asset Management App menyediakan alat untuk pelacakan, pengelolaan, dan pemeliharaan inventaris serta aset. Pengguna bertanggung jawab atas keakuratan data yang dimasukkan ke sistem dan harus memiliki otorisasi yang sesuai untuk melacak aset di organisasi.",
+            "Setiap pengguna wajib menjaga kerahasiaan akun dan bertanggung jawab atas setiap aktivitas yang dilakukan melalui akun tersebut. Akses aplikasi hanya diberikan kepada karyawan atau pihak yang telah mendapat izin resmi dari Indocement.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "3. Akun Pengguna",
+            "3. Pengelolaan Data Barang dan Aset",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -286,12 +286,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Pengguna bertanggung jawab menjaga keamanan kredensial login dan segala aktivitas yang dilakukan di bawah akun mereka. Aplikasi tidak boleh digunakan untuk melacak aset tanpa izin yang sah dari pemilik atau organisasi.",
+            "Data yang dimasukkan ke dalam SIMBA Indocement sepenuhnya merupakan tanggung jawab pengguna. Setiap informasi barang, aset, lokasi, dan status harus akurat dan sesuai dengan kondisi sebenarnya di lapangan.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "4. Data dan Konten Aset",
+            "4. Keamanan & Privasi",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -300,7 +300,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Pengguna tetap memiliki hak penuh atas data aset mereka. Kami tidak mengklaim hak atas konten Anda. Anda bertanggung jawab atas keakuratan dan legalitas data yang dimasukkan ke sistem. Informasi sensitif harus diolah sesuai kebijakan data organisasi Anda.",
+            "SIMBA Indocement berkomitmen menjaga keamanan data pengguna dan aset perusahaan. Data akan diakses dan diproses sesuai kebijakan internal Indocement terkait privasi dan perlindungan data.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -314,12 +314,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "SIMBA Asset Management App disediakan ‘sebagaimana adanya’ tanpa jaminan apapun. Kami tidak bertanggung jawab atas kerugian atau kerusakan akibat penggunaan layanan, termasuk namun tidak terbatas pada kehilangan data, kehilangan aset fisik, atau kerugian finansial akibat ketergantungan pada informasi aplikasi.",
+            "Indocement dan pengembang aplikasi tidak bertanggung jawab atas kerugian, kehilangan data, atau kesalahan input yang dilakukan oleh pengguna. Penggunaan aplikasi sepenuhnya menjadi tanggung jawab pengguna.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "6. Perubahan Layanan",
+            "6. Penggunaan Fitur QR Code dan Scan",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -328,12 +328,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Kami berhak mengubah atau menghentikan layanan kapan saja, dengan atau tanpa pemberitahuan. Kami tidak bertanggung jawab kepada Anda atau pihak ketiga atas perubahan, penangguhan, atau penghentian layanan.",
+            "Fitur scan dan QR code dalam aplikasi hanya boleh digunakan untuk keperluan inventarisasi dan pemeliharaan barang di lingkungan Indocement. Penggunaan di luar keperluan resmi dilarang.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "7. Fitur QR Code dan Pemindaian",
+            "7. Perubahan dan Pengembangan Layanan",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -342,24 +342,24 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Fitur pemindaian QR code hanya disediakan untuk keperluan pelacakan aset. Pengguna tidak diperbolehkan menggunakan fitur ini untuk memindai QR code atau barcode yang tidak sah. Kami tidak bertanggung jawab atas kerusakan akibat pemindaian QR code berbahaya dari luar sistem kami.",
+            "Indocement berhak untuk memperbarui, mengubah, atau menghentikan fitur aplikasi kapan saja sesuai kebutuhan operasional tanpa pemberitahuan terlebih dahulu.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
-          Text(
-            "8. Hukum yang Berlaku",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Syarat dan Ketentuan ini diatur dan ditafsirkan berdasarkan hukum yang berlaku di Indonesia, tanpa memperhatikan pertentangan ketentuan hukum.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
+          // Text(
+          //   "8. Hukum yang Berlaku",
+          //   style: TextStyle(
+          //     fontFamily: 'Maison Bold',
+          //     fontSize: 13,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          // ),
+          // SizedBox(height: 8),
+          // Text(
+          //   "Syarat dan ketentuan ini tunduk pada hukum yang berlaku di Republik Indonesia.",
+          //   style: TextStyle(fontSize: 12),
+          // ),
+          // SizedBox(height: 16),
         ],
       ),
     );
@@ -372,7 +372,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            "Kebijakan Privasi",
+            "Kebijakan Privasi SIMBA Indocement",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 15,
@@ -382,7 +382,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 16),
           Text(
-            "1. Informasi yang Kami Kumpulkan",
+            "1. Informasi yang Dikumpulkan",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -391,16 +391,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "SIMBA Asset Management App mengumpulkan informasi berikut:\n"
-            "• Informasi akun: username, email, dan password\n"
-            "• Data aset: deskripsi, lokasi, status, catatan perawatan\n"
-            "• Informasi perangkat: tipe perangkat, sistem operasi, versi aplikasi\n"
-            "• Data penggunaan: fitur yang digunakan, waktu penggunaan, aktivitas pemindaian",
+            "SIMBA Indocement mengumpulkan data akun pengguna (username, email, ID karyawan), data barang/aset (deskripsi, lokasi, status, histori perawatan), serta data perangkat (tipe dan versi OS).",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "2. Cara Kami Menggunakan Informasi",
+            "2. Penggunaan Data",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -409,17 +405,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Kami menggunakan informasi yang dikumpulkan untuk:\n"
-            "• Memberikan layanan manajemen aset\n"
-            "• Mengirim notifikasi perubahan status aset\n"
-            "• Membuat laporan penggunaan dan perawatan aset\n"
-            "• Meningkatkan fungsi dan pengalaman aplikasi\n"
-            "• Mendiagnosis masalah teknis dan mengoptimalkan performa",
+            "Data digunakan untuk mendukung operasional manajemen barang, pelaporan, analisis, dan peningkatan proses inventarisasi di Indocement.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "3. Penyimpanan Data",
+            "3. Penyimpanan dan Keamanan Data",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -428,12 +419,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Data aset disimpan di server yang aman. Sebagian data mungkin di-cache secara lokal di perangkat untuk fitur offline. Kami menerapkan langkah keamanan yang sesuai untuk melindungi dari akses atau perubahan tidak sah.",
+            "Data disimpan secara aman di server internal Indocement. Sistem keamanan diterapkan sesuai standar perusahaan untuk mencegah akses tidak sah.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "4. Akses Kamera dan Lokasi",
+            "4. Hak Akses dan Kontrol Pengguna",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -442,12 +433,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Aplikasi kami memerlukan akses kamera untuk pemindaian QR code dan foto aset. Layanan lokasi mungkin digunakan untuk pelacakan lokasi aset. Kedua izin ini opsional, namun dapat membatasi fungsi aplikasi jika tidak diberikan.",
+            "Pengguna dapat meminta akses, koreksi, atau penghapusan data pribadi melalui admin sistem atau Divisi IT Indocement.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "5. Berbagi Data",
+            "5. Pembagian Data",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -456,12 +447,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Kami tidak menjual atau menyewakan data pengguna kepada pihak ketiga. Data aset dapat dibagikan dengan pengguna yang berwenang di organisasi Anda sesuai pengaturan izin. Kami dapat membagikan statistik penggunaan anonim untuk meningkatkan layanan.",
+            "Data tidak akan dibagikan ke pihak eksternal kecuali atas persetujuan manajemen Indocement atau sesuai peraturan yang berlaku.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "6. Retensi Data",
+            "6. Perubahan Kebijakan",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -470,12 +461,12 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Kami menyimpan data Anda selama akun aktif atau sesuai kebutuhan layanan. Anda dapat meminta penghapusan data akun, namun sebagian informasi mungkin disimpan untuk kepentingan hukum atau bisnis.",
+            "Indocement berhak memperbarui Kebijakan Privasi sesuai kebutuhan dan akan menginformasikan pengguna melalui aplikasi.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
           Text(
-            "7. Notifikasi",
+            "7. Kontak & Informasi Lebih Lanjut",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -484,49 +475,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Aplikasi kami mengirim notifikasi terkait perubahan status aset, pengingat perawatan, dan pembaruan sistem. Anda dapat mengatur preferensi notifikasi di pengaturan aplikasi.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "8. Hak Anda",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Anda berhak mengakses, mengoreksi, atau menghapus data pribadi Anda. Hubungi admin sistem atau tim dukungan kami untuk menggunakan hak ini.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "9. Perubahan Kebijakan Privasi",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Kami dapat memperbarui Kebijakan Privasi dari waktu ke waktu. Kami akan memberitahu pengguna tentang perubahan signifikan melalui aplikasi atau email.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "10. Kontak",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Jika Anda memiliki pertanyaan atau kekhawatiran terkait Kebijakan Privasi ini, silakan hubungi Data Protection Officer kami di privacy@simba-app.id.",
+            "Untuk pertanyaan atau permintaan terkait privasi dan aplikasi, silakan hubungi Contact person: wildansobah69@gmail.com",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),

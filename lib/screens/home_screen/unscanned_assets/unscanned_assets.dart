@@ -222,7 +222,6 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
                     },
                   ),
                 ),
-                // Riwayat Scan Tab (pencarian dan kategori filter juga berlaku!)
                 RefreshIndicator(
                   onRefresh: () async {
                     await fetchScannedHistory();
@@ -726,24 +725,13 @@ class _UnscannedAssetsPageState extends State<UnscannedAssetsPage>
                       ],
                     ),
                   ),
-                  // Action Buttons or Status
                   if (!isScanned)
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _actionButton(
-                            label: "Scan",
-                            color: Color(0xFF405189),
-                            onPressed: () => onScan?.call(asset),
-                          ),
-                          SizedBox(height: 4),
-                          _actionButton(
-                            label: "Manual",
-                            color: Colors.orange,
-                            onPressed: () => onManualScan?.call(asset),
-                          ),
+                          Icon(Icons.chevron_right, color: Color(0xFF405189), size: 24),
                         ],
                       ),
                     )

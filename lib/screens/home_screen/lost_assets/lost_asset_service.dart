@@ -5,23 +5,18 @@ import 'package:http/http.dart' as http;
 class LostAssetService {
   final String baseUrl;
 
-  LostAssetService({this.baseUrl = "http://192.168.1.9:8000/api"});
+  LostAssetService({this.baseUrl = "http://192.168.8.138:8000/api"});
 
   Future<List<Map<String, dynamic>>> fetchLostAssets() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/lost-assets'));
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
-      
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         if (responseData.containsKey('success') && responseData['success'] == true) {
-          if (responseData.containsKey('data') && responseData['data'] is List) {
-            final List data = responseData['data'];
-            return data.cast<Map<String, dynamic>>();
-          } else {
-            throw Exception('Data field is missing or not a list');
-          }
+          final List data = responseData['data'];
+          return data.cast<Map<String, dynamic>>();
         } else {
           throw Exception(responseData['message'] ?? 'API returned unsuccessful response');
         }
@@ -39,16 +34,11 @@ class LostAssetService {
       final response = await http.get(Uri.parse('$baseUrl/lost-assets/reportable-assets'));
       print('Reportable assets response status: ${response.statusCode}');
       print('Reportable assets response body: ${response.body}');
-      
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         if (responseData.containsKey('success') && responseData['success'] == true) {
-          if (responseData.containsKey('data') && responseData['data'] is List) {
-            final List data = responseData['data'];
-            return data.cast<Map<String, dynamic>>();
-          } else {
-            throw Exception('Data field is missing or not a list');
-          }
+          final List data = responseData['data'];
+          return data.cast<Map<String, dynamic>>();
         } else {
           throw Exception(responseData['message'] ?? 'API returned unsuccessful response');
         }
@@ -63,22 +53,23 @@ class LostAssetService {
 
   Future<List<Map<String, dynamic>>> fetchRegisteredAssets() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/lost-assets/registered-assets'));
+      final response = await http.get(Uri.parse('$baseUrl/assets?status=lost'));
       print('Registered assets response status: ${response.statusCode}');
       print('Registered assets response body: ${response.body}');
-      
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        if (responseData.containsKey('success') && responseData['success'] == true) {
-          if (responseData.containsKey('data') && responseData['data'] is List) {
-            final List data = responseData['data'];
-            return data.cast<Map<String, dynamic>>();
-          } else {
-            throw Exception('Data field is missing or not a list');
-          }
+        final decoded = json.decode(response.body);
+        List<Map<String, dynamic>> assets;
+        if (decoded is List) {
+          assets = decoded.cast<Map<String, dynamic>>();
+        } else if (decoded is Map && decoded.containsKey('data')) {
+          final List data = decoded['data'];
+          assets = data.cast<Map<String, dynamic>>();
         } else {
-          throw Exception(responseData['message'] ?? 'API returned unsuccessful response');
+          throw Exception('Unexpected response format: $decoded');
         }
+        final lostAssets = assets.where((a) =>
+          (a['status']?.toString().toLowerCase() == 'lost')).toList();
+        return lostAssets;
       } else {
         throw Exception('HTTP Error: ${response.statusCode}');
       }
@@ -88,6 +79,8 @@ class LostAssetService {
     }
   }
 
+  /// Submit laporan kehilangan aset
+  /// Pastikan assetId adalah ID dari asset yang statusnya masih 'registered' atau 'damaged'
   Future<bool> reportAssetLost({
     required int assetId,
     required String lostCause,
@@ -108,7 +101,8 @@ class LostAssetService {
 
       var response = await request.send();
       final responseBody = await response.stream.bytesToString();
-      print('Report lost response: $responseBody');
+      print('Report lost response status: ${response.statusCode}');
+      print('Report lost response body: $responseBody');
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final responseData = json.decode(responseBody);
@@ -123,15 +117,14 @@ class LostAssetService {
     }
   }
 
+  /// Tandai aset hilang sebagai ditemukan
   Future<bool> markAssetFound(int assetId) async {
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/lost-assets/$assetId/found'),
         headers: {'Content-Type': 'application/json'},
       );
-      
       print('Mark found response: ${response.body}');
-      
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         return responseData['success'] == true;
@@ -143,6 +136,7 @@ class LostAssetService {
     }
   }
 
+  /// Ambil detail asset hilang
   Future<Map<String, dynamic>> fetchLostAssetDetail(int id) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/lost-assets/$id'));
@@ -161,4 +155,4 @@ class LostAssetService {
       throw Exception('Gagal mengambil detail aset: $e');
     }
   }
-} 
+}

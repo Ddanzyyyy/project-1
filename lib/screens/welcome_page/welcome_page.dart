@@ -1,11 +1,15 @@
 import 'package:Simba/screens/activity_screen/activity_page.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_page.dart';
+// import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_scan_page.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu_page/logistic_asset_scan_menu.dart';
 import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_assets.dart';
 import 'package:Simba/screens/home_screen/search_page/search_page.dart';
 import 'package:Simba/screens/registered_page/asset_list_page.dart';
-import 'package:Simba/screens/registered_page/asset_service.dart' as registered_asset_service;
+import 'package:Simba/screens/registered_page/asset_service.dart'
+    as registered_asset_service;
 import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +22,9 @@ class AppBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
 
-  const AppBottomNavBar({required this.selectedIndex, required this.onTap, Key? key}) : super(key: key);
+  const AppBottomNavBar(
+      {required this.selectedIndex, required this.onTap, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +50,8 @@ class AppBottomNavBar extends StatelessWidget {
           children: [
             _buildNavItem(context, Icons.home_rounded, "Home", 0),
             _buildNavItem(context, Icons.timeline_rounded, "Activity", 1),
-            _buildNavItem(context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
+            _buildNavItem(
+                context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
             _buildNavItem(context, Icons.settings_rounded, "Setting", 3),
           ],
         ),
@@ -52,7 +59,8 @@ class AppBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+  Widget _buildNavItem(
+      BuildContext context, IconData icon, String label, int index) {
     final selected = index == selectedIndex;
     return GestureDetector(
       onTap: () => onTap(index),
@@ -60,9 +68,11 @@ class AppBottomNavBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 8),
-          Icon(icon, color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
+          Icon(icon,
+              color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
           const SizedBox(height: 4),
-          Text(label,
+          Text(
+            label,
             style: TextStyle(
               fontFamily: 'Maison Bold',
               color: selected ? Color(0xFF405189) : Colors.grey,
@@ -78,7 +88,6 @@ class AppBottomNavBar extends StatelessWidget {
 }
 
 // ==== END NAVBAR WIDGET ====
-
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -129,7 +138,8 @@ class _WelcomePageState extends State<WelcomePage> {
 
   Future<void> fetchAssetCount() async {
     try {
-      final fetchedAssets = await registered_asset_service.AssetService.getAssets();
+      final fetchedAssets =
+          await registered_asset_service.AssetService.getAssets();
       setState(() {
         assets = fetchedAssets;
         assetCount = assets.length;
@@ -176,13 +186,16 @@ class _WelcomePageState extends State<WelcomePage> {
   void _onNavTap(int index) {
     if (index == 0) return; // Home
     if (index == 1) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => ActivityPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => ActivityPage()));
     }
     if (index == 2) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
     }
     if (index == 3) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => SettingsPage()));
     }
   }
 
@@ -248,7 +261,8 @@ class _WelcomePageState extends State<WelcomePage> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
                                         width: 120,
@@ -286,10 +300,13 @@ class _WelcomePageState extends State<WelcomePage> {
                                   ),
                                 ),
                               );
-                              if (result != null && result is Map<String, String>) {
+                              if (result != null &&
+                                  result is Map<String, String>) {
                                 setState(() {
-                                  currentUserName = result['name'] ?? currentUserName;
-                                  currentUsername = result['username'] ?? currentUsername;
+                                  currentUserName =
+                                      result['name'] ?? currentUserName;
+                                  currentUsername =
+                                      result['username'] ?? currentUsername;
                                 });
                               }
                             } catch (e) {
@@ -347,7 +364,8 @@ class _WelcomePageState extends State<WelcomePage> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         currentUserName,
@@ -462,6 +480,57 @@ class _WelcomePageState extends State<WelcomePage> {
                               physics: const AlwaysScrollableScrollPhysics(),
                               children: [
                                 AssetCardMinimalist(
+                                  title: 'Logistic Assets',
+                                  image: Image.asset(
+                                    'assets/images/icons/activity_page/product.png',
+                                    width: 28,
+                                    height: 28,
+                                  ),
+                                  count: '∞',
+                                  description: 'Import & scan logistics',
+                                  color: Color(0xFF6B46C1),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            LogisticAssetPage(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                                AssetCardMinimalist(
+                                  title: 'Scan Logistic Asset',
+                                  image: Image.asset(
+                                    'assets/images/icons/activity_page/research.png',
+                                    width: 28,
+                                    height: 28,
+                                  ),
+                                  count: '∞',
+                                  description: 'Scan QR/Barcode asset logistik',
+                                  color: const Color(0xFF0085FF),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            LogisticAssetScanMenuPage(), 
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                                Title(
+                                  color: Colors.black,
+                                  title: 'Asset Summary',
+                                  child: Divider(
+                                    color: Colors.grey[300],
+                                    thickness: 1,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),                              
+                                AssetCardMinimalist(
                                   title: 'Registered Assets',
                                   image: Image.asset(
                                     'assets/images/icons/welcome_page/registered_asset.png',
@@ -555,7 +624,6 @@ class _WelcomePageState extends State<WelcomePage> {
                                     );
                                   },
                                 ),
-                                const SizedBox(height: 10),
                               ],
                             ),
                     ),

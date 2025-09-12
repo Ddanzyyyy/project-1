@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'asset_item.dart'; 
 
 class UnscannedAssetService {
-  static String baseUrl = "http://192.168.1.9:8000/api";
+  static String baseUrl = "http://192.168.8.138:8000/api";
 
   static Future<List<AssetItem>> fetchUnscannedAssets({
     required String auditId,
@@ -67,7 +67,6 @@ class UnscannedAssetService {
     return manualScanAssetWithStatus(auditId, assetId, "pending", "");
   }
 
-  // Versi baru dengan status & notes
   static Future<bool> scanAssetWithStatus(
     String auditId, 
     String assetCode, 

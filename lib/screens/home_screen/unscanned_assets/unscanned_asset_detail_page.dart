@@ -282,10 +282,10 @@ class _UnscannedAssetDetailPageState extends State<UnscannedAssetDetailPage> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    '• Isi status dan catatan terlebih dahulu (opsional)\n'
-                    '• Scan Barcode: Buka kamera untuk scan barcode fisik\n'
-                    '• Manual: Tandai manual jika barcode rusak/tidak bisa dibaca\n'
-                    '• Status dan catatan akan otomatis tersimpan setelah scan berhasil',
+                    'Isi status dan catatan terlebih dahulu (opsional)\n'
+                    'Scan Barcode: Buka kamera untuk scan barcode fisik\n'
+                    'Manual: Tandai manual jika barcode rusak/tidak bisa dibaca\n'
+                    'Status dan catatan akan otomatis tersimpan setelah scan berhasil',
                     style: TextStyle(fontFamily: 'MaisonBook', fontSize: 10, color: Colors.blue[600], height: 1.4),
                   ),
                 ],

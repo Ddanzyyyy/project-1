@@ -1,24 +1,27 @@
-import 'package:Simba/screens/home_screen/lost_assets/lost_asset_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'lost_asset_service.dart';
 import 'lost_asset_form.dart';
 import 'lost_asset_detail.dart';
+import 'compact_lost_asset_card.dart';
+import 'registered_lost_asset_card.dart';
+import 'lost_asset_detail_dialog.dart';
 
 const primaryColor = Color(0xFF405189);
 const secondaryColor = Color(0xFFF8F9FA);
-const accentColor = Color(0xFFE9ECEF);
 
 class LostAssetPage extends StatefulWidget {
   @override
   State<LostAssetPage> createState() => _LostAssetPageState();
 }
 
-class _LostAssetPageState extends State<LostAssetPage>
-    with SingleTickerProviderStateMixin {
+class _LostAssetPageState extends State<LostAssetPage> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  late TabController _tabController;
 
   List<Map<String, dynamic>> lostAssets = [];
+  List<Map<String, dynamic>> registeredLostAssets = [];
   bool loading = true;
   final service = LostAssetService();
   String currentUser = 'Unknown';
@@ -26,6 +29,13 @@ class _LostAssetPageState extends State<LostAssetPage>
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+      if (_tabController.index == 1) {
+        fetchAllData();
+      }
+    });
     _animationController = AnimationController(
       duration: Duration(milliseconds: 600),
       vsync: this,
@@ -35,7 +45,14 @@ class _LostAssetPageState extends State<LostAssetPage>
     );
     _animationController.forward();
     _loadCurrentUser();
-    fetchLostAssets();
+    fetchAllData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCurrentUser() async {
@@ -45,19 +62,23 @@ class _LostAssetPageState extends State<LostAssetPage>
     });
   }
 
-  Future<void> fetchLostAssets() async {
+  Future<void> fetchAllData() async {
     setState(() => loading = true);
     try {
-      final data = await service.fetchLostAssets();
+      final lostData = await service.fetchLostAssets();
+      final registeredData = await service.fetchRegisteredAssets();
       setState(() {
-        lostAssets = data;
+        lostAssets = lostData;
+        registeredLostAssets = registeredData;
         loading = false;
       });
     } catch (e) {
       setState(() => loading = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Gagal mengambil data aset hilang: $e',
-              style: TextStyle(fontFamily: 'Inter'))));
+        content: Text('Gagal mengambil data aset hilang: $e',
+            style: TextStyle(fontFamily: 'Maison Book')),
+        backgroundColor: Colors.red,
+      ));
     }
   }
 
@@ -72,14 +93,21 @@ class _LostAssetPageState extends State<LostAssetPage>
         service: service,
         currentUser: currentUser,
         onAssetReported: () {
-          fetchLostAssets();
+          fetchAllData();
         },
       ),
     );
   }
 
   Future<void> _refreshAssets() async {
-    await fetchLostAssets();
+    await fetchAllData();
+  }
+
+  void showRegisteredAssetDetail(Map asset) {
+    showDialog(
+      context: context,
+      builder: (context) => LostAssetDetailDialog(asset: asset),
+    );
   }
 
   @override
@@ -100,7 +128,7 @@ class _LostAssetPageState extends State<LostAssetPage>
             color: Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 16,
-            fontFamily: 'Inter',
+            fontFamily: 'Maison Bold',
           ),
         ),
         actions: [
@@ -113,23 +141,44 @@ class _LostAssetPageState extends State<LostAssetPage>
             ),
             child: Center(
               child: Text(
-                '${lostAssets.length}',
+                '${_tabController.index == 0 ? lostAssets.length : registeredLostAssets.length}',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
+                  fontFamily: 'Maison Bold',
                 ),
               ),
             ),
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white.withOpacity(0.7),
+          labelStyle: TextStyle(
+            fontFamily: 'Maison Bold',
+            fontSize: 14,
+          ),
+          unselectedLabelStyle: TextStyle(
+            fontFamily: 'Maison Book',
+            fontSize: 14,
+          ),
+          onTap: (index) {
+            setState(() {});
+          },
+          tabs: [
+            Tab(text: 'Laporan Hilang'),
+            Tab(text: 'Asset Lost'),
+          ],
+        ),
       ),
       body: FadeTransition(
         opacity: _fadeAnimation,
         child: Column(
           children: [
-            // Header Section
             Container(
               color: primaryColor,
               child: Padding(
@@ -138,346 +187,226 @@ class _LostAssetPageState extends State<LostAssetPage>
                   children: [
                     Expanded(
                       child: Text(
-                        'Daftar Aset Hilang',
+                        _tabController.index == 0 
+                            ? 'Daftar Aset Hilang' 
+                            : 'Asset Terdaftar (Status Lost)',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          fontFamily: 'Inter',
+                          fontSize: 15,
+                          fontFamily: 'Maison Bold',
                         ),
                       ),
-                    ),
-                    ElevatedButton.icon(
-                      icon: Icon(Icons.add_circle_outline,
-                          size: 16, color: primaryColor),
-                      label: Text('Laporkan',
-                          style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 12,
-                              color: primaryColor)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: primaryColor,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                      onPressed: openReportForm,
                     ),
                   ],
                 ),
               ),
             ),
-            // Lost Asset List
             Expanded(
-              child: RefreshIndicator(
-                color: primaryColor,
-                onRefresh: _refreshAssets,
-                child: loading
-                    ? ListView.builder(
-                        padding: EdgeInsets.all(12),
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 8),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              height: 70,
-                              width: double.infinity,
-                            ),
-                          );
-                        },
-                      )
-                    : lostAssets.isEmpty
-                        ? ListView(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            children: [
-                              SizedBox(height: 100),
-                              Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.inventory_2_outlined,
-                                        size: 48, color: Colors.grey[400]),
-                                    SizedBox(height: 12),
-                                    Text(
-                                      'No lost assets found',
-                                      style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: 16,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    SizedBox(height: 6),
-                                    Text(
-                                      'Try reporting lost assets!',
-                                      style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: 13,
-                                          color: Colors.grey[500]),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          )
-                        : ListView.builder(
-                            physics: AlwaysScrollableScrollPhysics(),
-                            padding: EdgeInsets.all(12),
-                            itemCount: lostAssets.length,
-                            itemBuilder: (context, index) {
-                              final asset = lostAssets[index];
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: 8),
-                                child: CompactLostAssetCard(
-                                  asset: asset,
-                                  onTap: () async {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => LostAssetDetailPage(
-                                          asset: asset,
-                                          service: service,
-                                          currentUser: currentUser,
-                                        ),
-                                      ),
-                                    );
-                                    // Jika asset ditemukan, refresh list agar tidak double
-                                    if (result == 'found') {
-                                      await fetchLostAssets();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Aset berhasil dipindahkan ke daftar aktif.',
-                                            style: TextStyle(fontFamily: 'Inter'),
-                                          ),
-                                          backgroundColor: Colors.blue,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: ElevatedButton.icon(
-        icon: Icon(Icons.add, size: 18),
-        label: Text('Laporkan Hilang',
-            style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 14,
-                fontWeight: FontWeight.w600)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 4,
-        ),
-        onPressed: openReportForm,
-      ),
-    );
-  }
-}
-
-class CompactLostAssetCard extends StatelessWidget {
-  final Map asset;
-  final VoidCallback onTap;
-
-  const CompactLostAssetCard({
-    Key? key,
-    required this.asset,
-    required this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final String assetImageUrl = (asset['image_path'] != null &&
-            asset['image_path'].toString().isNotEmpty)
-        ? (asset['image_path'].toString().startsWith('http')
-            ? asset['image_path']
-            : 'http://192.168.1.9:8000/storage/' + asset['image_path'])
-        : '';
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 4,
-              offset: Offset(0, 1),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(12),
-          child: Row(
-            children: [
-              // Lost Asset Image (Dari Registered Asset)
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: assetImageUrl.isNotEmpty
-                      ? Image.network(
-                          assetImageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.inventory_2_outlined,
-                              color: primaryColor,
-                              size: 24,
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                color: primaryColor,
-                                strokeWidth: 2,
-                              ),
-                            );
-                          },
-                        )
-                      : Icon(
-                          Icons.inventory_2_outlined,
-                          color: primaryColor,
-                          size: 24,
-                        ),
-                ),
-              ),
-              SizedBox(width: 12),
-
-              // Asset Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      asset['name'] ?? '-',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 2),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        asset['category'] ?? "-",
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 10,
-                          color: primaryColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      asset['location'] ?? '-',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        color: Colors.grey[600],
-                        fontSize: 11,
-                        height: 1.2,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-
-              // Date & Status
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: TabBarView(
+                controller: _tabController,
                 children: [
-                  Text(
-                    asset['lost_date'] != null
-                        ? _formatDate(asset['lost_date'])
-                        : '-',
-                    style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 11,
-                        color: Colors.red.shade400,
-                        fontWeight: FontWeight.w700),
+                  RefreshIndicator(
+                    color: primaryColor,
+                    onRefresh: _refreshAssets,
+                    child: _buildLostAssetsList(),
                   ),
-                  SizedBox(height: 4),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.red[50],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      'Lost',
-                      style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 10,
-                          color: Colors.red[700],
-                          fontWeight: FontWeight.w700),
-                    ),
+                  RefreshIndicator(
+                    color: primaryColor,
+                    onRefresh: _refreshAssets,
+                    child: _buildRegisteredLostAssetsList(),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+      floatingActionButton: _tabController.index == 0
+          ? ElevatedButton.icon(
+              icon: Icon(Icons.add, size: 18),
+              label: Text('Laporkan Hilang',
+                  style: TextStyle(
+                      fontFamily: 'Maison Bold',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+              ),
+              onPressed: openReportForm,
+            )
+          : null,
     );
   }
 
-  String _formatDate(String dateStr) {
-    try {
-      final date = DateTime.parse(dateStr);
-      final months = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ];
-      return '${date.day} ${months[date.month - 1]} ${date.year}';
-    } catch (e) {
-      return dateStr;
+  Widget _buildLostAssetsList() {
+    if (loading) {
+      return ListView.builder(
+        padding: EdgeInsets.all(12),
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              height: 70,
+              width: double.infinity,
+            ),
+          );
+        },
+      );
     }
+
+    if (lostAssets.isEmpty) {
+      return ListView(
+        physics: AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: 100),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[400]),
+                SizedBox(height: 12),
+                Text(
+                  'No lost assets found',
+                  style: TextStyle(
+                      fontFamily: 'Maison Bold',
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  'Try reporting lost assets!',
+                  style: TextStyle(
+                      fontFamily: 'Maison Book',
+                      fontSize: 13,
+                      color: Colors.grey[500]),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ListView.builder(
+      physics: AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.all(12),
+      itemCount: lostAssets.length,
+      itemBuilder: (context, index) {
+        final asset = lostAssets[index];
+        return Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          child: CompactLostAssetCard(
+            asset: asset,
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LostAssetDetailPage(
+                    asset: asset,
+                    service: service,
+                    currentUser: currentUser,
+                  ),
+                ),
+              );
+              if (result == 'found') {
+                await fetchAllData();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Aset berhasil dipindahkan ke daftar aktif.',
+                      style: TextStyle(fontFamily: 'Maison Book'),
+                    ),
+                    backgroundColor: Colors.blue,
+                  ),
+                );
+              }
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildRegisteredLostAssetsList() {
+    if (loading) {
+      return ListView.builder(
+        padding: EdgeInsets.all(12),
+        itemCount: 5,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              height: 70,
+              width: double.infinity,
+            ),
+          );
+        },
+      );
+    }
+
+    if (registeredLostAssets.isEmpty) {
+      return ListView(
+        physics: AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(height: 100),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[400]),
+                SizedBox(height: 12),
+                Text(
+                  'Tidak ada asset lost',
+                  style: TextStyle(
+                      fontFamily: 'Maison Bold',
+                      fontSize: 16,
+                      color: Colors.grey[600]),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  'Semua asset dalam kondisi baik.',
+                  style: TextStyle(
+                      fontFamily: 'Maison Book',
+                      fontSize: 13,
+                      color: Colors.grey[500]),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ListView.builder(
+      physics: AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.all(12),
+      itemCount: registeredLostAssets.length,
+      itemBuilder: (context, index) {
+        final asset = registeredLostAssets[index];
+        return Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          child: RegisteredLostAssetCard(
+            asset: asset,
+            onTap: () => showRegisteredAssetDetail(asset),
+          ),
+        );
+      },
+    );
   }
 }

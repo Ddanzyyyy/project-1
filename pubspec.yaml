@@ -29,10 +29,10 @@ dependencies:
   dio: ^5.9.0
   flutter_image_compress: ^2.4.0
   path_provider: ^2.1.5
+  lottie: ^3.2.0
   # qr_code_scanner: ^1.0.1
   # mime: ^1.0.4
   # intl: ^0.18.0
-  # lottie: ^3.2.0
   # custom_refresh_indicator: ^4.0.1
   # url_launcher: ^6.3.1
   # flutter_barcode_scanner: ^2.0.0
@@ -72,6 +72,9 @@ flutter:
     - assets/images/icons/activity_page/product.png
     - assets/images/icons/activity_page/research.png
     - assets/images/icons/lost_page/warning.png
+    - assets/lottie/Inventory.lottie
+    - assets/lottie/Logistic.lottie
+    - assets/lottie/Trader.lottie
 
     # - assets/lottie/idea.gif
     # - assets/images/icons/registered_assets.png

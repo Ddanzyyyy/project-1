@@ -1,32 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'asset.dart';
 
-class AssetDetailsModal extends StatefulWidget {
+
+class AssetDetailModal extends StatelessWidget {
   final Asset asset;
-  final bool isNewScan;
-  final String currentUser;
-  final Function(Asset) onUpdate;
-  final Function(String) onDelete;
 
-  const AssetDetailsModal({
-    Key? key,
-    required this.asset,
-    required this.isNewScan,
-    required this.currentUser,
-    required this.onUpdate,
-    required this.onDelete,
-  }) : super(key: key);
+  const AssetDetailModal({Key? key, required this.asset}) : super(key: key);
 
-  @override
-  _AssetDetailsModalState createState() => _AssetDetailsModalState();
-}
-
-class _AssetDetailsModalState extends State<AssetDetailsModal> {
-  String? scanTime;
-
-  void _showFullImage(String imageUrl) {
+  void _showFullImage(BuildContext context, String imageUrl) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -44,7 +26,9 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
                   return Container(
                     color: Colors.white,
                     height: 300,
-                    child: Center(child: Icon(Icons.broken_image, size: 64, color: Colors.grey)),
+                    child: Center(
+                      child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                    ),
                   );
                 },
               ),
@@ -54,79 +38,13 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
       ),
     );
   }
-  Asset? updatedAsset;
-
-  @override
-  void initState() {
-    super.initState();
-    updatedAsset = widget.asset;
-    _initializeScanTime();
-  }
-
-  void _initializeScanTime() {
-    if (widget.isNewScan) {
-      scanTime = _formatCurrentTime();
-
-      final now = DateTime.now();
-      updatedAsset = widget.asset.copyWith(
-        lastScannedAt: now,
-        // status: 'registered', // Jangan ubah status!
-      );
-
-      widget.onUpdate(updatedAsset!);
-    } else {
-      scanTime = _getScanTimeFromDatabase();
-    }
-  }
-
-  String _formatCurrentTime() {
-    final now = DateTime.now();
-    return DateFormat('dd MMM yyyy HH:mm').format(now) + ' WIB';
-  }
-
-  String? _getScanTimeFromDatabase() {
-    if (updatedAsset?.lastScannedAt != null) {
-      final scanDateTime = updatedAsset!.lastScannedAt!;
-      return DateFormat('dd MMM yyyy HH:mm').format(scanDateTime) + ' WIB';
-    }
-    return null;
-  }
-
-  String _getDisplayScanTime() {
-    if (widget.isNewScan) {
-      return scanTime ?? _formatCurrentTime();
-    } else {
-      return scanTime ?? '-';
-    }
-  }
-
-  String _getScannedByText() {
-    if (widget.isNewScan) {
-      return widget.currentUser;
-    } else {
-      if (widget.asset.lastScannedAt != null) {
-        return widget.currentUser;
-      } else {
-        return '-';
-      }
-    }
-  }
-
-  String _getCreatedAtRaw(String createdAt) {
-    if (createdAt.contains('T')) {
-      return createdAt.split('T').first;
-    }
-    return createdAt.isNotEmpty ? createdAt : '-';
-  }
 
   @override
   Widget build(BuildContext context) {
-    final displayAsset = updatedAsset ?? widget.asset;
-
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      height: MediaQuery.of(context).size.height * 0.90,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFFF8F9FA),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
@@ -134,211 +52,401 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
       ),
       child: Column(
         children: [
-          // Drag Handle
+          // Drag Handle & Header
           Container(
-            width: 32,
-            height: 4,
-            margin: const EdgeInsets.only(top: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Header
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-            child: Row(
+            padding: const EdgeInsets.all(16),
+            child: Column(
               children: [
-                if (widget.isNewScan)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                Center(
+                  child: Container(
+                    width: 32,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF405189).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.qr_code_scanner,
-                          size: 12,
-                          color: const Color(0xFF405189),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Scanned',
-                          style: TextStyle(
-                            fontFamily: 'Maison Book',
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF405189),
-                          ),
-                        ),
-                      ],
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.grey[600],
-                    size: 20,
-                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Asset Detail',
+                      style: TextStyle(
+                        color: Color(0xFF405189),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        fontFamily: 'Maison Bold',
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Color(0xFF405189), size: 24),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-
+          
+          // Scrollable Content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: displayAsset.imagePath != null && displayAsset.imagePath!.isNotEmpty
-                            ? () => _showFullImage(displayAsset.imagePath!)
-                            : null,
-                        child: Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF405189).withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF405189).withOpacity(0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: displayAsset.imagePath != null && displayAsset.imagePath!.isNotEmpty
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(11),
-                                  child: Image.network(
-                                    displayAsset.imagePath!,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return _buildAssetIcon();
-                                    },
-                                  ),
-                                )
-                              : _buildAssetIcon(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              displayAsset.name,
-                              style: const TextStyle(
-                                fontFamily: 'Maison Bold',
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1A1A1A),
-                                height: 1.2,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                displayAsset.assetCode,
-                                style: TextStyle(
-                                  fontFamily: 'Maison Book',
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[700],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                _buildStatusIndicator(displayAsset.status),
-                                const SizedBox(width: 6),
-                                Text(
-                                  _getStatusText(displayAsset.status),
-                                  style: TextStyle(
-                                    fontFamily: 'Maison Book',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: _getStatusColor(displayAsset.status),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  _buildDetailRow('Category', displayAsset.category),
-                  _buildDetailRow('Location', displayAsset.location),
-                  _buildDetailRow('Description', displayAsset.description),
-
-                  const SizedBox(height: 24),
-
+                  // Header Card
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey[200]!,
-                        width: 1,
-                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(7),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Icon(
-                              Icons.info_outlined,
-                              size: 16,
-                              color: const Color(0xFF405189),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF405189).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              child: Text(
+                                asset.assetCode,
+                                style: const TextStyle(
+                                  fontFamily: 'Maison Bold',
+                                  fontSize: 14,
+                                  color: Color(0xFF405189),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Asset Information',
-                              style: TextStyle(
-                                fontFamily: 'Maison Bold',
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.grey[900],
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: _getStatusColor(asset.status).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                              child: Text(
+                                asset.status,
+                                style: TextStyle(
+                                  fontFamily: 'Maison Bold',
+                                  fontSize: 12,
+                                  color: _getStatusColor(asset.status),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow('Asset Code', displayAsset.assetCode),
-                        _buildInfoRow(
-                          'Date Added',
-                          _getCreatedAtRaw(displayAsset.createdAt != null ? displayAsset.createdAt!.toIso8601String() : ''),
+                        const SizedBox(height: 16),
+                        Text(
+                          asset.name,
+                          style: const TextStyle(
+                            fontFamily: 'Maison Bold',
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87,
+                          ),
                         ),
-                        _buildInfoRow('Person in Charge', displayAsset.pic),
-                        _buildInfoRow('Scanned By', _getScannedByText()),
-                        _buildInfoRow('Scan Time', _getDisplayScanTime()),
-                        if (displayAsset.id != 0)
-                          _buildInfoRow('Database ID', displayAsset.id.toString()),
+                        const SizedBox(height: 8),
+                        Text(
+                          asset.assetSpecification ?? asset.description,
+                          style: TextStyle(
+                            fontFamily: 'Maison Book',
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+
+                  const SizedBox(height: 16),
+
+                  // Full Information
+                  _buildInfoCard('Full Information', [
+                    _buildInfoRow('Title', asset.name),
+                    _buildInfoRow('Asset No', asset.assetCode),
+                    _buildInfoRow('General Account', asset.generalAccount ?? '-'),
+                    _buildInfoRow('Category', asset.category),
+                    _buildInfoRow('Sub Category', asset.subCategory ?? '-'),
+                    _buildInfoRow('Subsidiary Account', asset.subsidiaryAccount ?? '-'),
+                    _buildInfoRow('Asset Specification', asset.assetSpecification ?? '-'),
+                    _buildInfoRow(
+                      'Acquisition Date',
+                      asset.acquisitionDate != null
+                          ? DateFormat('dd MMM yyyy').format(asset.acquisitionDate!)
+                          : '-'
+                    ),
+                    _buildInfoRow('Aging', asset.aging ?? '-'),
+                    _buildInfoRow('Quantity', asset.quantity?.toString() ?? '1'),
+                    _buildInfoRow('Department', asset.location),
+                    _buildInfoRow('Control Department', asset.controlDepartment ?? '-'),
+                    _buildInfoRow('Cost Center', asset.costCenter ?? '-'),
+                    // _buildInfoRow('Person in Charge', asset.pic),
+                    // _buildInfoRow('Status', asset.status),
+                    _buildInfoRow('Remarks', asset.remarks?.isNotEmpty == true ? asset.remarks! : '-'),
+                    // _buildInfoRow('Date Added', asset.dateAdded),
+                    // _buildInfoRow('Created At', asset.createdAt != null ? DateFormat('dd MMM yyyy').format(asset.createdAt!) : '-'),
+                    // _buildInfoRow('Last Updated', asset.updatedAt != null ? DateFormat('dd MMM yyyy').format(asset.updatedAt!) : '-'),
+                    // _buildInfoRow('Last Scanned', asset.lastScannedAt != null ? DateFormat('dd MMM yyyy HH:mm').format(asset.lastScannedAt!) : '-'),
+                    // _buildInfoRow('Scanned By', asset.scannedBy ?? '-'),
+                  ]),
+
+                  const SizedBox(height: 16),
+
+                  // Status Summary
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(7),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Status Summary',
+                          style: TextStyle(
+                            fontFamily: 'Maison Bold',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF405189),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatusCard(
+                                'Available', 
+                                asset.available ?? (asset.status.toLowerCase() == 'available' ? 1 : 0), 
+                                Colors.green
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildStatusCard(
+                                'Broken', 
+                                asset.broken ?? (asset.status.toLowerCase() == 'broken' || asset.status.toLowerCase() == 'damaged' ? 1 : 0), 
+                                Colors.orange
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildStatusCard(
+                                'Lost', 
+                                asset.lost ?? (asset.status.toLowerCase() == 'lost' ? 1 : 0), 
+                                Colors.red
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Asset Photo
+                  if (asset.primaryPhoto != null && asset.primaryPhoto!.fileUrl.isNotEmpty) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(7),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Asset Photo',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF405189),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          GestureDetector(
+                            onTap: () => _showFullImage(context, asset.primaryPhoto!.fileUrl),
+                            child: Container(
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(7),
+                                child: Image.network(
+                                  asset.primaryPhoto!.fileUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[100],
+                                      child: const Center(
+                                        child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                                      ),
+                                    );
+                                  },
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Container(
+                                      color: Colors.grey[100],
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                              : null,
+                                          color: const Color(0xFF405189),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tap to view full image',
+                            style: TextStyle(
+                              fontFamily: 'Maison Book',
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ] else if (asset.imagePath != null && asset.imagePath!.isNotEmpty) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(7),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Asset Photo',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF405189),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          GestureDetector(
+                            onTap: () => _showFullImage(context, asset.imagePath!),
+                            child: Container(
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(7),
+                                child: Image.network(
+                                  asset.imagePath!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[100],
+                                      child: const Center(
+                                        child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tap to view full image',
+                            style: TextStyle(
+                              fontFamily: 'Maison Book',
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Close Button
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF405189),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                          fontFamily: 'Maison Bold',
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -348,92 +456,35 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
     );
   }
 
-  Widget _buildAssetIcon() {
-    return Icon(
-      Icons.inventory_2_outlined,
-      size: 24,
-      color: const Color(0xFF405189).withOpacity(0.6),
-    );
-  }
-
-  Widget _buildStatusIndicator(String status) {
+  Widget _buildInfoCard(String title, List<Widget> children) {
     return Container(
-      width: 6,
-      height: 6,
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _getStatusColor(status),
-        shape: BoxShape.circle,
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(7),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-    );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'registered':
-        return const Color(0xFF10B981);
-      case 'damaged':
-        return const Color(0xFFEF4444);
-      case 'unscanned':
-        return const Color(0xFFF59E0B);
-      case 'lost':
-        return const Color(0xFFEF4444);
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getStatusText(String status) {
-    switch (status.toLowerCase()) {
-      case 'registered':
-        return 'Registered';
-      case 'damaged':
-        return 'Damaged';
-      case 'unscanned':
-        return 'Unscanned';
-      case 'lost':
-        return 'Lost';
-      default:
-        return 'Unknown';
-    }
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
-            style: TextStyle(
+            title,
+            style: const TextStyle(
               fontFamily: 'Maison Bold',
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF405189),
             ),
           ),
-          const SizedBox(height: 4),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Colors.grey[200]!,
-                width: 1,
-              ),
-            ),
-            child: Text(
-              value.isNotEmpty ? value : '-',
-              style: TextStyle(
-                fontFamily: 'Maison Book',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[800],
-              ),
-            ),
-          ),
+          const SizedBox(height: 16),
+          ...children,
         ],
       ),
     );
@@ -441,36 +492,102 @@ class _AssetDetailsModalState extends State<AssetDetailsModal> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 90,
+            width: 120,
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Maison Bold',
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
+                fontSize: 13,
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          Text(
+            ': ',
+            style: TextStyle(
+              fontFamily: 'Maison Book',
+              fontSize: 13,
+              color: Colors.grey[600],
+            ),
+          ),
           Expanded(
             child: Text(
-              value,
+              value.isNotEmpty ? value : '-',
               style: const TextStyle(
                 fontFamily: 'Maison Book',
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A1A),
+                fontSize: 13,
+                color: Colors.black87,
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildStatusCard(String label, int count, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          count == 1
+              ? Icon(
+                  Icons.done,
+                  color: color,
+                  size: 30,
+                )
+              : Text(
+                  count.toString(),
+                  style: TextStyle(
+                    fontFamily: 'Maison Bold',
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Maison Bold',
+              fontSize: 12,
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'available':
+      case 'active':
+        return Colors.green;
+      case 'damaged':
+      case 'broken':
+      case 'inactive':
+        return Colors.orange;
+      case 'lost':
+      case 'disposed':
+        return Colors.red;
+      case 'maintenance':
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
   }
 }

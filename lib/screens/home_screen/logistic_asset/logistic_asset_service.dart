@@ -7,7 +7,7 @@ import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 class LogisticAssetService {
-  static const String baseUrl = 'http://192.168.1.8:8000/api';
+  static const String baseUrl = 'http://192.168.8.138:8000/api';
 
   static Future<List<LogisticAsset>> getLogisticAssets({
     String search = '',
@@ -52,7 +52,6 @@ class LogisticAssetService {
     }
   }
 
-  // Tambahan: Ambil semua foto asset dari database (API)
   static Future<List<AssetPhoto>> getAssetPhotos(String assetNo) async {
     try {
       final response = await http.get(
@@ -71,7 +70,6 @@ class LogisticAssetService {
     }
   }
 
-  // Import excel asset
   static Future<Map<String, dynamic>> importExcel(File file) async {
     try {
       final request =
@@ -79,6 +77,10 @@ class LogisticAssetService {
       request.files.add(await http.MultipartFile.fromPath('file', file.path));
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
+      print ('Import response: $responseBody');
+      if (responseBody.isEmpty) {
+        throw Exception('Empty response from server');
+      }
       final jsonData = json.decode(responseBody);
 
       if (response.statusCode == 200) {
@@ -91,7 +93,6 @@ class LogisticAssetService {
     }
   }
 
-  // Get daftar kategori
   static Future<List<String>> getCategories() async {
     try {
       final response =
@@ -243,7 +244,6 @@ class LogisticAssetService {
     }
   }
 
-  // UPDATE STATUS ASSET (tetap pakai Dio)
   static Future<bool> updateAssetStatus({
     required String assetId,
     required String status,

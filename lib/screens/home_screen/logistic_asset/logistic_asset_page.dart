@@ -6,7 +6,7 @@ import 'logistic_asset_model.dart';
 import 'logistic_asset_service.dart';
 import 'logistic_asset_detail_page.dart';
 import 'logistic_asset_scan_page.dart';
-import 'logistic_asset_analytics_page.dart'; 
+import '../analytic_logistic/logistic_asset_analytics_page.dart'; 
 
 class LogisticAssetPage extends StatefulWidget {
   @override
@@ -130,7 +130,6 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
     );
   }
 
-  // Widget untuk Summary Analytics di bagian atas list
   Widget _buildQuickAnalytics() {
     if (assets.isEmpty) return SizedBox.shrink();
 
@@ -358,6 +357,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
             },
             itemBuilder: (context) => [
               PopupMenuItem(
+                // backgroundColor: Colors.white,
                 value: 'analytics',
                 child: Row(
                   children: [

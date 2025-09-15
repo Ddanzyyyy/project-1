@@ -1,8 +1,11 @@
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_upload_dialog.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
 import 'package:Simba/screens/scan_assets/asset.dart';
 import 'package:Simba/screens/scan_assets/asset_api_service.dart';
 import 'package:Simba/screens/scan_assets/asset_detail_modal.dart';
 import 'package:Simba/screens/scan_assets/qr_scanner_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:Simba/screens/activity_screen/activity_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:Simba/screens/welcome_page/welcome_page.dart';
@@ -10,12 +13,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 
-// ==== REUSABLE NAVBAR ====
+
 class AppBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
 
-  const AppBottomNavBar({required this.selectedIndex, required this.onTap, Key? key}) : super(key: key);
+  const AppBottomNavBar(
+      {required this.selectedIndex, required this.onTap, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +46,8 @@ class AppBottomNavBar extends StatelessWidget {
           children: [
             _buildNavItem(context, Icons.home_rounded, "Home", 0),
             _buildNavItem(context, Icons.timeline_rounded, "Activity", 1),
-            _buildNavItem(context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
+            _buildNavItem(
+                context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
             _buildNavItem(context, Icons.settings_rounded, "Setting", 3),
           ],
         ),
@@ -49,7 +55,8 @@ class AppBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+  Widget _buildNavItem(
+      BuildContext context, IconData icon, String label, int index) {
     final selected = index == selectedIndex;
     return GestureDetector(
       onTap: () => onTap(index),
@@ -57,9 +64,11 @@ class AppBottomNavBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 8),
-          Icon(icon, color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
+          Icon(icon,
+              color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
           const SizedBox(height: 4),
-          Text(label,
+          Text(
+            label,
             style: TextStyle(
               fontFamily: 'Maison Bold',
               color: selected ? Color(0xFF405189) : Colors.grey,
@@ -73,7 +82,6 @@ class AppBottomNavBar extends StatelessWidget {
     );
   }
 }
-// ==== END NAVBAR WIDGET ====
 
 class ScanAssetPage extends StatefulWidget {
   @override
@@ -86,6 +94,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
 
   List<Asset> assets = [];
   List<Asset> filteredAssets = [];
+  List<Asset> recentScannedAssets = [];
   String selectedTab = 'Scan';
   bool isLoading = false;
 
@@ -113,11 +122,12 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       final prefs = await SharedPreferences.getInstance();
 
       final username = prefs.getString('username') ?? 'User';
-      final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'Caccarehana';
+      final fullName = prefs.getString('full_name') ??
+          prefs.getString('name') ??
+          'Caccarehana';
       final firstName = prefs.getString('first_name') ?? '';
       final lastName = prefs.getString('last_name') ?? '';
 
-      // Build display name
       String displayName = fullName;
       if (displayName == 'User' && firstName.isNotEmpty) {
         displayName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
@@ -139,18 +149,16 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     }
   }
 
-  // Get current time (WIB) in proper format
   String getCurrentTime() {
     final nowUtc = DateTime.now().toUtc();
     final nowWib = nowUtc.add(const Duration(hours: 7));
     return DateFormat('yyyy-MM-dd HH:mm:ss').format(nowWib);
   }
 
-  // Format Updated At (WIB) from database UTC
-  String formatUpdatedTimeWIB(String? updatedAt) {
-    if (updatedAt == null || updatedAt.isEmpty) return "-";
+  String formatUpdatedTimeWIB(DateTime? updatedAt) {
+    if (updatedAt == null) return "-";
     try {
-      final dt = DateTime.parse(updatedAt).toUtc().add(const Duration(hours: 7));
+      final dt = updatedAt.toUtc().add(const Duration(hours: 7));
       return DateFormat('HH:mm').format(dt);
     } catch (e) {
       return "-";
@@ -166,7 +174,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         filteredAssets = loadedAssets;
       });
     } catch (e) {
-      _showErrorSnackBar('Failed to load assets: $e');
+      _showErrorSnackBarSafe('Failed to load assets: $e');
     } finally {
       setState(() => isLoading = false);
     }
@@ -193,16 +201,50 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         ),
       );
     } catch (e) {
-      _showErrorSnackBar('Scanner temporarily unavailable. Please use manual input.');
+      _showErrorSnackBarSafe(
+          'Scanner temporarily unavailable. Please use manual input.');
     }
   }
 
   void _simulateScan() {
     if (_qrController.text.isEmpty) {
-      _showErrorSnackBar('Please enter QR code to scan');
+      _showErrorSnackBarSafe('Please enter QR code to scan');
       return;
     }
     _processScannedQr(_qrController.text);
+  }
+
+  LogisticAsset _assetToLogisticAsset(Asset asset) {
+    return LogisticAsset(
+      id: asset.id.toString(),
+      title: asset.name,
+      assetNo: asset.assetCode,
+      generalAccount: asset.generalAccount ?? '',
+      subsidiaryAccount: asset.subsidiaryAccount ?? '',
+      category: asset.category,
+      subCategory: asset.subCategory ?? '',
+      assetSpecification: asset.assetSpecification ?? '',
+      assetStatus: asset.status,
+      acquisitionDate: asset.acquisitionDate ?? asset.createdAt,
+      aging: asset.aging ?? '',
+      quantity: asset.quantity ?? 1,
+      department: asset.location,
+      controlDepartment: asset.controlDepartment ?? '',
+      costCenter: asset.costCenter ?? '',
+      available: asset.available ??
+          (asset.status.toLowerCase() == 'available' ? 1 : 0),
+      broken: asset.broken ??
+          (asset.status.toLowerCase() == 'broken' ||
+                  asset.status.toLowerCase() == 'damaged'
+              ? 1
+              : 0),
+      lost: asset.lost ?? (asset.status.toLowerCase() == 'lost' ? 1 : 0),
+      remarks: asset.remarks ?? asset.description,
+      createdAt: asset.createdAt ?? DateTime.now(),
+      updatedAt: asset.updatedAt ?? DateTime.now(),
+      photos: asset.photos,
+      primaryPhoto: asset.primaryPhoto,
+    );
   }
 
   Future<void> _processScannedQr(String qrCode) async {
@@ -241,17 +283,59 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       }
 
       if (foundAsset != null) {
-        _showAssetDetailsWithAnimation(foundAsset, isNewScan: true);
-        _showSuccessSnackBar('Asset found! ${foundAsset.name} (${foundAsset.assetCode})');
+        setState(() {
+          recentScannedAssets
+              .removeWhere((a) => a.assetCode == foundAsset!.assetCode);
+          recentScannedAssets.insert(0, foundAsset!);
+          if (recentScannedAssets.length > 3) {
+            recentScannedAssets = recentScannedAssets.take(3).toList();
+          }
+        });
+
+        _showAssetDetailsModal(foundAsset, isNewScan: true);
+
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          Future.delayed(Duration(milliseconds: 300), () async {
+            if (mounted) {
+              final logisticAsset = _assetToLogisticAsset(foundAsset!);
+              final uploaded = await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => AssetUploadDialog(asset: logisticAsset),
+              );
+              if (uploaded == true) {
+                _showSuccessSnackBarSafe('Foto asset berhasil diupload!');
+              }
+            }
+          });
+
+          // _showSuccessSnackBarSafe(
+          //     'Asset ditemukan! ${foundAsset!.name} (${foundAsset!.assetCode})');
+        });
       } else {
-        _showAssetNotRegisteredDialog(qrCode);
-        _showErrorSnackBar('Asset tidak terdaftar');
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          _showAssetNotRegisteredDialog(qrCode);
+          _showErrorSnackBarSafe('Asset tidak terdaftar');
+        });
       }
     } catch (e) {
-      _showErrorSnackBar('Scan error: ${e.toString()}');
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _showErrorSnackBarSafe('Scan error: ${e.toString()}');
+      });
     } finally {
       setState(() => isLoading = false);
     }
+  }
+
+  void _showAssetDetailsModal(Asset asset, {bool isNewScan = false}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useRootNavigator: true,
+      enableDrag: true,
+      builder: (context) => AssetDetailModal(asset: asset),
+    );
   }
 
   void _showAssetNotRegisteredDialog(String qrCode) {
@@ -263,115 +347,9 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: Row(
-            children: [
-              Icon(
-                Icons.warning_amber_rounded,
-                color: Colors.orange[600],
-                size: 28,
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Asset Tidak Terdaftar',
-                style: TextStyle(
-                  fontFamily: 'Maison Bold',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A1A1A),
-                ),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Asset dengan kode QR berikut tidak ditemukan dalam sistem:',
-                  style: TextStyle(
-                    fontFamily: 'Maison Book',
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.grey[300]!,
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    qrCode,
-                    style: const TextStyle(
-                      fontFamily: 'Maison Bold',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF405189),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.blue[200]!,
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 16,
-                            color: Colors.blue[700],
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Informasi Scan:',
-                            style: TextStyle(
-                              fontFamily: 'Maison Bold',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blue[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      _buildScanInfoRow('Waktu Scan', getCurrentTime()),
-                      _buildScanInfoRow('User', currentUserName),
-                      _buildScanInfoRow('Status', 'Tidak Terdaftar'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Silakan hubungi administrator atau verifikasi kembali kode QR yang dipindai.',
-                  style: TextStyle(
-                    fontFamily: 'Maison Book',
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          title: Text('Asset Tidak Terdaftar'),
+          content:
+              Text('Asset dengan kode $qrCode tidak ditemukan dalam sistem.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -379,70 +357,11 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                 _qrController.clear();
                 setState(() {});
               },
-              child: Text(
-                'Tutup',
-                style: TextStyle(
-                  fontFamily: 'Maison Bold',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF405189),
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _openQRScanner();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF405189),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              ),
-              child: const Text(
-                'Scan Ulang',
-                style: TextStyle(
-                  fontFamily: 'Maison Bold',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Text('Tutup'),
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildScanInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Maison Book',
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontFamily: 'Maison Book',
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1A1A),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -466,64 +385,50 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         child: ListTile(
           contentPadding: const EdgeInsets.all(14),
           leading: Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10))),
           title: Container(
-            height: 14,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
+              height: 14,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(4))),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 6),
               Container(
-                height: 12,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
+                  height: 12,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4))),
               const SizedBox(height: 6),
               Row(
                 children: [
                   Container(
-                    height: 20,
-                    width: 60,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
+                      height: 20,
+                      width: 60,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6))),
                   const SizedBox(width: 8),
                   Container(
-                    height: 12,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
+                      height: 12,
+                      width: 80,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4))),
                 ],
               ),
             ],
           ),
           trailing: Container(
-            width: 14,
-            height: 14,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(2))),
         ),
       ),
     );
@@ -531,8 +436,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
 
   Widget _buildShimmerRecentAssets() {
     return Column(
-      children: List.generate(3, (index) => _buildShimmerAssetCard()),
-    );
+        children: List.generate(3, (index) => _buildShimmerAssetCard()));
   }
 
   Widget _buildShimmerAssetsList() {
@@ -543,82 +447,20 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     );
   }
 
-  void _showAssetDetailsWithAnimation(Asset asset, {bool isNewScan = false}) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      useRootNavigator: true,
-      enableDrag: true,
-      builder: (context) => AssetDetailsModal(
-        asset: asset,
-        isNewScan: isNewScan,
-        currentUser: currentUser,
-        onUpdate: (updatedAsset) async {
-          try {
-            if (updatedAsset.id > 0) {
-              await AssetApiService.updateAsset(updatedAsset.id, updatedAsset);
-              _showSuccessSnackBar(isNewScan
-                  ? 'Scanned asset saved successfully!'
-                  : 'Asset updated successfully!');
-            } else {
-              _showErrorSnackBar('Cannot save unknown asset. Please contact administrator.');
-            }
-            _loadAssets();
-          } catch (e) {
-            _showErrorSnackBar('Failed to save asset: $e');
-          }
-        },
-        onDelete: (assetId) async {
-          try {
-            final id = int.tryParse(assetId);
-            if (id != null && id > 0) {
-              await AssetApiService.deleteAsset(id);
-              _loadAssets();
-              _showSuccessSnackBar('Asset deleted successfully!');
-            }
-          } catch (e) {
-            _showErrorSnackBar('Failed to delete asset: $e');
-          }
-        },
-      ),
-    );
+  void _showErrorSnackBarSafe(String message) {
+    if (mounted) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _showErrorSnackBar(message);
+      });
+    }
   }
 
-  void _showAssetDetails(Asset asset) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => AssetDetailsModal(
-        asset: asset,
-        isNewScan: false,
-        currentUser: currentUser,
-        onUpdate: (updatedAsset) async {
-          try {
-            if (updatedAsset.id > 0) {
-              await AssetApiService.updateAsset(updatedAsset.id, updatedAsset);
-              _showSuccessSnackBar('Asset updated successfully!');
-            }
-            _loadAssets();
-          } catch (e) {
-            _showErrorSnackBar('Failed to save asset: $e');
-          }
-        },
-        onDelete: (assetId) async {
-          try {
-            final id = int.tryParse(assetId);
-            if (id != null && id > 0) {
-              await AssetApiService.deleteAsset(id);
-              _loadAssets();
-              _showSuccessSnackBar('Asset deleted successfully!');
-            }
-          } catch (e) {
-            _showErrorSnackBar('Failed to delete asset: $e');
-          }
-        },
-      ),
-    );
+  void _showSuccessSnackBarSafe(String message) {
+    if (mounted) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _showSuccessSnackBar(message);
+      });
+    }
   }
 
   void _showErrorSnackBar(String message) {
@@ -629,13 +471,16 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             children: [
               const Icon(Icons.error_outline, color: Colors.white, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(message, style: TextStyle(fontFamily: 'Maison Book'))),
+              Expanded(
+                  child: Text(message,
+                      style: TextStyle(fontFamily: 'Maison Book'))),
             ],
           ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 4),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
@@ -647,33 +492,38 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
+              const Icon(Icons.check_circle_outline,
+                  color: Colors.white, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(message, style: TextStyle(fontFamily: 'Maison Book'))),
+              Expanded(
+                  child: Text(message,
+                      style: TextStyle(fontFamily: 'Maison Book'))),
             ],
           ),
           backgroundColor: const Color(0xFF405189),
           duration: const Duration(seconds: 3),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
   }
 
-  // ==== NAVIGATION HANDLER ====
   void _onNavTap(int index) {
     if (index == 0) {
       Navigator.push(context, MaterialPageRoute(builder: (_) => WelcomePage()));
     }
     if (index == 1) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => ActivityPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => ActivityPage()));
     }
     if (index == 2) {
       // Already on ScanAssetPage
     }
     if (index == 3) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => SettingsPage()));
     }
   }
 
@@ -702,7 +552,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             ),
             const SizedBox(width: 10),
             ClipRRect(
-              // borderRadius: BorderRadius.circular(5),
               child: Image.asset(
                 'assets/images/indocement_logo.png',
                 width: 40,
@@ -721,7 +570,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         },
         child: Column(
           children: [
-            // Header with tabs
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 15),
@@ -737,12 +585,11 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildTabButton('Scan', Icons.qr_code_scanner),
-                      ),
+                          child:
+                              _buildTabButton('Scan', Icons.qr_code_scanner)),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: _buildTabButton('Assets', Icons.inventory),
-                      ),
+                          child: _buildTabButton('Assets', Icons.inventory)),
                     ],
                   ),
                   const SizedBox(height: 15),
@@ -756,14 +603,14 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                               width: 12,
                               height: 12,
                               child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white70,
-                              ),
+                                  strokeWidth: 2, color: Colors.white70),
                             ),
                             const SizedBox(width: 8),
                           ],
                           Text(
-                            isLoadingUserInfo ? 'Loading user...' : 'Logged in as: $currentUserName',
+                            isLoadingUserInfo
+                                ? 'Loading user...'
+                                : 'Logged in as: $currentUserName',
                             style: const TextStyle(
                               fontFamily: 'Maison Book',
                               color: Colors.white70,
@@ -825,11 +672,9 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: isSelected ? const Color(0xFF405189) : Colors.white,
-              size: 16,
-            ),
+            Icon(icon,
+                color: isSelected ? const Color(0xFF405189) : Colors.white,
+                size: 16),
             const SizedBox(width: 6),
             Text(
               label,
@@ -923,11 +768,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.qr_code_scanner,
-                        color: Colors.white,
-                        size: 30,
-                      ),
+                      child: const Icon(Icons.qr_code_scanner,
+                          color: Colors.white, size: 30),
                     ),
                     const SizedBox(height: 12),
                     const Text(
@@ -951,7 +793,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
                         color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -997,7 +840,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             child: TextField(
               controller: _qrController,
               decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.qr_code, color: Color(0xFF405189), size: 20),
+                prefixIcon: const Icon(Icons.qr_code,
+                    color: Color(0xFF405189), size: 20),
                 hintText: 'Enter asset code...',
                 hintStyle: TextStyle(
                   fontFamily: 'Maison Book',
@@ -1012,7 +856,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                           _qrController.clear();
                           setState(() {});
                         },
-                        icon: const Icon(Icons.clear, color: Colors.grey, size: 18),
+                        icon: const Icon(Icons.clear,
+                            color: Colors.grey, size: 18),
                       )
                     : null,
               ),
@@ -1081,46 +926,46 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           SizedBox(
             height: 200,
             child: isLoading
-              ? _buildShimmerRecentAssets()
-              : assets.isEmpty 
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inventory_2_outlined,
-                          size: 40,
-                          color: Colors.grey[400],
+                ? _buildShimmerRecentAssets()
+                : recentScannedAssets.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.inventory_2_outlined,
+                              size: 40,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Belum ada scan asset',
+                              style: TextStyle(
+                                fontFamily: 'Maison Bold',
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Scan QR untuk menambahkan recent scan',
+                              style: TextStyle(
+                                fontFamily: 'Maison Book',
+                                color: Colors.grey[500],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'No assets found',
-                          style: TextStyle(
-                            fontFamily: 'Maison Bold',
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Scan QR codes to view assets',
-                          style: TextStyle(
-                            fontFamily: 'Maison Book',
-                            color: Colors.grey[500],
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: assets.take(3).length,
-                    itemBuilder: (context, index) {
-                      final asset = assets[index];
-                      return _buildAssetCard(asset, showScanTime: true);
-                    },
-                  ),
+                      )
+                    : ListView.builder(
+                        itemCount: recentScannedAssets.length,
+                        itemBuilder: (context, index) {
+                          final asset = recentScannedAssets[index];
+                          return _buildAssetCard(asset, showScanTime: true);
+                        },
+                      ),
           ),
           const SizedBox(height: 20),
         ],
@@ -1149,7 +994,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             controller: _searchController,
             onChanged: _filterAssets,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.search, color: Color(0xFF405189), size: 20),
+              prefixIcon:
+                  const Icon(Icons.search, color: Color(0xFF405189), size: 20),
               hintText: 'Search assets...',
               hintStyle: TextStyle(
                 fontFamily: 'Maison Book',
@@ -1196,55 +1042,55 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         const SizedBox(height: 10),
         Expanded(
           child: isLoading
-            ? _buildShimmerAssetsList()
-            : filteredAssets.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _searchController.text.isNotEmpty 
-                          ? Icons.search_off 
-                          : Icons.inventory_2_outlined,
-                        size: 64,
-                        color: Colors.grey[400],
+              ? _buildShimmerAssetsList()
+              : filteredAssets.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _searchController.text.isNotEmpty
+                                ? Icons.search_off
+                                : Icons.inventory_2_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _searchController.text.isNotEmpty
+                                ? 'No assets found for "${_searchController.text}"'
+                                : 'No assets found',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _searchController.text.isNotEmpty
+                                ? 'Try different search terms'
+                                : 'Start by scanning QR codes to view assets',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              color: Colors.grey[500],
+                              fontSize: 12,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _searchController.text.isNotEmpty 
-                          ? 'No assets found for "${_searchController.text}"'
-                          : 'No assets found',
-                        style: TextStyle(
-                          fontFamily: 'Maison Bold',
-                          color: Colors.grey[600],
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _searchController.text.isNotEmpty 
-                          ? 'Try different search terms'
-                          : 'Start by scanning QR codes to view assets',
-                        style: TextStyle(
-                          fontFamily: 'Maison Bold',
-                          color: Colors.grey[500],
-                          fontSize: 12,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                )
-              : ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: filteredAssets.length,
-                  itemBuilder: (context, index) {
-                    final asset = filteredAssets[index];
-                    return _buildAssetCard(asset);
-                  },
-                ),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: filteredAssets.length,
+                      itemBuilder: (context, index) {
+                        final asset = filteredAssets[index];
+                        return _buildAssetCard(asset);
+                      },
+                    ),
         ),
       ],
     );
@@ -1255,21 +1101,22 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     IconData statusIcon;
 
     switch (asset.status.toLowerCase()) {
-      case 'registered':
+      case 'available':
         statusColor = Colors.green;
         statusIcon = Icons.check_circle;
         break;
       case 'damaged':
+      case 'broken':
         statusColor = Colors.red;
         statusIcon = Icons.error;
-        break;
-      case 'unscanned':
-        statusColor = Colors.orange;
-        statusIcon = Icons.warning;
         break;
       case 'lost':
         statusColor = Colors.red;
         statusIcon = Icons.cancel;
+        break;
+      case 'maintenance':
+        statusColor = Colors.orange;
+        statusIcon = Icons.build_circle;
         break;
       default:
         statusColor = Colors.grey;
@@ -1307,9 +1154,10 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: asset.imagePath != null && asset.imagePath!.isNotEmpty
+            child: asset.primaryPhoto != null &&
+                    asset.primaryPhoto!.fileUrl.isNotEmpty
                 ? Image.network(
-                    asset.imagePath!,
+                    asset.primaryPhoto!.fileUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
@@ -1332,11 +1180,36 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                       );
                     },
                   )
-                : const Icon(
-                    Icons.inventory,
-                    color: Color(0xFF405189),
-                    size: 22,
-                  ),
+                : asset.imagePath != null && asset.imagePath!.isNotEmpty
+                    ? Image.network(
+                        asset.imagePath!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.inventory,
+                            color: Color(0xFF405189),
+                            size: 22,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              strokeWidth: 2,
+                              color: const Color(0xFF405189),
+                            ),
+                          );
+                        },
+                      )
+                    : const Icon(
+                        Icons.inventory,
+                        color: Color(0xFF405189),
+                        size: 22,
+                      ),
           ),
         ),
         title: Text(
@@ -1364,7 +1237,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -1390,7 +1264,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                     ],
                   ),
                 ),
-                if (showScanTime && asset.updatedAt != null) ...[
+                if (showScanTime && asset.lastScannedAt != null) ...[
                   const SizedBox(width: 8),
                   Icon(
                     Icons.access_time,
@@ -1399,8 +1273,24 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    // asset.updatedAt assumed to be DateTime? type, so use .toIso8601String()
-                    'Updated: ${formatUpdatedTimeWIB(asset.updatedAt?.toIso8601String())}',
+                    'Scanned: ${formatUpdatedTimeWIB(asset.lastScannedAt)}',
+                    style: TextStyle(
+                      fontFamily: 'Maison Book',
+                      fontSize: 9,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+                if (showScanTime && asset.scannedBy != null) ...[
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.person,
+                    size: 10,
+                    color: Colors.grey[500],
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    asset.scannedBy!,
                     style: TextStyle(
                       fontFamily: 'Maison Book',
                       fontSize: 9,
@@ -1417,7 +1307,16 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           color: Colors.grey,
           size: 14,
         ),
-        onTap: () => _showAssetDetails(asset),
+        onTap: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            useRootNavigator: true,
+            enableDrag: true,
+            builder: (context) => AssetDetailModal(asset: asset),
+          );
+        },
       ),
     );
   }

@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 String parseAndFormatToWIB(String raw) {
   if (raw.isEmpty) return '-';
   try {
-    DateTime dt = DateTime.parse(raw); // Assume UTC
+    DateTime dt = DateTime.parse(raw);
     final dtWib = dt.toUtc().add(const Duration(hours: 7));
     return '${dtWib.year}-${dtWib.month.toString().padLeft(2, '0')}-${dtWib.day.toString().padLeft(2, '0')} '
         '${dtWib.hour.toString().padLeft(2, '0')}:${dtWib.minute.toString().padLeft(2, '0')}:${dtWib.second.toString().padLeft(2, '0')}';
@@ -13,7 +13,6 @@ String parseAndFormatToWIB(String raw) {
     return '-';
   }
 }
-  
 
 class ActivityDetailCard extends StatefulWidget {
   final AssetDetail asset;
@@ -54,28 +53,55 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
     }
   }
 
-  /// Ambil waktu activity (current time dari database) dan format ke WIB
   String getCurrentTimeFromActivity() {
     return parseAndFormatToWIB(widget.asset.activityTime ?? '');
   }
 
-  /// Ambil waktu created_at dari database dan format ke WIB
   String getAssetCreatedTimeWIB() {
     return parseAndFormatToWIB(widget.asset.createdAt ?? '');
   }
 
-  /// Ambil waktu updated_at dari database dan format ke WIB
   String getAssetUpdatedTimeWIB() {
     return parseAndFormatToWIB(widget.asset.updatedAt ?? '');
   }
 
-  void _showFullScreenImage(BuildContext context) {
-    if (widget.asset.imageUrl == null) return;
-    showDialog(
-      context: context,
-      builder: (context) => FullScreenImageDialog(imageUrl: widget.asset.imageUrl!),
-    );
-  }
+  // void _showFullScreenImage(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => Dialog(
+  //       backgroundColor: Colors.transparent,
+  //       child: Container(
+  //         padding: const EdgeInsets.all(20),
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.circular(16),
+  //         ),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Icon(Icons.image_not_supported, size: 64, color: Colors.grey[400]),
+  //             SizedBox(height: 16),
+  //             Text(
+  //               'No Image Available',
+  //               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+  //             ),
+  //             SizedBox(height: 8),
+  //             Text(
+  //               'This asset doesn\'t have an associated image.',
+  //               style: TextStyle(color: Colors.grey[600]),
+  //               textAlign: TextAlign.center,
+  //             ),
+  //             SizedBox(height: 16),
+  //             ElevatedButton(
+  //               onPressed: () => Navigator.pop(context),
+  //               child: Text('Close'),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -132,62 +158,10 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => _showFullScreenImage(context),
-                    child: Container(
-                      width: double.infinity,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: widget.asset.imageUrl != null
-                              ? Image.network(
-                                  widget.asset.imageUrl!,
-                                  width: double.infinity,
-                                  height: 160,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return _buildPlaceholderImage();
-                                  },
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return _buildLoadingImage();
-                                  },
-                                )
-                              : _buildPlaceholderImage(),
-                          ),
-                          if (widget.asset.imageUrl != null)
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: const Icon(
-                                  Icons.fullscreen,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // GestureDetector(
+                  //   onTap: () => _showFullScreenImage(context),
+                  //   child: _buildPlaceholderImage(),
+                  // ),
                   const SizedBox(height: 16),
                   Text(
                     widget.asset.assetName,
@@ -235,30 +209,37 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
                   ),
                   const SizedBox(height: 10),
                   _buildDetailRow(
-                    icon: Icons.location_on_outlined,
-                    label: 'Location',
-                    value: widget.asset.location ?? '-',
+                    icon: Icons.business_outlined,
+                    label: 'Department',
+                    value: widget.asset.department ?? '-',
                     iconColor: const Color(0xFF8B5CF6),
                   ),
                   const SizedBox(height: 10),
                   _buildDetailRow(
                     icon: Icons.check_circle_outline,
                     label: 'Status',
-                    value: widget.asset.status ?? '-',
-                    iconColor: _getStatusColor(widget.asset.status),
+                    value: widget.asset.assetStatus ?? '-',
+                    iconColor: _getStatusColor(widget.asset.assetStatus),
                   ),
                   const SizedBox(height: 10),
                   _buildDetailRow(
-                    icon: Icons.access_time_outlined,
-                    label: 'Created At',
-                    value: getAssetCreatedTimeWIB(),
+                    icon: Icons.inventory_outlined,
+                    label: 'Quantity',
+                    value: widget.asset.quantity?.toString() ?? '-',
+                    iconColor: const Color(0xFF10B981),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildDetailRow(
+                    icon: Icons.calendar_today_outlined,
+                    label: 'Acquisition Date',
+                    value: widget.asset.acquisitionDate ?? '-',
                     iconColor: const Color(0xFF6366F1),
                   ),
                   const SizedBox(height: 10),
                   _buildDetailRow(
-                    icon: Icons.update_outlined,
-                    label: 'Updated At',
-                    value: getAssetUpdatedTimeWIB(),
+                    icon: Icons.schedule_outlined,
+                    label: 'Aging',
+                    value: widget.asset.aging ?? '-',
                     iconColor: const Color(0xFFF59E0B),
                   ),
                   const SizedBox(height: 20),
@@ -292,7 +273,7 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              'System Information',
+                              'Asset Status Details',
                               style: TextStyle(
                                 fontFamily: 'Maison Bold',
                                 fontSize: 12,
@@ -303,11 +284,13 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
                           ],
                         ),
                         const SizedBox(height: 12),
+                        _buildInfoRow('Available', widget.asset.available?.toString() ?? '-'),
+                        _buildInfoRow('Broken', widget.asset.broken?.toString() ?? '-'),
+                        _buildInfoRow('Lost', widget.asset.lost?.toString() ?? '-'),
                         _buildInfoRow('Current User', isLoadingUserInfo ? 'Loading...' : currentUserName),
-                        _buildInfoRow('Current Time (Activity)', getCurrentTimeFromActivity()),
+                        _buildInfoRow('Activity Time', getCurrentTimeFromActivity()),
                         _buildInfoRow('Created At', getAssetCreatedTimeWIB()),
                         _buildInfoRow('Updated At', getAssetUpdatedTimeWIB()),
-                        _buildInfoRow('Action', 'View Asset Details'),
                       ],
                     ),
                   ),
@@ -328,18 +311,25 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.image_outlined,
+            Icons.inventory_2_outlined,
             size: 40,
             color: Colors.grey[400],
           ),
           const SizedBox(height: 6),
           Text(
-            'No Image Available',
+            'Asset Image',
             style: TextStyle(
               fontFamily: 'Maison Book',
               fontSize: 12,
@@ -347,24 +337,16 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
               color: Colors.grey[500],
             ),
           ),
+          Text(
+            'Tap to view details',
+            style: TextStyle(
+              fontFamily: 'Maison Book',
+              fontSize: 10,
+              fontWeight: FontWeight.w400,
+              color: Colors.grey[400],
+            ),
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildLoadingImage() {
-    return Container(
-      width: double.infinity,
-      height: 160,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF405189),
-          strokeWidth: 2,
-        ),
       ),
     );
   }
@@ -470,144 +452,16 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
 
   Color _getStatusColor(String? status) {
     switch (status?.toLowerCase()) {
-      case 'registered':
+      case 'available':
         return const Color(0xFF10B981);
-      case 'damaged':
+      case 'broken':
         return const Color(0xFFEF4444);
-      case 'unscanned':
-        return const Color(0xFFF59E0B);
       case 'lost':
         return const Color(0xFFEF4444);
+      case 'maintenance':
+        return const Color(0xFFF59E0B);
       default:
         return Colors.grey;
     }
-  }
-}
-
-class FullScreenImageDialog extends StatelessWidget {
-  final String imageUrl;
-
-  const FullScreenImageDialog({Key? key, required this.imageUrl}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.zero,
-      child: Stack(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.black87,
-            ),
-          ),
-          Center(
-            child: InteractiveViewer(
-              minScale: 0.5,
-              maxScale: 4.0,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          color: Colors.white70,
-                          size: 32,
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Failed to load image',
-                          style: TextStyle(
-                            fontFamily: 'Maison Bold',
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[800],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 12,
-            right: 12,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.close,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: MediaQuery.of(context).padding.bottom + 20,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Text(
-                  'Pinch to zoom • Tap to close',
-                  style: TextStyle(
-                    fontFamily: 'Maison Bold',
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

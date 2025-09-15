@@ -1,4 +1,5 @@
 import 'package:Simba/screens/activity_screen/activity_page.dart';
+import 'package:Simba/screens/home_screen/analytic_logistic/logistic_asset_analytics_page.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_page.dart';
 // import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_scan_page.dart';
 import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/logistic_asset_scan_menu.dart';
@@ -12,13 +13,12 @@ import 'package:Simba/screens/registered_page/asset_service.dart'
     as registered_asset_service;
 import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
-import 'package:excel/excel.dart';
+// import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_service.dart';
 import 'package:shimmer/shimmer.dart';
 
-// ==== REUSABLE NAVBAR ====
 class AppBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
@@ -88,7 +88,6 @@ class AppBottomNavBar extends StatelessWidget {
   }
 }
 
-// ==== END NAVBAR WIDGET ====
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -527,6 +526,27 @@ class _WelcomePageState extends State<WelcomePage> {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             LogisticAssetScanMenuPage(), 
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 10),
+                                AssetCardMinimalist(
+                                  title: 'Chart Logistic Asset',
+                                  image: Image.asset(
+                                    'assets/images/icons/activity_page/research.png',
+                                    width: 28,
+                                    height: 28,
+                                  ),
+                                  count: '∞',
+                                  description: 'Scan Barcode asset logistik',
+                                  color: const Color.fromRGBO(234, 0, 255, 1),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            LogisticAssetAnalyticsPage(), 
                                       ),
                                     );
                                   },

@@ -303,14 +303,12 @@ class _LogisticAssetScanMenuPageState extends State<LogisticAssetScanMenuPage> {
                 ),
               ],
 
-              // Asset Info Widget
               if (_scannedAsset != null) ...[
                 AssetInfoWidget(
                   asset: _scannedAsset!,
                 ),
               ],
 
-              // Status Message
               if (_scanStatus.isNotEmpty && !_isLoadingAsset && _scannedAsset == null) ...[
                 Container(
                   width: double.infinity,

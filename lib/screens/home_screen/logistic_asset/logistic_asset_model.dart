@@ -1,3 +1,61 @@
+class AssetPhoto {
+  final String id;
+  final String assetId;
+  final String fileName;
+  final String filePath;
+  final String fileUrl;
+  final bool isPrimary;
+  final String? caption;
+  final int? fileSize;
+  final String? mimeType;
+  final String uploadedBy;
+  final DateTime createdAt;
+
+  AssetPhoto({
+    required this.id,
+    required this.assetId,
+    required this.fileName,
+    required this.filePath,
+    required this.fileUrl,
+    required this.isPrimary,
+    this.caption,
+    this.fileSize,
+    this.mimeType,
+    required this.uploadedBy,
+    required this.createdAt,
+  });
+
+  factory AssetPhoto.fromJson(Map<String, dynamic> json) {
+    return AssetPhoto(
+      id: json['id']?.toString() ?? '',
+      assetId: json['asset_id']?.toString() ?? '',
+      fileName: json['file_name']?.toString() ?? '',
+      filePath: json['file_path']?.toString() ?? '',
+      fileUrl: json['file_url']?.toString() ?? '',
+      isPrimary: json['is_primary'] == true || json['is_primary'] == 1,
+      caption: json['caption']?.toString(),
+      fileSize: int.tryParse(json['file_size']?.toString() ?? ''),
+      mimeType: json['mime_type']?.toString(),
+      uploadedBy: json['uploaded_by']?.toString() ?? '',
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'asset_id': assetId,
+    'file_name': fileName,
+    'file_path': filePath,
+    'file_url': fileUrl,
+    'is_primary': isPrimary,
+    'caption': caption,
+    'file_size': fileSize,
+    'mime_type': mimeType,
+    'uploaded_by': uploadedBy,
+    'created_at': createdAt.toIso8601String(),
+  };
+}
+
 class LogisticAsset {
   final String id;
   final String title;
@@ -80,50 +138,6 @@ class LogisticAsset {
       primaryPhoto: json['primary_photo'] != null 
           ? AssetPhoto.fromJson(json['primary_photo']) 
           : null,
-    );
-  }
-}
-
-class AssetPhoto {
-  final String id;
-  final String assetId;
-  final String fileName;
-  final String filePath;
-  final String fileUrl;
-  final bool isPrimary;
-  final String? caption;
-  final int? fileSize;
-  final String? mimeType;
-  final String uploadedBy;
-  final DateTime createdAt;
-
-  AssetPhoto({
-    required this.id,
-    required this.assetId,
-    required this.fileName,
-    required this.filePath,
-    required this.fileUrl,
-    required this.isPrimary,
-    this.caption,
-    this.fileSize,
-    this.mimeType,
-    required this.uploadedBy,
-    required this.createdAt,
-  });
-
-  factory AssetPhoto.fromJson(Map<String, dynamic> json) {
-    return AssetPhoto(
-      id: json['id']?.toString() ?? '',
-      assetId: json['asset_id']?.toString() ?? '',
-      fileName: json['file_name']?.toString() ?? '',
-      filePath: json['file_path']?.toString() ?? '',
-      fileUrl: json['file_url']?.toString() ?? '',
-      isPrimary: json['is_primary'] == true || json['is_primary'] == 1,
-      caption: json['caption']?.toString(),
-      fileSize: int.tryParse(json['file_size']?.toString() ?? ''),
-      mimeType: json['mime_type']?.toString(),
-      uploadedBy: json['uploaded_by']?.toString() ?? '',
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
     );
   }
 }

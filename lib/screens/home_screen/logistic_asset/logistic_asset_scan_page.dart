@@ -64,7 +64,6 @@ class _LogisticAssetScanPageState extends State<LogisticAssetScanPage> {
       setState(() => isSearching = false);
 
       if (asset != null) {
-        // Asset found - navigate to detail
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -238,7 +237,6 @@ class _LogisticAssetScanPageState extends State<LogisticAssetScanPage> {
             onDetect: _onDetect,
           ),
           
-          // Scanning frame overlay
           Center(
             child: Container(
               width: 250,
@@ -252,10 +250,6 @@ class _LogisticAssetScanPageState extends State<LogisticAssetScanPage> {
               ),
             ),
           ),
-
-
-
-          // Instructions at bottom
           Positioned(
             bottom: 80,
             left: 0,
@@ -281,7 +275,6 @@ class _LogisticAssetScanPageState extends State<LogisticAssetScanPage> {
             ),
           ),
 
-          // Subtle loading indicator
           if (isSearching)
             Container(
               color: Colors.black45,

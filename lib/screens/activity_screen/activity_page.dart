@@ -90,7 +90,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   void initState() {
     super.initState();
-    activityService = ActivityService(baseUrl: 'http://192.168.1.8:8000');
+    activityService = ActivityService(baseUrl: 'http://192.168.8.138:8000');
     _loadUserData();
   }
 
@@ -422,7 +422,6 @@ class _ActivityPageState extends State<ActivityPage> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // REFRESHINDICATOR IMPLEMENTATION
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: fetchActivities,
@@ -557,52 +556,52 @@ class _ActivityPageState extends State<ActivityPage> {
               ),
             ),
             const SizedBox(width: 12),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: Colors.grey[200],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: activity.assetDetail.imageUrl != null && activity.assetDetail.imageUrl!.isNotEmpty
-                    ? Image.network(
-                        activity.assetDetail.imageUrl!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.image_not_supported,
-                            size: 20,
-                            color: Colors.grey[400],
-                          );
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                strokeWidth: 2,
-                                color: const Color(0xFF405189),
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : Icon(
-                        Icons.image_not_supported,
-                        size: 20,
-                        color: Colors.grey[400],
-                      ),
-              ),
-            ),
-            const SizedBox(width: 12),
+            // Container(
+            //   width: 40,
+            //   height: 40,
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(5),
+            //     color: Colors.grey[200],
+            //   ),
+            //   // child: ClipRRect(
+            //   //   borderRadius: BorderRadius.circular(5),
+            //   //   child: activity.assetDetail.imageUrl != null && activity.assetDetail.imageUrl!.isNotEmpty
+            //   //       ? Image.network(
+            //   //           activity.assetDetail.imageUrl!,
+            //   //           fit: BoxFit.cover,
+            //   //           errorBuilder: (context, error, stackTrace) {
+            //   //             return Icon(
+            //   //               Icons.image_not_supported,
+            //   //               size: 20,
+            //   //               color: Colors.grey[400],
+            //   //             );
+            //   //           },
+            //   //           loadingBuilder: (context, child, loadingProgress) {
+            //   //             if (loadingProgress == null) return child;
+            //   //             return Center(
+            //   //               child: SizedBox(
+            //   //                 width: 16,
+            //   //                 height: 16,
+            //   //                 child: CircularProgressIndicator(
+            //   //                   value: loadingProgress.expectedTotalBytes != null
+            //   //                       ? loadingProgress.cumulativeBytesLoaded /
+            //   //                           loadingProgress.expectedTotalBytes!
+            //   //                       : null,
+            //   //                   strokeWidth: 2,
+            //   //                   color: const Color(0xFF405189),
+            //   //                 ),
+            //   //               ),
+            //   //             );
+            //   //           },
+            //   //         )
+            //   //       : Icon(
+            //   //           Icons.image_not_supported,
+            //   //           size: 20,
+            //   //           color: Colors.grey[400],
+            //   //         ),
+            //   // ),
+            // ),
+            // const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -678,68 +677,63 @@ class _ActivityPageState extends State<ActivityPage> {
     );
   }
 
-  IconData _iconForType(String type) {
-    switch (type) {
-      case 'scan':
-        return Icons.qr_code_scanner;
-      case 'register':
-        return Icons.add_box;
-      case 'update':
-        return Icons.edit;
-      case 'damage':
-        return Icons.warning_amber_rounded;
-      case 'lost':
-        return Icons.location_off;
-      case 'search':
-        return Icons.search;
-      case 'delete':
-        return Icons.delete_forever;
-      default:
-        return Icons.info_outline;
-    }
+  // Tambahkan method ini untuk mengganti yang lama
+IconData _iconForType(String type) {
+  switch (type) {
+    case 'scan_asset':
+      return Icons.qr_code_scanner;
+    case 'upload_photo':
+      return Icons.photo_camera;
+    case 'update_status':
+      return Icons.edit;
+    case 'import_assets':
+      return Icons.file_upload;
+    case 'search_asset':
+      return Icons.search;
+    case 'view_photos':
+      return Icons.photo_library;
+    default:
+      return Icons.info_outline;
   }
+}
 
-  String _titleForType(String type) {
-    switch (type) {
-      case 'scan':
-        return 'Asset Scanned';
-      case 'register':
-        return 'New Asset Registered';
-      case 'update':
-        return 'Asset Updated';
-      case 'damage':
-        return 'Damaged Asset Reported';
-      case 'lost':
-        return 'Lost Asset Reported';
-      case 'search':
-        return 'Asset Search';
-      case 'delete':
-        return 'Asset Deleted';
-      default:
-        return 'Other Activity';
-    }
+String _titleForType(String type) {
+  switch (type) {
+    case 'scan_asset':
+      return 'Asset Scanned';
+    case 'upload_photo':
+      return 'Photo Uploaded';
+    case 'update_status':
+      return 'Status Updated';
+    case 'import_assets':
+      return 'Assets Imported';
+    case 'search_asset':
+      return 'Asset Searched';
+    case 'view_photos':
+      return 'Photos Viewed';
+    default:
+      return 'Other Activity';
   }
+}
 
-  Color _colorForType(String type) {
-    switch (type) {
-      case 'scan':
-        return Colors.green;
-      case 'register':
-        return const Color(0xFF405189);
-      case 'update':
-        return Colors.blue;
-      case 'damage':
-        return Colors.orange;
-      case 'lost':
-        return Colors.red;
-      case 'search':
-        return Colors.grey;
-      case 'delete':
-        return Colors.redAccent;
-      default:
-        return Colors.black54;
-    }
+Color _colorForType(String type) {
+  switch (type) {
+    case 'scan_asset':
+      return Colors.green;
+    case 'upload_photo':
+      return Colors.blue;
+    case 'update_status':
+      return Colors.orange;
+    case 'import_assets':
+      return const Color(0xFF405189);
+    case 'search_asset':
+      return Colors.grey;
+    case 'view_photos':
+      return Colors.purple;
+    default:
+      return Colors.black54;
   }
+}
 
   String _formatWibDate(DateTime dt) {
     DateTime wib = dt.toUtc().add(const Duration(hours: 7));

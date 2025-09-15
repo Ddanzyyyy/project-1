@@ -118,7 +118,7 @@ class LogisticAssetDetailPage extends StatelessWidget {
             SizedBox(height: 16),
 
             // Basic Information
-            _buildInfoCard('Information', [
+            _buildInfoCard('Full Information', [
               // Title(
               //   color: Colors.black,
               //   // title: 'Asset Summary',
@@ -127,19 +127,26 @@ class LogisticAssetDetailPage extends StatelessWidget {
               //     thickness: 1,
               //   ),
               // ),
+              _buildInfoRow('Title', asset.title),
+              _buildInfoRow('Asset No', asset.assetNo),
               _buildInfoRow('General Account', asset.generalAccount),
-              _buildInfoRow('Subsidiary Account', asset.subsidiaryAccount),
               _buildInfoRow('Category', asset.category),
               _buildInfoRow('Sub Category', asset.subCategory),
-              _buildInfoRow('Department', asset.department),
-              _buildInfoRow('Control Department', asset.controlDepartment),
-              _buildInfoRow('Cost Center', asset.costCenter),
+              _buildInfoRow('Subsidiary Account', asset.subsidiaryAccount),
+              _buildInfoRow('Asset Specification', asset.assetSpecification),
+              // _buildInfoRow('Asset Specification', asset.assetSpecification),
               _buildInfoRow(
                   'Acquisition Date',
                   asset.acquisitionDate != null
                       ? DateFormat('dd MMM yyyy').format(asset.acquisitionDate!)
                       : '-'),
               _buildInfoRow('Aging', '${asset.aging}'),
+              _buildInfoRow('Quantity', asset.quantity.toString()),
+              _buildInfoRow('Department', asset.department),
+              _buildInfoRow('Control Department', asset.controlDepartment),
+              _buildInfoRow('Cost Center', asset.costCenter),
+              _buildInfoRow('Asset Status', asset.assetStatus),
+              _buildInfoRow('Remarks', asset.remarks.isNotEmpty ? asset.remarks : '-')
             ]),
 
             // SizedBox(height: 16),
@@ -210,50 +217,50 @@ class LogisticAssetDetailPage extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(7),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Remarks',
-                      style: TextStyle(
-                        fontFamily: 'Maison Bold',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF405189),
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(7),
-                        border: Border.all(color: Colors.grey[200]!),
-                      ),
-                      child: Text(
-                        asset.remarks,
-                        style: TextStyle(
-                          fontFamily: 'Maison Book',
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // decoration: BoxDecoration(
+                //   color: Colors.white,
+                //   borderRadius: BorderRadius.circular(7),
+                //   boxShadow: [
+                //     BoxShadow(
+                //       color: Colors.black.withOpacity(0.05),
+                //       blurRadius: 10,
+                //       offset: Offset(0, 2),
+                //     ),
+                //   ],
+                // ),
+                // child: Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     Text(
+                //       'Remarks',
+                //       style: TextStyle(
+                //         fontFamily: 'Maison Bold',
+                //         fontSize: 16,
+                //         fontWeight: FontWeight.w700,
+                //         color: Color(0xFF405189),
+                //       ),
+                //     ),
+                //     SizedBox(height: 12),
+                //     Container(
+                //       width: double.infinity,
+                //       padding: EdgeInsets.all(12),
+                //       decoration: BoxDecoration(
+                //         color: Colors.grey[50],
+                //         borderRadius: BorderRadius.circular(7),
+                //         border: Border.all(color: Colors.grey[200]!),
+                //       ),
+                //       child: Text(
+                //         asset.remarks,
+                //         style: TextStyle(
+                //           fontFamily: 'Maison Book',
+                //           fontSize: 14,
+                //           color: Colors.grey[700],
+                //           height: 1.5,
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ),
           ],
         ),

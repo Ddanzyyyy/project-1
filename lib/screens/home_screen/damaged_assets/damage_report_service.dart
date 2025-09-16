@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'damage_report_model.dart';
 
-const String baseUrl = "http://192.168.8.138:8000/api";
+const String baseUrl = "http://192.168.1.4:8000/api";
 
 class DamageReportService {
   static Future<List<DamageReport>> getDamageReports(

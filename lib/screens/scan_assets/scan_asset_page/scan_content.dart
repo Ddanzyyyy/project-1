@@ -1,4 +1,4 @@
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_asset_card.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_card.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/shimmer_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_model.dart';

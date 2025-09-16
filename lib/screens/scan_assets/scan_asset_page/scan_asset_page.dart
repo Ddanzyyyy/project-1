@@ -283,7 +283,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     }
   }
 
-  // === UI EVENT HANDLERS ===
   void _onNavTap(int index) {
     switch (index) {
       case 0:
@@ -295,7 +294,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             context, MaterialPageRoute(builder: (_) => ActivityPage()));
         break;
       case 2:
-        break; // Already on ScanAssetPage
+        break;
       case 3:
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => SettingsPage()));
@@ -340,7 +339,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     );
   }
 
-  // === SNACKBAR METHODS ===
   void _showErrorSnackBarSafe(String message) {
     if (mounted) {
       SchedulerBinding.instance.addPostFrameCallback((_) {

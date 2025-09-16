@@ -20,6 +20,14 @@ class AssetCard extends StatelessWidget {
     IconData statusIcon;
 
     switch (asset.status.toLowerCase()) {
+      case 'active':
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle;
+        break;
+      case 'fully depreciation':
+        statusColor = Colors.amber;
+        statusIcon = Icons.info_outline;
+        break;
       case 'available':
         statusColor = Colors.green;
         statusIcon = Icons.check_circle;
@@ -43,23 +51,23 @@ class AssetCard extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 8, left: 4, right: 4),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
+            color: Colors.grey.withOpacity(0.09),
+            blurRadius: 7,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(14),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         leading: Container(
-          width: 50,
-          height: 50,
+          width: 35,
+          height: 35,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -69,10 +77,10 @@ class AssetCard extends StatelessWidget {
                 const Color(0xFF405189).withOpacity(0.05),
               ],
             ),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             child: asset.primaryPhoto != null &&
                     asset.primaryPhoto!.fileUrl.isNotEmpty
                 ? Image.network(
@@ -82,7 +90,7 @@ class AssetCard extends StatelessWidget {
                       return const Icon(
                         Icons.inventory,
                         color: Color(0xFF405189),
-                        size: 22,
+                        size: 18,
                       );
                     },
                     loadingBuilder: (context, child, loadingProgress) {
@@ -107,7 +115,7 @@ class AssetCard extends StatelessWidget {
                           return const Icon(
                             Icons.inventory,
                             color: Color(0xFF405189),
-                            size: 22,
+                            size: 18,
                           );
                         },
                         loadingBuilder: (context, child, loadingProgress) {
@@ -127,7 +135,7 @@ class AssetCard extends StatelessWidget {
                     : const Icon(
                         Icons.inventory,
                         color: Color(0xFF405189),
-                        size: 22,
+                        size: 20,
                       ),
           ),
         ),
@@ -137,35 +145,39 @@ class AssetCard extends StatelessWidget {
             fontFamily: 'Maison Bold',
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: Colors.black,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 3),
+            const SizedBox(height: 2),
             Text(
               '${asset.assetCode} • ${asset.category}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Maison Book',
-                fontSize: 11,
-                color: Colors.grey[600],
+                fontSize: 10,
+                color: Colors.black,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
+                    color: statusColor.withOpacity(0.13),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(statusIcon, size: 10, color: statusColor),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 3),
                       Text(
                         asset.status.toUpperCase(),
                         style: TextStyle(
@@ -179,27 +191,27 @@ class AssetCard extends StatelessWidget {
                   ),
                 ),
                 if (showScanTime && asset.lastScannedAt != null) ...[
-                  const SizedBox(width: 8),
-                  Icon(Icons.access_time, size: 10, color: Colors.grey[500]),
+                  const SizedBox(width: 10),
+                  Icon(Icons.access_time, size: 12, color: Colors.grey[500]),
                   const SizedBox(width: 4),
                   Text(
                     'Scanned: ${formatUpdatedTimeWIB(asset.lastScannedAt)}',
                     style: TextStyle(
                       fontFamily: 'Maison Book',
-                      fontSize: 9,
+                      fontSize: 8,
                       color: Colors.grey[500],
                     ),
                   ),
                 ],
                 if (showScanTime && asset.scannedBy != null) ...[
-                  const SizedBox(width: 8),
-                  Icon(Icons.person, size: 10, color: Colors.grey[500]),
-                  const SizedBox(width: 2),
+                  const SizedBox(width: 6),
+                  Icon(Icons.person, size: 8, color: Colors.grey[500]),
+                  const SizedBox(width: 6),
                   Text(
                     asset.scannedBy!,
                     style: TextStyle(
                       fontFamily: 'Maison Book',
-                      fontSize: 9,
+                      fontSize: 8,
                       color: Colors.grey[500],
                     ),
                   ),
@@ -208,7 +220,7 @@ class AssetCard extends StatelessWidget {
             ),
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 14),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
         onTap: () {
           showModalBottomSheet(
             context: context,

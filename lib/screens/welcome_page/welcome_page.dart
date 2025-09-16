@@ -8,10 +8,10 @@ import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
 import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_assets.dart';
 import 'package:Simba/screens/home_screen/search_page/search_page.dart';
-import 'package:Simba/screens/registered_page/asset_list_page.dart';
+// import 'package:Simba/screens/registered_page/asset_list_page.dart';
 import 'package:Simba/screens/registered_page/asset_service.dart'
     as registered_asset_service;
-import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 // import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
@@ -570,27 +570,27 @@ class _WelcomePageState extends State<WelcomePage> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),                             
-                                AssetCardMinimalist(
-                                  title: 'Registered Assets',
-                                  image: Image.asset(
-                                    'assets/images/icons/welcome_page/registered_asset.png',
-                                    width: 28,
-                                    height: 28,
-                                  ),
-                                  count: isAssetLoading
-                                      ? '...'
-                                      : assetCount.toString(),
-                                  description: 'Has been registered',
-                                  color: Color(0xFF2F9022),
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AssetListPage()));
-                                  },
-                                ),
-                                const SizedBox(height: 10),
+                                // AssetCardMinimalist(
+                                //   title: 'Registered Assets',
+                                //   image: Image.asset(
+                                //     'assets/images/icons/welcome_page/registered_asset.png',
+                                //     width: 28,
+                                //     height: 28,
+                                //   ),
+                                //   count: isAssetLoading
+                                //       ? '...'
+                                //       : assetCount.toString(),
+                                //   description: 'Has been registered',
+                                //   color: Color(0xFF2F9022),
+                                //   onTap: () {
+                                //     Navigator.push(
+                                //         context,
+                                //         MaterialPageRoute(
+                                //             builder: (context) =>
+                                //                 AssetListPage()));
+                                //   },
+                                // ),
+                                // const SizedBox(height: 10),
                                 AssetCardMinimalist(
                                   title: 'Unscanned Assets',
                                   image: Image.asset(

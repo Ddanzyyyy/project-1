@@ -213,54 +213,6 @@ class AssetInfoWidget extends StatelessWidget {
 
         // Remarks
         if (asset.remarks.isNotEmpty)
-          // Container(
-          //   width: double.infinity,
-          //   padding: EdgeInsets.all(20),
-          //   // decoration: BoxDecoration(
-          //   //   color: Colors.white,
-          //   //   borderRadius: BorderRadius.circular(7),
-          //   //   // boxShadow: [
-          //   //   //   BoxShadow(
-          //   //   //     color: Colors.black.withOpacity(0.05),
-          //   //   //     blurRadius: 10,
-          //   //   //     offset: Offset(0, 2),
-          //   //   //   ),
-          //   //   // ],
-          //   // ),
-          //   // child: Column(
-          //   //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   //   children: [
-          //   //     Text(
-          //   //       'Remarks',
-          //   //       style: TextStyle(
-          //   //         fontFamily: 'Maison Bold',
-          //   //         fontSize: 16,
-          //   //         fontWeight: FontWeight.w700,
-          //   //         color: Color(0xFF405189),
-          //   //       ),
-          //   //     ),
-          //   //     SizedBox(height: 12),
-          //   //     Container(
-          //   //       width: double.infinity,
-          //   //       padding: EdgeInsets.all(12),
-          //   //       decoration: BoxDecoration(
-          //   //         color: Colors.grey[50],
-          //   //         borderRadius: BorderRadius.circular(7),
-          //   //         border: Border.all(color: Colors.grey[200]!),
-          //   //       ),
-          //   //       child: Text(
-          //   //         asset.remarks,
-          //   //         style: TextStyle(
-          //   //           fontFamily: 'Maison Book',
-          //   //           fontSize: 14,
-          //   //           color: Colors.grey[700],
-          //   //           height: 1.5,
-          //   //         ),
-          //   //       ),
-          //   //     ),
-          //   //   ],
-          //   // ),
-          // ),
 
         if (asset.remarks.isNotEmpty)
 

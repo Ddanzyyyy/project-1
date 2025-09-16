@@ -3,42 +3,43 @@ import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.da
 import 'package:Simba/screens/scan_assets/asset.dart';
 import 'package:http/http.dart' as http;
 
-/// Service untuk membaca data asset yang sudah di-import ke sistem (LogisticAsset).
-/// Semua endpoint disesuaikan agar membaca data dari backend yang sudah terupdate,
-/// khususnya dari tabel logistic_assets, termasuk asset hasil import dari Excel.
-
 class AssetApiService {
   static const String baseUrl = 'http://192.168.8.138:8000/api';
 
   static Map<String, String> get headers => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
   static Future<Asset?> getAssetByQr(String qrCode) async {
     try {
-      print('🔍 Searching for asset (logistic_assets) with QR Code: $qrCode');
-      final url = '$baseUrl/logistic-assets/qr?qr_code=${Uri.encodeComponent(qrCode)}';
-      print('📡 API URL: $url');
+      print('Searching for asset (logistic_assets) with QR Code: $qrCode');
+      final url =
+          '$baseUrl/logistic-assets/qr?qr_code=${Uri.encodeComponent(qrCode)}';
+      print('API URL: $url');
 
       final response = await http.get(Uri.parse(url), headers: headers);
 
-      print('📊 Response Status: ${response.statusCode}');
-      print('📄 Response Body: ${response.body}');
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
 
-        // Backend sebaiknya mengembalikan Map<String, dynamic>
-        if (rawData is Map<String, dynamic>) {
-          print('✅ LogisticAsset found: ${rawData['title']} (Asset No: ${rawData['asset_no']})');
-          return Asset.fromJson(rawData);
-        } else if (rawData is Map) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(rawData);
-          print('✅ LogisticAsset found (converted): ${data['title']}');
-          return Asset.fromJson(data);
+        if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
+          final dynamic dataList = rawData['data'];
+          if (dataList is List && dataList.isNotEmpty) {
+            final assetData = dataList[0];
+            print(
+                '✅ LogisticAsset found: ${assetData['title']} (Asset No: ${assetData['asset_no']})');
+            return Asset.fromJson(assetData);
+          } else {
+            print('❌ Asset "data" list kosong!');
+            return null;
+          }
         } else {
-          print('⚠️ Unexpected response format: ${rawData.runtimeType}');
+          print(
+              '⚠️ Unexpected response format (no data): ${rawData.runtimeType}');
           return null;
         }
       } else if (response.statusCode == 404) {
@@ -54,7 +55,6 @@ class AssetApiService {
     }
   }
 
-  /// Ambil asset berdasarkan asset_no (kode asset) di logistic_assets
   static Future<Asset?> getAssetByAssetCode(String assetCode) async {
     try {
       print('🔍 Searching for logistic asset with Asset Code: $assetCode');
@@ -76,28 +76,20 @@ class AssetApiService {
         if (response.statusCode == 200) {
           final dynamic rawData = json.decode(response.body);
 
-          // Jika backend mengembalikan list (pencarian)
-          if (rawData is List) {
-            if (rawData.isNotEmpty) {
-              final dynamic firstItem = rawData.first;
-              if (firstItem is Map<String, dynamic>) {
-                print('✅ LogisticAsset found in array: ${firstItem['title']}');
-                return Asset.fromJson(firstItem);
-              } else if (firstItem is Map) {
-                final Map<String, dynamic> data = Map<String, dynamic>.from(firstItem);
-                print('✅ LogisticAsset found in array (converted): ${data['title']}');
-                return Asset.fromJson(data);
-              }
+          // Jika backend mengembalikan { data: [...] }
+          if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
+            final dataList = rawData['data'];
+            if (dataList is List && dataList.isNotEmpty) {
+              final assetData = dataList[0];
+              print('✅ LogisticAsset found in array: ${assetData['title']}');
+              return Asset.fromJson(assetData);
             }
           }
-          // Jika backend mengembalikan satu asset
-          else if (rawData is Map<String, dynamic>) {
-            print('✅ LogisticAsset found: ${rawData['title']}');
+          // Jika backend mengembalikan satu asset (fallback, jarang dipakai)
+          else if (rawData is Map<String, dynamic> &&
+              rawData.containsKey('title')) {
+            print('✅ LogisticAsset found (single): ${rawData['title']}');
             return Asset.fromJson(rawData);
-          } else if (rawData is Map) {
-            final Map<String, dynamic> data = Map<String, dynamic>.from(rawData);
-            print('✅ LogisticAsset found (converted): ${data['title']}');
-            return Asset.fromJson(data);
           }
         }
       }
@@ -110,8 +102,8 @@ class AssetApiService {
     }
   }
 
-  /// Ambil semua asset di logistic_assets, termasuk hasil import Excel
-  static Future<List<Asset>> getAssets({String? search, String? category}) async {
+  static Future<List<Asset>> getAssets(
+      {String? search, String? category}) async {
     try {
       String url = '$baseUrl/logistic-assets';
       Map<String, String> queryParams = {};
@@ -124,7 +116,10 @@ class AssetApiService {
       }
 
       if (queryParams.isNotEmpty) {
-        url += '?' + queryParams.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
+        url += '?' +
+            queryParams.entries
+                .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+                .join('&');
       }
 
       print('📡 Loading assets from: $url');
@@ -133,7 +128,27 @@ class AssetApiService {
       if (response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
 
-        if (rawData is List) {
+        // Jika API mengembalikan { data: [...] }
+        if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
+          final dataList = rawData['data'];
+          if (dataList is List) {
+            List<Asset> assets = [];
+            for (dynamic item in dataList) {
+              if (item is Map<String, dynamic>) {
+                assets.add(Asset.fromJson(item));
+              } else if (item is Map) {
+                final Map<String, dynamic> data =
+                    Map<String, dynamic>.from(item);
+                assets.add(Asset.fromJson(data));
+              }
+            }
+            print(
+                '✅ Loaded ${assets.length} assets (from logistic_assets.data)');
+            return assets;
+          }
+        }
+        // Jika API mengembalikan langsung List (jarang, fallback)
+        else if (rawData is List) {
           List<Asset> assets = [];
           for (dynamic item in rawData) {
             if (item is Map<String, dynamic>) {
@@ -145,24 +160,9 @@ class AssetApiService {
           }
           print('✅ Loaded ${assets.length} assets (from logistic_assets)');
           return assets;
-        } else if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
-          // Jika API mengembalikan { data: [...] }
-          final dataList = rawData['data'];
-          if (dataList is List) {
-            List<Asset> assets = [];
-            for (dynamic item in dataList) {
-              if (item is Map<String, dynamic>) {
-                assets.add(Asset.fromJson(item));
-              } else if (item is Map) {
-                final Map<String, dynamic> data = Map<String, dynamic>.from(item);
-                assets.add(Asset.fromJson(data));
-              }
-            }
-            print('✅ Loaded ${assets.length} assets (from logistic_assets.data)');
-            return assets;
-          }
         }
-        throw Exception('Unexpected response format: expected List, got ${rawData.runtimeType}');
+        throw Exception(
+            'Unexpected response format: expected List, got ${rawData.runtimeType}');
       } else {
         throw Exception('Failed to fetch assets: ${response.statusCode}');
       }
@@ -171,7 +171,6 @@ class AssetApiService {
     }
   }
 
-  /// Tambah asset ke logistic_assets (opsional, biasanya lewat import Excel di backend)
   static Future<Asset> addAsset(Asset asset) async {
     try {
       print('📝 Adding asset to logistic_assets: ${asset.name}');
@@ -187,14 +186,15 @@ class AssetApiService {
       if (response.statusCode == 201 || response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
 
-        if (rawData is Map<String, dynamic>) {
+        if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
+          final assetData = rawData['data'];
+          if (assetData is Map<String, dynamic>) {
+            return Asset.fromJson(assetData);
+          }
+        } else if (rawData is Map<String, dynamic>) {
           return Asset.fromJson(rawData);
-        } else if (rawData is Map) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(rawData);
-          return Asset.fromJson(data);
-        } else {
-          throw Exception('Unexpected response format');
         }
+        throw Exception('Unexpected response format');
       } else {
         final dynamic errorData = json.decode(response.body);
         String errorMessage = 'Unknown error';
@@ -211,7 +211,6 @@ class AssetApiService {
     }
   }
 
-  /// Update asset di logistic_assets
   static Future<Asset> updateAsset(String assetNo, Asset asset) async {
     try {
       print('📝 Updating logistic asset Asset No: $assetNo');
@@ -227,14 +226,15 @@ class AssetApiService {
       if (response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
 
-        if (rawData is Map<String, dynamic>) {
+        if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
+          final assetData = rawData['data'];
+          if (assetData is Map<String, dynamic>) {
+            return Asset.fromJson(assetData);
+          }
+        } else if (rawData is Map<String, dynamic>) {
           return Asset.fromJson(rawData);
-        } else if (rawData is Map) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(rawData);
-          return Asset.fromJson(data);
-        } else {
-          throw Exception('Unexpected response format');
         }
+        throw Exception('Unexpected response format');
       } else {
         final dynamic errorData = json.decode(response.body);
         String errorMessage = 'Unknown error';
@@ -251,7 +251,6 @@ class AssetApiService {
     }
   }
 
-  /// Hapus asset dari logistic_assets
   static Future<void> deleteAsset(String assetNo) async {
     try {
       print('🗑️ Deleting logistic asset Asset No: $assetNo');
@@ -277,8 +276,8 @@ class AssetApiService {
       throw Exception('Error deleting asset: $e');
     }
   }
-  /// GET asset photos by assetId
-static Future<List<AssetPhoto>> getAssetPhotos(String assetId) async {
+
+  static Future<List<AssetPhoto>> getAssetPhotos(String assetId) async {
     try {
       final url = '$baseUrl/logistic-assets/$assetId/photos';
       print('📡 Loading asset photos from: $url');
@@ -290,7 +289,6 @@ static Future<List<AssetPhoto>> getAssetPhotos(String assetId) async {
       if (response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
 
-        // Jika backend mengirimkan { success: true, data: [...] }
         if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
           final dataList = rawData['data'];
           if (dataList is List) {
@@ -299,16 +297,15 @@ static Future<List<AssetPhoto>> getAssetPhotos(String assetId) async {
               if (item is Map<String, dynamic>) {
                 photos.add(AssetPhoto.fromJson(item));
               } else if (item is Map) {
-                final Map<String, dynamic> data = Map<String, dynamic>.from(item);
+                final Map<String, dynamic> data =
+                    Map<String, dynamic>.from(item);
                 photos.add(AssetPhoto.fromJson(data));
               }
             }
             print('✅ Loaded ${photos.length} asset photos');
             return photos;
           }
-        }
-        // Jika backend mengirimkan langsung List (jarang)
-        else if (rawData is List) {
+        } else if (rawData is List) {
           List<AssetPhoto> photos = [];
           for (dynamic item in rawData) {
             if (item is Map<String, dynamic>) {
@@ -321,7 +318,8 @@ static Future<List<AssetPhoto>> getAssetPhotos(String assetId) async {
           print('✅ Loaded ${photos.length} asset photos');
           return photos;
         }
-        throw Exception('Unexpected response format for asset photos: ${rawData.runtimeType}');
+        throw Exception(
+            'Unexpected response format for asset photos: ${rawData.runtimeType}');
       } else {
         throw Exception('Failed to load asset photos: ${response.statusCode}');
       }

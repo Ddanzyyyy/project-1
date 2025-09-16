@@ -66,18 +66,18 @@ class Asset {
   factory Asset.fromJson(Map<String, dynamic> json) {
     return Asset(
       id: json['id'] ?? 0,
-      name: json['name'] ?? json['title'] ?? '',
+      name: json['title'] ?? json['name'] ?? '',
       category: json['category'] ?? '',
       description: json['description'] ?? json['remarks'] ?? '',
-      imagePath: json['image_path'] ?? json['primary_photo']?['file_url'],
+      imagePath: json['image_path'] ?? (json['primary_photo']?['file_url']),
       dateAdded: json['date_added'] ?? '',
-      assetCode: json['asset_code'] ?? json['asset_no'] ?? '',
+      assetCode: json['asset_no'] ?? json['asset_code'] ?? '',
       location: json['location'] ?? json['department'] ?? '',
       pic: json['pic'] ?? json['department'] ?? '',
-      status: json['status'] ?? json['asset_status'] ?? '',
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
-      lastScannedAt: json['last_scanned_at'] != null ? DateTime.parse(json['last_scanned_at']) : null,
+      status: json['asset_status'] ?? json['status'] ?? '',
+      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) : null,
+      lastScannedAt: json['last_scanned_at'] != null ? DateTime.tryParse(json['last_scanned_at'].toString()) : null,
       scannedBy: json['scanned_by'],
       generalAccount: json['general_account'],
       subsidiaryAccount: json['subsidiary_account'],
@@ -101,6 +101,7 @@ class Asset {
           ? AssetPhoto.fromJson(json['primary_photo']) 
           : null,
     );
+    
   }
 
   Map<String, dynamic> toJson() {

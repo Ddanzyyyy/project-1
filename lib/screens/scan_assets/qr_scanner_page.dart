@@ -191,7 +191,6 @@ class _QRScannerPageState extends State<QRScannerPage> {
   }
 }
 
-// Custom overlay shape for QR scanner - simple
 class QrScannerOverlayShape extends ShapeBorder {
   const QrScannerOverlayShape({
     this.borderColor = Colors.blue,

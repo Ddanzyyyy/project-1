@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'activity_service.dart';
 import 'activity_detail_card.dart';
 import 'package:Simba/screens/welcome_page/welcome_page.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 
 class AppBottomNavBar extends StatelessWidget {

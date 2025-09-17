@@ -1,8 +1,8 @@
 import 'package:Simba/screens/home_screen/lost_assets/compact_lost_asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
-import 'asset_upload_dialog.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
+import '../screen/asset_upload_dialog.dart';
 
 class AssetInfoWidget extends StatelessWidget {
   final LogisticAsset asset;

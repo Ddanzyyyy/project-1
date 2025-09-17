@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'logistic_asset_model.dart';
+import '../model/logistic_asset_model.dart';
 
 class LogisticAssetDetailPage extends StatelessWidget {
   final LogisticAsset asset;

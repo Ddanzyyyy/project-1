@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 class LogisticAssetService {
-  static const String baseUrl = 'http://192.168.8.138:8000/api';
+  static const String baseUrl = 'http://192.168.1.4:8000/api';
 
   static Future<List<LogisticAsset>> getLogisticAssets({
     String search = '',

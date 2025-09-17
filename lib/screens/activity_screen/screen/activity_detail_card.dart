@@ -1,4 +1,4 @@
-import 'package:Simba/screens/activity_screen/activity_service.dart';
+import 'package:Simba/screens/activity_screen/service/activity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,44 +64,6 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
   String getAssetUpdatedTimeWIB() {
     return parseAndFormatToWIB(widget.asset.updatedAt ?? '');
   }
-
-  // void _showFullScreenImage(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => Dialog(
-  //       backgroundColor: Colors.transparent,
-  //       child: Container(
-  //         padding: const EdgeInsets.all(20),
-  //         decoration: BoxDecoration(
-  //           color: Colors.white,
-  //           borderRadius: BorderRadius.circular(16),
-  //         ),
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Icon(Icons.image_not_supported, size: 64, color: Colors.grey[400]),
-  //             SizedBox(height: 16),
-  //             Text(
-  //               'No Image Available',
-  //               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-  //             ),
-  //             SizedBox(height: 8),
-  //             Text(
-  //               'This asset doesn\'t have an associated image.',
-  //               style: TextStyle(color: Colors.grey[600]),
-  //               textAlign: TextAlign.center,
-  //             ),
-  //             SizedBox(height: 16),
-  //             ElevatedButton(
-  //               onPressed: () => Navigator.pop(context),
-  //               child: Text('Close'),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {

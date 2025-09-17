@@ -1,11 +1,11 @@
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_info_widget.dart';
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_mobile_scanner_page.dart';
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_upload_dialog.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/widget/asset_info_widget.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/asset_mobile_scanner_page.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/asset_upload_dialog.dart';
 import 'package:Simba/screens/home_screen/lost_assets/compact_lost_asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_service.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/service/logistic_asset_service.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 
 class LogisticAssetScanMenuPage extends StatefulWidget {
   @override

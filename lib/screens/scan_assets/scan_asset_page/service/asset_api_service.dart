@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/asset.dart';
 import 'package:http/http.dart' as http;
 
 class AssetApiService {
-  static const String baseUrl = 'http://192.168.8.138:8000/api';
+  static const String baseUrl = 'http://192.168.1.4:8000/api';
 
   static Map<String, String> get headers => {
         'Content-Type': 'application/json',

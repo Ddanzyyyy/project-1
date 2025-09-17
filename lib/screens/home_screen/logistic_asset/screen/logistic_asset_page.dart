@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:io';
-import 'logistic_asset_model.dart';
-import 'logistic_asset_service.dart';
+import '../model/logistic_asset_model.dart';
+import '../service/logistic_asset_service.dart';
 import 'logistic_asset_detail_page.dart';
 import 'logistic_asset_scan_page.dart';
-import '../analytic_logistic/logistic_asset_analytics_page.dart'; 
+import '../../analytic_logistic/logistic_asset_analytics_page.dart'; 
 
 class LogisticAssetPage extends StatefulWidget {
   @override

@@ -1,8 +1,8 @@
-import 'package:Simba/screens/activity_screen/activity_page.dart';
+import 'package:Simba/screens/activity_screen/screen/activity_page.dart';
 import 'package:Simba/screens/home_screen/analytic_logistic/logistic_asset_analytics_page.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_page.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/screen/logistic_asset_page.dart';
 // import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_scan_page.dart';
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/logistic_asset_scan_menu.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/logistic_asset_scan_menu.dart';
 import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';

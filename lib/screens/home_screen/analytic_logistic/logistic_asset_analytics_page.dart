@@ -1,5 +1,5 @@
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_service.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/service/logistic_asset_service.dart';
 import 'package:flutter/material.dart';
 import 'chart_logistic_asset_page.dart';
 

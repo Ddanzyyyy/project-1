@@ -4,11 +4,11 @@ import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/scr
 import 'package:Simba/screens/welcome_page/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:Simba/screens/activity_screen/activity_page.dart';
+import 'package:Simba/screens/activity_screen/screen/activity_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:Simba/screens/welcome_page/welcome_page.dart' as welcome;
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_upload_dialog.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/asset_upload_dialog.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/asset.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/service/asset_api_service.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/asset_detail_modal.dart';
@@ -303,15 +303,18 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   }
 
   void _showAssetDetailsModal(Asset asset) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      useRootNavigator: true,
-      enableDrag: true,
-      builder: (context) => AssetDetailModal(asset: asset),
-    );
-  }
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    useRootNavigator: true,
+    enableDrag: true,
+    builder: (context) => AssetDetailModal(
+      asset: asset,
+      showUploadPhotoButton: true,
+    ),
+  );
+}
 
   void _showAssetNotRegisteredDialog(String qrCode) {
     showDialog(

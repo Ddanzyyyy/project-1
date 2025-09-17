@@ -1,4 +1,4 @@
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 
 class Asset {
   final int id;
@@ -178,7 +178,7 @@ class Asset {
     String? remarks,
     List<AssetPhoto>? photos,
     AssetPhoto? primaryPhoto,
-    int? photosCount, // Tambahkan di copyWith
+    int? photosCount,
   }) {
     return Asset(
       id: id ?? this.id,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
-import 'activity_service.dart';
+import '../service/activity_service.dart';
 import 'activity_detail_card.dart';
 import 'package:Simba/screens/welcome_page/welcome_page.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_asset_page.dart';
@@ -90,7 +90,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   void initState() {
     super.initState();
-    activityService = ActivityService(baseUrl: 'http://192.168.8.138:8000');
+    activityService = ActivityService(baseUrl: 'http://192.168.1.4:8000');
     _loadUserData();
   }
 

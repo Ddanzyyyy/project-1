@@ -3,7 +3,7 @@ import 'package:Simba/screens/setting_screen/setting_acount_card.dart';
 import 'package:Simba/screens/setting_screen/setting_header.dart';
 import 'package:Simba/screens/setting_screen/setting_section.dart';
 import 'package:Simba/screens/setting_screen/setting_notification.dart';
-import 'package:Simba/screens/activity_screen/activity_page.dart';
+import 'package:Simba/screens/activity_screen/screen/activity_page.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_asset_page.dart';
 import 'package:Simba/screens/welcome_page/welcome_page.dart';

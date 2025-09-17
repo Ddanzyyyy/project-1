@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'logistic_asset_service.dart';
+import '../service/logistic_asset_service.dart';
 import 'logistic_asset_detail_page.dart';
 
 class LogisticAssetScanPage extends StatefulWidget {

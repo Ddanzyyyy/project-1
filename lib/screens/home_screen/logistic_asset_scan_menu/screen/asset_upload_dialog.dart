@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:Simba/screens/home_screen/lost_assets/compact_lost_asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_service.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/service/logistic_asset_service.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 
 class AssetUploadDialog extends StatefulWidget {
   final LogisticAsset asset;

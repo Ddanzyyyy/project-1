@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../model/asset.dart';
-import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_upload_dialog.dart';
-import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/asset_upload_dialog.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class AssetDetailModal extends StatefulWidget {
   final Asset asset;
+  final bool showUploadPhotoButton;
 
-  const AssetDetailModal({Key? key, required this.asset}) : super(key: key);
+  const AssetDetailModal({
+    Key? key,
+    required this.asset,
+    this.showUploadPhotoButton = false,
+  }) : super(key: key);
 
   @override
   State<AssetDetailModal> createState() => _AssetDetailModalState();
@@ -25,30 +30,27 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
     asset = widget.asset;
   }
 
+  /// PATCH photos_count setiap kali upload foto sukses
   Future<void> _refreshPhotosCount() async {
     setState(() { isLoading = true; });
-
     try {
-      // Ganti sesuai id RecentAsset, jika asset.id adalah id RecentAsset
-      final recentAssetId = asset.id; // Pastikan ini adalah id RecentAsset!
-      final url = Uri.parse('http://192.168.8.138:8000/api/recent-assets/$recentAssetId/photos-count');
+      final recentAssetId = asset.id;
+      final url = Uri.parse('http://192.168.1.4:8000/api/recent-assets/$recentAssetId/photos-count');
       final response = await http.patch(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success'] == true && data['data'] != null) {
           setState(() {
-            // pastikan photosCount ada di asset model
             asset = asset.copyWith(photosCount: data['data']['photos_count']);
           });
         }
       }
-    } catch (e) {
-      // Handle error jika perlu
-    }
+    } catch (e) {}
     setState(() { isLoading = false; });
   }
 
+  /// Setelah upload foto, PATCH photos_count otomatis
   Future<void> _showUploadPhotoDialog(BuildContext context) async {
     final logisticAsset = _assetToLogisticAsset(asset);
     final result = await showDialog(
@@ -56,9 +58,11 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
       builder: (ctx) => AssetUploadDialog(asset: logisticAsset),
     );
     if (result == true) {
-      // Setelah upload sukses, refresh photos_count
+      /// PATCH otomatis ke backend setelah upload
       await _refreshPhotosCount();
-      // Jika ingin refresh asset/foto, tambahkan logic fetch asset di sini
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Foto asset berhasil diupload!'), backgroundColor: Colors.green),
+      );
     }
   }
 
@@ -282,6 +286,7 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
                     _buildInfoRow('Control Department', asset.controlDepartment ?? '-'),
                     _buildInfoRow('Cost Center', asset.costCenter ?? '-'),
                     _buildInfoRow('Remarks', asset.remarks?.isNotEmpty == true ? asset.remarks! : '-'),
+                    _buildInfoRow('Photos Count', asset.photosCount?.toString() ?? '0'), // <-- Tampilkan photos_count
                   ]),
 
                   const SizedBox(height: 16),
@@ -500,31 +505,32 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
                     const SizedBox(height: 16),
                   ],
 
-                  // BUTTON UPLOAD FOTO ASSET
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.upload, color: Colors.white),
-                      label: const Text(
-                        'Upload Foto Asset',
-                        style: TextStyle(
-                          fontFamily: 'Maison Bold',
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                  // TOMBOL UPLOAD FOTO ASSET hanya muncul jika showUploadPhotoButton == true
+                  if (widget.showUploadPhotoButton)
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.upload, color: Colors.white),
+                        label: const Text(
+                          'Upload Foto Asset',
+                          style: TextStyle(
+                            fontFamily: 'Maison Bold',
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF405189),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(7),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF405189),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(7),
+                          ),
                         ),
+                        onPressed: () => _showUploadPhotoDialog(context),
                       ),
-                      onPressed: () => _showUploadPhotoDialog(context),
                     ),
-                  ),
 
                   // Close Button
                   Container(

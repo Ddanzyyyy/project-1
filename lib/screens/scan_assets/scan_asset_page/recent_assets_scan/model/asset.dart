@@ -30,6 +30,7 @@ class Asset {
   final String? remarks;
   final List<AssetPhoto>? photos;
   final AssetPhoto? primaryPhoto;
+  final int? photosCount; // Tambahkan field ini
 
   Asset({
     required this.id,
@@ -61,6 +62,7 @@ class Asset {
     this.remarks,
     this.photos,
     this.primaryPhoto,
+    this.photosCount, // Tambahkan ke constructor
   });
 
   factory Asset.fromJson(Map<String, dynamic> json) {
@@ -100,8 +102,10 @@ class Asset {
       primaryPhoto: json['primary_photo'] != null 
           ? AssetPhoto.fromJson(json['primary_photo']) 
           : null,
+      photosCount: json['photos_count'] != null
+          ? int.tryParse(json['photos_count'].toString())
+          : null, // mapping dari API
     );
-    
   }
 
   Map<String, dynamic> toJson() {
@@ -139,6 +143,74 @@ class Asset {
       'lost': lost,
       'photos': photos?.map((photo) => photo.toJson()).toList(),
       'primary_photo': primaryPhoto?.toJson(),
+      'photos_count': photosCount, // tambahkan ke toJson
     };
+  }
+
+  // Tambahkan agar bisa update field tertentu tanpa membuat instance baru
+  Asset copyWith({
+    int? id,
+    String? name,
+    String? category,
+    String? description,
+    String? imagePath,
+    String? dateAdded,
+    String? assetCode,
+    String? location,
+    String? pic,
+    String? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? lastScannedAt,
+    String? scannedBy,
+    String? generalAccount,
+    String? subsidiaryAccount,
+    String? subCategory,
+    String? assetSpecification,
+    DateTime? acquisitionDate,
+    String? aging,
+    int? quantity,
+    String? controlDepartment,
+    String? costCenter,
+    int? available,
+    int? broken,
+    int? lost,
+    String? remarks,
+    List<AssetPhoto>? photos,
+    AssetPhoto? primaryPhoto,
+    int? photosCount, // Tambahkan di copyWith
+  }) {
+    return Asset(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      description: description ?? this.description,
+      imagePath: imagePath ?? this.imagePath,
+      dateAdded: dateAdded ?? this.dateAdded,
+      assetCode: assetCode ?? this.assetCode,
+      location: location ?? this.location,
+      pic: pic ?? this.pic,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lastScannedAt: lastScannedAt ?? this.lastScannedAt,
+      scannedBy: scannedBy ?? this.scannedBy,
+      generalAccount: generalAccount ?? this.generalAccount,
+      subsidiaryAccount: subsidiaryAccount ?? this.subsidiaryAccount,
+      subCategory: subCategory ?? this.subCategory,
+      assetSpecification: assetSpecification ?? this.assetSpecification,
+      acquisitionDate: acquisitionDate ?? this.acquisitionDate,
+      aging: aging ?? this.aging,
+      quantity: quantity ?? this.quantity,
+      controlDepartment: controlDepartment ?? this.controlDepartment,
+      costCenter: costCenter ?? this.costCenter,
+      available: available ?? this.available,
+      broken: broken ?? this.broken,
+      lost: lost ?? this.lost,
+      remarks: remarks ?? this.remarks,
+      photos: photos ?? this.photos,
+      primaryPhoto: primaryPhoto ?? this.primaryPhoto,
+      photosCount: photosCount ?? this.photosCount,
+    );
   }
 }

@@ -1,7 +1,7 @@
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_card.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/shimmer_loading.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/widget/recent_asset_card.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/shimmer_loading.dart';
 import 'package:flutter/material.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_model.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/recent_asset_model.dart';
 
 class ScanContent extends StatelessWidget {
   final TextEditingController qrController;

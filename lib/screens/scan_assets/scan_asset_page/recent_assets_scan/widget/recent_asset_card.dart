@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_model.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_detail_widget.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/recent_asset_model.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/widget/recent_asset_detail_widget.dart';
 import 'package:intl/intl.dart';
 
 class RecentAssetCard extends StatelessWidget {
@@ -81,11 +81,11 @@ class RecentAssetCard extends StatelessWidget {
                   color: const Color(0xFF405189).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.inventory,
-                    color: Color(0xFF405189),
-                    size: 18,
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/icons/welcome_page/box_icon.png',
+                    width: 22,
+                    height: 22,
                   ),
                 ),
               ),

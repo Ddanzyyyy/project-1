@@ -1,7 +1,7 @@
-import 'package:Simba/screens/scan_assets/scan_asset_page/asset_card.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/shimmer_loading.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/widget/asset_card.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/shimmer_loading.dart';
 import 'package:flutter/material.dart';
-import 'package:Simba/screens/scan_assets/asset.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/asset.dart';
 
 class AssetsContent extends StatelessWidget {
   final TextEditingController searchController;

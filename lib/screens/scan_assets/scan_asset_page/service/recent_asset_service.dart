@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_model.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/recent_asset_model.dart';
 import 'package:http/http.dart' as http;
 
 class RecentAssetService {
-  static const String baseUrl = 'http://192.168.1.4:8000/api';
+  static const String baseUrl = 'http://192.168.8.138:8000/api';
 
   static Future<bool> saveRecentAsset(String assetNo, String scannedBy) async {
     final url = '$baseUrl/recent-assets';

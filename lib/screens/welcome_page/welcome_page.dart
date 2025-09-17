@@ -11,7 +11,7 @@ import 'package:Simba/screens/home_screen/search_page/search_page.dart';
 // import 'package:Simba/screens/registered_page/asset_list_page.dart';
 import 'package:Simba/screens/registered_page/asset_service.dart'
     as registered_asset_service;
-import 'package:Simba/screens/scan_assets/scan_asset_page/scan_asset_page.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 // import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
@@ -532,9 +532,9 @@ class _WelcomePageState extends State<WelcomePage> {
                                 ),
                                 const SizedBox(height: 10),
                                 AssetCardMinimalist(
-                                  title: 'Chart Logistic Asset',
+                                  title: 'Analytic Asset',
                                   image: Image.asset(
-                                    'assets/images/icons/activity_page/research.png',
+                                    'assets/images/icons/welcome_page/analytic.png',
                                     width: 28,
                                     height: 28,
                                   ),

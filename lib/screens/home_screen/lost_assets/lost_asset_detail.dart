@@ -97,7 +97,7 @@ class _LostAssetDetailPageState extends State<LostAssetDetailPage> {
       final path = currentAsset!['lost_evidence_path'].toString();
       return path.startsWith('http')
           ? path
-          : 'http://192.168.1.4:8000/storage/$path';
+          : 'http://192.168.8.138:8000/storage/$path';
     }
     return '';
   }

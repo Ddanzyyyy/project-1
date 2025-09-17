@@ -72,9 +72,15 @@ flutter:
     - assets/images/icons/activity_page/product.png
     - assets/images/icons/activity_page/research.png
     - assets/images/icons/lost_page/warning.png
-    - assets/lottie/Inventory.lottie
-    - assets/lottie/Logistic.lottie
-    - assets/lottie/Trader.lottie
+    - assets/images/icons/welcome_page/analytic.png
+    - assets/images/icons/welcome_page/box_icon.png
+
+
+
+    
+    # - assets/lottie/Inventory.lottie
+    # - assets/lottie/Logistic.lottie
+    # - assets/lottie/Trader.lottie
 
     # - assets/lottie/idea.gif
     # - assets/images/icons/registered_assets.png

@@ -1,6 +1,6 @@
-import 'package:Simba/screens/scan_assets/scan_asset_page/asset_content.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/scan_asset_tab_button.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/scan_content.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/asset_content.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_asset_tab_button.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_content.dart';
 import 'package:Simba/screens/welcome_page/welcome_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -9,12 +9,12 @@ import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:Simba/screens/welcome_page/welcome_page.dart' as welcome;
 import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_upload_dialog.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
-import 'package:Simba/screens/scan_assets/asset.dart';
-import 'package:Simba/screens/scan_assets/asset_api_service.dart';
-import 'package:Simba/screens/scan_assets/asset_detail_modal.dart';
-import 'package:Simba/screens/scan_assets/qr_scanner_page.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_service.dart';
-import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/recent_asset_model.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/asset.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/service/asset_api_service.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/asset_detail_modal.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/qr_scanner_page.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/service/recent_asset_service.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/recent_asset_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
@@ -189,13 +189,13 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       await _loadRecentScannedAssetsDb();
     }
 
-    // Show asset details
+    // Show asset details only!
     _showAssetDetailsModal(foundAsset);
 
-    // Handle photo upload
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      _handlePhotoUpload(foundAsset);
-    });
+    // --- Jangan panggil upload foto otomatis di sini ---
+    // SchedulerBinding.instance.addPostFrameCallback((_) {
+    //   _handlePhotoUpload(foundAsset);
+    // });
   }
 
   Future<void> _handlePhotoUpload(Asset foundAsset) async {
@@ -216,15 +216,15 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   }
 
   Future<void> _updatePhotosCount() async {
-  await Future.delayed(Duration(milliseconds: 1000));
-  if (recentScannedAssetsDb.isNotEmpty) {
-    final targetRecentAsset = recentScannedAssetsDb.first;
-    final updateSuccess = await RecentAssetService.updatePhotosCount(targetRecentAsset.id);
-    if (updateSuccess) {
-      await _loadRecentScannedAssetsDb();
+    await Future.delayed(Duration(milliseconds: 1000));
+    if (recentScannedAssetsDb.isNotEmpty) {
+      final targetRecentAsset = recentScannedAssetsDb.first;
+      final updateSuccess = await RecentAssetService.updatePhotosCount(targetRecentAsset.id);
+      if (updateSuccess) {
+        await _loadRecentScannedAssetsDb();
+      }
     }
   }
-}
 
   LogisticAsset _assetToLogisticAsset(Asset asset) {
     return LogisticAsset(

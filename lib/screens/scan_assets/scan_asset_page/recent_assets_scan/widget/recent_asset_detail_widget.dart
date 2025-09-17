@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'recent_asset_model.dart';
+import '../model/recent_asset_model.dart';
 
 class RecentAssetDetailWidget extends StatelessWidget {
   final RecentAsset recentAsset;

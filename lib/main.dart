@@ -1,4 +1,4 @@
-import 'package:Simba/screens/scan_assets/scan_asset_page/scan_asset_page.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/notification_service.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';

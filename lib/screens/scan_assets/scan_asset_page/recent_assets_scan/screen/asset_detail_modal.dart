@@ -1,12 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'asset.dart';
+import '../model/asset.dart';
+import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/asset_upload_dialog.dart';
+import 'package:Simba/screens/home_screen/logistic_asset/logistic_asset_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-
-class AssetDetailModal extends StatelessWidget {
+class AssetDetailModal extends StatefulWidget {
   final Asset asset;
 
   const AssetDetailModal({Key? key, required this.asset}) : super(key: key);
+
+  @override
+  State<AssetDetailModal> createState() => _AssetDetailModalState();
+}
+
+class _AssetDetailModalState extends State<AssetDetailModal> {
+  late Asset asset;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    asset = widget.asset;
+  }
+
+  Future<void> _refreshPhotosCount() async {
+    setState(() { isLoading = true; });
+
+    try {
+      // Ganti sesuai id RecentAsset, jika asset.id adalah id RecentAsset
+      final recentAssetId = asset.id; // Pastikan ini adalah id RecentAsset!
+      final url = Uri.parse('http://192.168.8.138:8000/api/recent-assets/$recentAssetId/photos-count');
+      final response = await http.patch(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success'] == true && data['data'] != null) {
+          setState(() {
+            // pastikan photosCount ada di asset model
+            asset = asset.copyWith(photosCount: data['data']['photos_count']);
+          });
+        }
+      }
+    } catch (e) {
+      // Handle error jika perlu
+    }
+    setState(() { isLoading = false; });
+  }
+
+  Future<void> _showUploadPhotoDialog(BuildContext context) async {
+    final logisticAsset = _assetToLogisticAsset(asset);
+    final result = await showDialog(
+      context: context,
+      builder: (ctx) => AssetUploadDialog(asset: logisticAsset),
+    );
+    if (result == true) {
+      // Setelah upload sukses, refresh photos_count
+      await _refreshPhotosCount();
+      // Jika ingin refresh asset/foto, tambahkan logic fetch asset di sini
+    }
+  }
 
   void _showFullImage(BuildContext context, String imageUrl) {
     showDialog(
@@ -36,6 +90,34 @@ class AssetDetailModal extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  LogisticAsset _assetToLogisticAsset(Asset asset) {
+    return LogisticAsset(
+      id: asset.id.toString(),
+      title: asset.name,
+      assetNo: asset.assetCode,
+      generalAccount: asset.generalAccount ?? '',
+      subsidiaryAccount: asset.subsidiaryAccount ?? '',
+      category: asset.category,
+      subCategory: asset.subCategory ?? '',
+      assetSpecification: asset.assetSpecification ?? '',
+      assetStatus: asset.status,
+      acquisitionDate: asset.acquisitionDate ?? asset.createdAt,
+      aging: asset.aging ?? '',
+      quantity: asset.quantity ?? 1,
+      department: asset.location,
+      controlDepartment: asset.controlDepartment ?? '',
+      costCenter: asset.costCenter ?? '',
+      available: asset.available ?? (asset.status.toLowerCase() == 'available' ? 1 : 0),
+      broken: asset.broken ?? (asset.status.toLowerCase() == 'broken' || asset.status.toLowerCase() == 'damaged' ? 1 : 0),
+      lost: asset.lost ?? (asset.status.toLowerCase() == 'lost' ? 1 : 0),
+      remarks: asset.remarks ?? asset.description,
+      createdAt: asset.createdAt ?? DateTime.now(),
+      updatedAt: asset.updatedAt ?? DateTime.now(),
+      photos: asset.photos,
+      primaryPhoto: asset.primaryPhoto,
     );
   }
 
@@ -92,7 +174,9 @@ class AssetDetailModal extends StatelessWidget {
           
           // Scrollable Content
           Expanded(
-            child: SingleChildScrollView(
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,7 +261,7 @@ class AssetDetailModal extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // Full Information
+                  // Full Information (tambah Photos Count)
                   _buildInfoCard('Full Information', [
                     _buildInfoRow('Title', asset.name),
                     _buildInfoRow('Asset No', asset.assetCode),
@@ -197,14 +281,7 @@ class AssetDetailModal extends StatelessWidget {
                     _buildInfoRow('Department', asset.location),
                     _buildInfoRow('Control Department', asset.controlDepartment ?? '-'),
                     _buildInfoRow('Cost Center', asset.costCenter ?? '-'),
-                    // _buildInfoRow('Person in Charge', asset.pic),
-                    // _buildInfoRow('Status', asset.status),
                     _buildInfoRow('Remarks', asset.remarks?.isNotEmpty == true ? asset.remarks! : '-'),
-                    // _buildInfoRow('Date Added', asset.dateAdded),
-                    // _buildInfoRow('Created At', asset.createdAt != null ? DateFormat('dd MMM yyyy').format(asset.createdAt!) : '-'),
-                    // _buildInfoRow('Last Updated', asset.updatedAt != null ? DateFormat('dd MMM yyyy').format(asset.updatedAt!) : '-'),
-                    // _buildInfoRow('Last Scanned', asset.lastScannedAt != null ? DateFormat('dd MMM yyyy HH:mm').format(asset.lastScannedAt!) : '-'),
-                    // _buildInfoRow('Scanned By', asset.scannedBy ?? '-'),
                   ]),
 
                   const SizedBox(height: 16),
@@ -422,6 +499,32 @@ class AssetDetailModal extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                   ],
+
+                  // BUTTON UPLOAD FOTO ASSET
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.upload, color: Colors.white),
+                      label: const Text(
+                        'Upload Foto Asset',
+                        style: TextStyle(
+                          fontFamily: 'Maison Bold',
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF405189),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                      ),
+                      onPressed: () => _showUploadPhotoDialog(context),
+                    ),
+                  ),
 
                   // Close Button
                   Container(

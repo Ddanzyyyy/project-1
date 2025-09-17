@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:Simba/screens/scan_assets/asset.dart';
-import 'package:Simba/screens/scan_assets/asset_detail_modal.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/asset.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/asset_detail_modal.dart';
 
 class AssetCard extends StatelessWidget {
   final Asset asset;
   final String Function(DateTime?) formatUpdatedTimeWIB;
   final bool showScanTime;
+  final double imageWidth;
+  final double imageHeight;
 
   const AssetCard({
     required this.asset,
     required this.formatUpdatedTimeWIB,
     this.showScanTime = false,
+    this.imageWidth = 35,
+    this.imageHeight = 35,
     Key? key,
   }) : super(key: key);
 
@@ -25,7 +29,7 @@ class AssetCard extends StatelessWidget {
         statusIcon = Icons.check_circle;
         break;
       case 'fully depreciation':
-        statusColor = Colors.amber;
+        statusColor = Colors.grey;
         statusIcon = Icons.info_outline;
         break;
       case 'available':
@@ -66,8 +70,8 @@ class AssetCard extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         leading: Container(
-          width: 35,
-          height: 35,
+          width: imageWidth,
+          height: imageHeight,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -86,6 +90,8 @@ class AssetCard extends StatelessWidget {
                 ? Image.network(
                     asset.primaryPhoto!.fileUrl,
                     fit: BoxFit.cover,
+                    width: imageWidth,
+                    height: imageHeight,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
                         Icons.inventory,
@@ -111,6 +117,8 @@ class AssetCard extends StatelessWidget {
                     ? Image.network(
                         asset.imagePath!,
                         fit: BoxFit.cover,
+                        width: imageWidth,
+                        height: imageHeight,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(
                             Icons.inventory,
@@ -132,10 +140,12 @@ class AssetCard extends StatelessWidget {
                           );
                         },
                       )
-                    : const Icon(
-                        Icons.inventory,
-                        color: Color(0xFF405189),
-                        size: 20,
+                    : Center(
+                        child: Image.asset(
+                          'assets/images/icons/welcome_page/box_icon.png',
+                          width: 22,
+                          height: 22,
+                        ),
                       ),
           ),
         ),
@@ -168,7 +178,8 @@ class AssetCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.13),
                     borderRadius: BorderRadius.circular(5),
@@ -220,7 +231,8 @@ class AssetCard extends StatelessWidget {
             ),
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+        trailing:
+            const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
         onTap: () {
           showModalBottomSheet(
             context: context,

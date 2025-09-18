@@ -4,7 +4,7 @@ import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/mod
 import 'package:http/http.dart' as http;
 
 class AssetApiService {
-  static const String baseUrl = 'http://192.168.1.4:8000/api';
+  static const String baseUrl = 'http://192.168.8.138:8000/api';
 
   static Map<String, String> get headers => {
         'Content-Type': 'application/json',
@@ -85,7 +85,6 @@ class AssetApiService {
               return Asset.fromJson(assetData);
             }
           }
-          // Jika backend mengembalikan satu asset (fallback, jarang dipakai)
           else if (rawData is Map<String, dynamic> &&
               rawData.containsKey('title')) {
             print('✅ LogisticAsset found (single): ${rawData['title']}');
@@ -128,7 +127,6 @@ class AssetApiService {
       if (response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
 
-        // Jika API mengembalikan { data: [...] }
         if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
           final dataList = rawData['data'];
           if (dataList is List) {

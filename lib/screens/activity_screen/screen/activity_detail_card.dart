@@ -2,13 +2,15 @@ import 'package:Simba/screens/activity_screen/service/activity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+
+const Color primaryColor = Color(0xFF405189);
 String parseAndFormatToWIB(String raw) {
   if (raw.isEmpty) return '-';
   try {
     DateTime dt = DateTime.parse(raw);
     final dtWib = dt.toUtc().add(const Duration(hours: 7));
-    return '${dtWib.year}-${dtWib.month.toString().padLeft(2, '0')}-${dtWib.day.toString().padLeft(2, '0')} '
-        '${dtWib.hour.toString().padLeft(2, '0')}:${dtWib.minute.toString().padLeft(2, '0')}:${dtWib.second.toString().padLeft(2, '0')}';
+    return '${dtWib.day.toString().padLeft(2, '0')}/${dtWib.month.toString().padLeft(2, '0')}/${dtWib.year} '
+        '${dtWib.hour.toString().padLeft(2, '0')}:${dtWib.minute.toString().padLeft(2, '0')} WIB';
   } catch (e) {
     return '-';
   }
@@ -24,7 +26,7 @@ class ActivityDetailCard extends StatefulWidget {
 }
 
 class _ActivityDetailCardState extends State<ActivityDetailCard> {
-  String currentUser = 'caccarehana';
+  String currentUser = 'User';
   String currentUserName = 'Loading...';
   bool isLoadingUserInfo = true;
 
@@ -37,8 +39,8 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
   Future<void> _loadUserSession() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final username = prefs.getString('username') ?? 'caccarehana';
-      final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'Caccarehana';
+      final username = prefs.getString('username') ?? 'User';
+      final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'User';
       setState(() {
         currentUser = username;
         currentUserName = fullName;
@@ -65,198 +67,408 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
     return parseAndFormatToWIB(widget.asset.updatedAt ?? '');
   }
 
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'available':
+        return const Color(0xFF059669);
+      case 'broken':
+        return const Color(0xFFDC2626);
+      case 'lost':
+        return const Color(0xFFDC2626);
+      case 'maintenance':
+        return const Color(0xFFD97706);
+      default:
+        return const Color(0xFF6B7280);
+    }
+  }
+
+  String _getActivityType() {
+    String activityType = widget.asset.activityType ?? 'scan_asset';
+    String description = widget.asset.description ?? '';
+    
+    switch (activityType.toLowerCase()) {
+      case 'scan_asset':
+        return 'Asset Scanning';
+      case 'create_asset':
+        return 'Asset Creation';
+      case 'update_asset':
+        return 'Asset Update';
+      case 'delete_asset':
+        return 'Asset Deletion';
+      case 'photo_upload':
+        return 'Photo Upload';
+      case 'photo_delete':
+        return 'Photo Deletion';
+      case 'status_change':
+        return 'Status Change';
+      default:
+        if (description.toLowerCase().contains('scan')) {
+          return 'Asset Scanning';
+        } else if (description.toLowerCase().contains('photo')) {
+          return 'Photo Management';
+        } else if (description.toLowerCase().contains('update')) {
+          return 'Asset Update';
+        }
+        return 'Asset Activity';
+    }
+  }
+
+  String _getActivityDescription() {
+    String description = widget.asset.description ?? '';
+    String assetCode = widget.asset.assetCode;
+    String activityType = _getActivityType();
+    
+    if (description.isNotEmpty) {
+      return description;
+    }
+    
+    switch (activityType) {
+      case 'Asset Scanning':
+        return 'Scan asset: $assetCode';
+      case 'Asset Creation':
+        return 'Created new asset: $assetCode';
+      case 'Asset Update':
+        return 'Updated asset information: $assetCode';
+      case 'Photo Upload':
+        return 'Uploaded photo for asset: $assetCode';
+      case 'Photo Deletion':
+        return 'Deleted photo from asset: $assetCode';
+      case 'Status Change':
+        return 'Changed status for asset: $assetCode';
+      default:
+        return 'Activity performed on asset: $assetCode';
+    }
+  }
+
+  IconData _getActivityIcon() {
+    String activityType = _getActivityType();
+    
+    switch (activityType) {
+      case 'Asset Scanning':
+        return Icons.qr_code_scanner;
+      case 'Asset Creation':
+        return Icons.add_circle_outline;
+      case 'Asset Update':
+        return Icons.edit_outlined;
+      case 'Asset Deletion':
+        return Icons.delete_outline;
+      case 'Photo Upload':
+        return Icons.camera_alt_outlined;
+      case 'Photo Deletion':
+        return Icons.photo_library_outlined;
+      case 'Status Change':
+        return Icons.swap_horiz;
+      default:
+        return Icons.inventory_outlined;
+    }
+  }
+
+  Color _getActivityColor() {
+    String activityType = _getActivityType();
+    
+    switch (activityType) {
+      case 'Asset Scanning':
+        return const Color(0xFF059669);
+      case 'Asset Creation':
+        return const Color(0xFF3B82F6);
+      case 'Asset Update':
+        return const Color(0xFFD97706);
+      case 'Asset Deletion':
+        return const Color(0xFFDC2626);
+      case 'Photo Upload':
+        return const Color(0xFF8B5CF6);
+      case 'Photo Deletion':
+        return const Color(0xFF6B7280);
+      case 'Status Change':
+        return const Color(0xFF0891B2);
+      default:
+        return const Color(0xFF405189);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF405189);
-
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Color(0xFFFAFAFA),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
       ),
       child: Column(
         children: [
+          // Handle Bar
           Container(
-            width: 32,
-            height: 3,
-            margin: const EdgeInsets.only(top: 8),
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: const Color(0xFFE5E7EB),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
+          
+          // Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            padding: const EdgeInsets.all(20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Activity Details',
-                  style: TextStyle(
-                    fontFamily: 'Maison Bold',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A1A1A),
+                Expanded(
+                  child: Text(
+                    'Activity Details',
+                    style: const TextStyle(
+                      fontFamily: 'Maison Bold',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF111827),
+                    ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.grey[600],
-                    size: 20,
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Color(0xFF6B7280),
+                      size: 18,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
+
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // GestureDetector(
-                  //   onTap: () => _showFullScreenImage(context),
-                  //   child: _buildPlaceholderImage(),
-                  // ),
-                  const SizedBox(height: 16),
-                  Text(
-                    widget.asset.assetName,
-                    style: const TextStyle(
-                      fontFamily: 'Maison Bold',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1A1A),
-                      height: 1.2,
+                  // Activity Information Card
+                  Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Color(0xFFF3F4F6), width: 1),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      widget.asset.assetCode,
-                      style: TextStyle(
-                        fontFamily: 'Maison Book',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: primaryColor,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: _getActivityColor().withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  _getActivityIcon(),
+                                  color: _getActivityColor(),
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _getActivityType(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Maison Bold',
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF111827),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      getCurrentTimeFromActivity(),
+                                      style: const TextStyle(
+                                        fontFamily: 'Maison Book',
+                                        fontSize: 12,
+                                        color: Color(0xFF6B7280),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF9FAFB),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: const Color(0xFFF3F4F6)),
+                            ),
+                            child: Text(
+                              _getActivityDescription(),
+                              style: const TextStyle(
+                                fontFamily: 'Maison Book',
+                                fontSize: 13,
+                                color: Color(0xFF374151),
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Information',
-                    style: TextStyle(
-                      fontFamily: 'Maison Bold',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1A1A),
+
+                  const SizedBox(height: 16),
+
+                  // Asset Info Card
+                  Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Color(0xFFF3F4F6), width: 1),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDetailRow(
-                    icon: Icons.category_outlined,
-                    label: 'Category',
-                    value: widget.asset.category ?? '-',
-                    iconColor: const Color(0xFF3B82F6),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildDetailRow(
-                    icon: Icons.business_outlined,
-                    label: 'Department',
-                    value: widget.asset.department ?? '-',
-                    iconColor: const Color(0xFF8B5CF6),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildDetailRow(
-                    icon: Icons.check_circle_outline,
-                    label: 'Status',
-                    value: widget.asset.assetStatus ?? '-',
-                    iconColor: _getStatusColor(widget.asset.assetStatus),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildDetailRow(
-                    icon: Icons.inventory_outlined,
-                    label: 'Quantity',
-                    value: widget.asset.quantity?.toString() ?? '-',
-                    iconColor: const Color(0xFF10B981),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildDetailRow(
-                    icon: Icons.calendar_today_outlined,
-                    label: 'Acquisition Date',
-                    value: widget.asset.acquisitionDate ?? '-',
-                    iconColor: const Color(0xFF6366F1),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildDetailRow(
-                    icon: Icons.schedule_outlined,
-                    label: 'Aging',
-                    value: widget.asset.aging ?? '-',
-                    iconColor: const Color(0xFFF59E0B),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: Colors.grey[200]!,
-                        width: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Asset Information',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.asset.assetName,
+                                  style: const TextStyle(
+                                    fontFamily: 'Maison Bold',
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF000000),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF405189).withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              widget.asset.assetCode,
+                              style: const TextStyle(
+                                fontFamily: 'Maison Book',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF405189),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSimpleInfoRow('Category', widget.asset.category ?? '-'),
+                          _buildSimpleInfoRow('Department', widget.asset.department ?? '-'),
+                          _buildSimpleInfoRow('Status', widget.asset.assetStatus ?? '-', 
+                            valueColor: _getStatusColor(widget.asset.assetStatus), isLast: true),
+                        ],
                       ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Icon(
-                                Icons.info_outlined,
-                                size: 14,
-                                color: primaryColor,
-                              ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Status Summary
+                  Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Color(0xFFF3F4F6), width: 1),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Status Summary',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
                             ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Asset Status Details',
-                              style: TextStyle(
-                                fontFamily: 'Maison Bold',
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1A1A1A),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow('Available', widget.asset.available?.toString() ?? '-'),
-                        _buildInfoRow('Broken', widget.asset.broken?.toString() ?? '-'),
-                        _buildInfoRow('Lost', widget.asset.lost?.toString() ?? '-'),
-                        _buildInfoRow('Current User', isLoadingUserInfo ? 'Loading...' : currentUserName),
-                        _buildInfoRow('Activity Time', getCurrentTimeFromActivity()),
-                        _buildInfoRow('Created At', getAssetCreatedTimeWIB()),
-                        _buildInfoRow('Updated At', getAssetUpdatedTimeWIB()),
-                      ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              _buildStatusCard('Available', widget.asset.available ?? 0, const Color(0xFF059669)),
+                              const SizedBox(width: 12),
+                              _buildStatusCard('Broken', widget.asset.broken ?? 0, const Color(0xFFDC2626)),
+                              const SizedBox(width: 12),
+                              _buildStatusCard('Lost', widget.asset.lost ?? 0, const Color(0xFF6B7280)),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
                   const SizedBox(height: 16),
+
+                  // User & Timing Details
+                  Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Color(0xFFF3F4F6), width: 1),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'User & Timing',
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: primaryColor,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSimpleInfoRow('Performed By', isLoadingUserInfo ? 'Loading...' : currentUserName),
+                          _buildSimpleInfoRow('Activity Time', getCurrentTimeFromActivity()),
+                          _buildSimpleInfoRow('Created At', getAssetCreatedTimeWIB()),
+                          // _buildSimpleInfoRow('Updated At', getAssetUpdatedTimeWIB(), isLast: true),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -266,164 +478,80 @@ class _ActivityDetailCardState extends State<ActivityDetailCard> {
     );
   }
 
-  Widget _buildPlaceholderImage() {
-    return Container(
-      width: double.infinity,
-      height: 160,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.inventory_2_outlined,
-            size: 40,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Asset Image',
-            style: TextStyle(
-              fontFamily: 'Maison Book',
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[500],
+  Widget _buildSimpleInfoRow(String label, String value, {Color? valueColor, bool isLast = false}) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 100,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: 'Maison Book',
+                  fontSize: 13,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
             ),
-          ),
-          Text(
-            'Tap to view details',
-            style: TextStyle(
-              fontFamily: 'Maison Book',
-              fontSize: 10,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey[400],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontFamily: 'Maison Bold',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: valueColor ?? const Color(0xFF111827),
+                ),
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color iconColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.grey[100]!,
-          width: 1,
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
+        if (!isLast) ...[
+          const SizedBox(height: 12),
+          const Divider(color: Color(0xFFF3F4F6), height: 1),
+          const SizedBox(height: 12),
         ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 16,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: 'Maison Bold',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontFamily: 'Maison Book',
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
+  Widget _buildStatusCard(String label, int count, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withOpacity(0.1)),
+        ),
+        child: Column(
+          children: [
+            Text(
+              count.toString(),
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontFamily: 'Maison Book',
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1A1A),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Maison Book',
+                fontSize: 11,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
-  }
-
-  Color _getStatusColor(String? status) {
-    switch (status?.toLowerCase()) {
-      case 'available':
-        return const Color(0xFF10B981);
-      case 'broken':
-        return const Color(0xFFEF4444);
-      case 'lost':
-        return const Color(0xFFEF4444);
-      case 'maintenance':
-        return const Color(0xFFF59E0B);
-      default:
-        return Colors.grey;
-    }
   }
 }

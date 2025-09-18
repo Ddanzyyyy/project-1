@@ -1,11 +1,15 @@
 import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/widget/asset_info_widget.dart';
 import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/asset_mobile_scanner_page.dart';
 import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/asset_upload_dialog.dart';
-import 'package:Simba/screens/home_screen/lost_assets/compact_lost_asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/service/logistic_asset_service.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
+import 'package:Simba/screens/scan_assets/scan_asset_page/service/recent_asset_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Definisikan primaryColor
+const primaryColor = Color(0xFF405189);
 
 class LogisticAssetScanMenuPage extends StatefulWidget {
   @override
@@ -18,6 +22,27 @@ class _LogisticAssetScanMenuPageState extends State<LogisticAssetScanMenuPage> {
   LogisticAsset? _scannedAsset;
   bool _isLoadingAsset = false;
   String? _lastScannedAssetNo;
+  String currentUser = 'User';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserSession();
+  }
+
+  Future<void> _loadUserSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final username = prefs.getString('username') ?? 'user';
+      setState(() {
+        currentUser = username;
+      });
+    } catch (e) {
+      setState(() {
+        currentUser = 'user';
+      });
+    }
+  }
 
   Future<void> _scanAsset() async {
     final status = await Permission.camera.request();
@@ -85,14 +110,40 @@ class _LogisticAssetScanMenuPageState extends State<LogisticAssetScanMenuPage> {
     showDialog(
       context: context,
       builder: (context) => AssetUploadDialog(asset: _scannedAsset!),
-    ).then((result) {
+    ).then((result) async {
       if (result == true && _lastScannedAssetNo != null) {
-        _refreshAssetInfo();
+        // Update photos_count di RecentAssets setelah upload foto berhasil
+        await _updatePhotosCountInRecentAssets();
+        
+        await _refreshAssetInfo();
         setState(() {
           _scanStatus = 'Foto berhasil diupload!';
         });
       }
     });
+  }
+
+  // Fungsi untuk update photos_count di recent_assets table
+  Future<void> _updatePhotosCountInRecentAssets() async {
+    try {
+      if (_scannedAsset != null) {
+        // Cari recent asset berdasarkan asset_code dan user
+        final recentAssets = await RecentAssetService.getRecentAssets(scannedBy: currentUser);
+        
+        // Cari recent asset yang sesuai dengan asset yang di-scan
+        final targetRecentAsset = recentAssets.firstWhere(
+          (recentAsset) => recentAsset.assetNo == _scannedAsset!.assetNo,
+          orElse: () => recentAssets.first, // fallback ke yang pertama jika tidak ditemukan
+        );
+        
+        // Update photos_count
+        await RecentAssetService.updatePhotosCount(targetRecentAsset.id);
+        
+        print('DEBUG: Photos count updated for recent asset ID: ${targetRecentAsset.id}');
+      }
+    } catch (e) {
+      print('DEBUG: Error updating photos count in recent assets: $e');
+    }
   }
 
   void _showManualInputDialog() {
@@ -142,7 +193,7 @@ class _LogisticAssetScanMenuPageState extends State<LogisticAssetScanMenuPage> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
+              backgroundColor: primaryColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -153,7 +204,7 @@ class _LogisticAssetScanMenuPageState extends State<LogisticAssetScanMenuPage> {
                 _loadAssetInfo(controller.text.trim());
               }
             },
-            child: Text('Cari'),
+            child: Text('Cari', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -234,7 +285,7 @@ class _LogisticAssetScanMenuPageState extends State<LogisticAssetScanMenuPage> {
                                 ),
                               ),
                               Text(
-                                'Scan Bar Code atau Barcode untuk mencari asset',
+                                'Untuk lebih detail nya silahkan masuk ke halaman Scan Asset ',
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 12,
@@ -306,6 +357,14 @@ class _LogisticAssetScanMenuPageState extends State<LogisticAssetScanMenuPage> {
               if (_scannedAsset != null) ...[
                 AssetInfoWidget(
                   asset: _scannedAsset!,
+                  onUploadSuccess: () async {
+                    // Callback ketika upload foto berhasil dari AssetInfoWidget
+                    await _updatePhotosCountInRecentAssets();
+                    await _refreshAssetInfo();
+                    setState(() {
+                      _scanStatus = 'Foto berhasil diupload!';
+                    });
+                  },
                 ),
               ],
 

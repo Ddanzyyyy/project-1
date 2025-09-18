@@ -73,7 +73,7 @@ class ShimmerLoading {
 
   static Widget recentAssetsList() {
     return Column(
-      children: List.generate(3, (index) => assetCard()),
+      children: List.generate(1, (index) => assetCard()),
     );
   }
 

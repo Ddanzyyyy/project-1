@@ -5,7 +5,8 @@ import 'chart_logistic_asset_page.dart';
 
 class LogisticAssetAnalyticsPage extends StatefulWidget {
   @override
-  State<LogisticAssetAnalyticsPage> createState() => _LogisticAssetAnalyticsPageState();
+  State<LogisticAssetAnalyticsPage> createState() =>
+      _LogisticAssetAnalyticsPageState();
 }
 
 class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
@@ -40,7 +41,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
       isLoading = true;
       errorMessage = '';
     });
-    
+
     try {
       final data = await LogisticAssetService.getLogisticAssets();
       setState(() {
@@ -60,7 +61,9 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
               children: [
                 Icon(Icons.error, color: Colors.white, size: 18),
                 SizedBox(width: 6),
-                Expanded(child: Text('Error loading data: $e', style: TextStyle(fontSize: 13))),
+                Expanded(
+                    child: Text('Error loading data: $e',
+                        style: TextStyle(fontSize: 13))),
               ],
             ),
             backgroundColor: Colors.red.shade600,
@@ -78,26 +81,28 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
 
   int get totalAssets => assets.length;
   int get totalQuantity => assets.fold(0, (sum, asset) => sum + asset.quantity);
-  int get totalAvailable => assets.fold(0, (sum, asset) => sum + asset.available);
+  int get totalAvailable =>
+      assets.fold(0, (sum, asset) => sum + asset.available);
   int get totalBroken => assets.fold(0, (sum, asset) => sum + asset.broken);
   int get totalLost => assets.fold(0, (sum, asset) => sum + asset.lost);
-  int get totalInUse => totalQuantity - totalAvailable - totalBroken - totalLost;
-  
+  int get totalInUse =>
+      totalQuantity - totalAvailable - totalBroken - totalLost;
+
   double get utilizationRate {
     if (totalQuantity == 0) return 0;
     return ((totalQuantity - totalAvailable) / totalQuantity) * 100;
   }
-  
+
   double get availabilityRate {
     if (totalQuantity == 0) return 0;
     return (totalAvailable / totalQuantity) * 100;
   }
-  
+
   double get maintenanceRate {
     if (totalQuantity == 0) return 0;
     return (totalBroken / totalQuantity) * 100;
   }
-  
+
   double get lossRate {
     if (totalQuantity == 0) return 0;
     return (totalLost / totalQuantity) * 100;
@@ -112,15 +117,19 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
 
   Color get healthStatusColor {
     switch (healthStatus) {
-      case 'Critical': return errorColor;
-      case 'Warning': return warningColor;
-      case 'Attention': return Color(0xFFFF7043);
-      default: return successColor;
+      case 'Critical':
+        return errorColor;
+      case 'Warning':
+        return warningColor;
+      case 'Attention':
+        return Color(0xFFFF7043);
+      default:
+        return successColor;
     }
   }
 
   static const Color primaryColor = Color(0xFF405189);
-  static const Color secondaryColor = Color(0xFF6366F1);
+  // static const Color secondaryColor = Color(0xFF6366F1);
   static const Color successColor = Color(0xFF10B981);
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color errorColor = Color(0xFFEF4444);
@@ -128,12 +137,8 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
   static const Color purpleColor = Color(0xFF8B5CF6);
 
   Widget _buildCompactSummaryCard(
-    String title, 
-    String value, 
-    IconData icon, 
-    Color color,
-    {String? subtitle}
-  ) {
+      String title, String value, IconData icon, Color color,
+      {String? subtitle}) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Container(
@@ -219,8 +224,11 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                 borderRadius: BorderRadius.circular(7),
               ),
               child: Icon(
-                healthStatus == 'Good' ? Icons.check_circle : 
-                healthStatus == 'Critical' ? Icons.error : Icons.warning,
+                healthStatus == 'Good'
+                    ? Icons.check_circle
+                    : healthStatus == 'Critical'
+                        ? Icons.error
+                        : Icons.warning,
                 color: healthStatusColor,
                 size: 18,
               ),
@@ -268,59 +276,56 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
             ),
           ],
         ),
-        child: Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7),
-                  ),
-                  elevation: 0,
+        child: Row(children: [
+          Expanded(
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(7),
                 ),
-                icon: Icon(Icons.bar_chart, size: 16),
-                label: Text(
-                  'Charts',
-                  style: TextStyle(fontSize: 12),
-                ),
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ChartLogisticAssetsPage(assets: assets),
-                  ),
+                elevation: 0,
+              ),
+              icon: Icon(Icons.bar_chart, size: 16),
+              label: Text(
+                'Charts',
+                style: TextStyle(fontSize: 12),
+              ),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ChartLogisticAssetsPage(assets: assets),
                 ),
               ),
             ),
-            SizedBox(width: 8),
-            Expanded(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7),
-                  ),
-                  elevation: 0,
-                ),
-                icon: Icon(Icons.download, size: 16),
-                label: Text(
-                  'Export',
-                  style: TextStyle(fontSize: 12),
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Export feature coming soon!', style: TextStyle(fontSize: 13)),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+          SizedBox(width: 8),
+          // Expanded(
+          //   child: ElevatedButton.icon(
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: secondaryColor,
+          //       foregroundColor: Colors.white,
+          //       padding: EdgeInsets.symmetric(vertical: 8),
+          //       shape: RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(7),
+          //       ),
+          //       elevation: 0,
+          //     ),
+          //     icon: Icon(Icons.download, size: 16),
+          //     label: Text(
+          //       'Export',
+          //       style: TextStyle(fontSize: 12),
+          //     ),
+          //     onPressed: () {
+          //       ScaffoldMessenger.of(context).showSnackBar(
+          //         SnackBar(
+          //           content: Text('Export feature coming soon!', style: TextStyle(fontSize: 13)),
+          //         ),
+          //       );
+          //     },
+          //   ),
+        ]),
       ),
     );
   }
@@ -427,7 +432,6 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
           elevation: 0,
           centerTitle: true,
           iconTheme: IconThemeData(color: Colors.white),
-
         ),
         body: _buildErrorState(),
       );
@@ -447,7 +451,6 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
         elevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.white),
-
         actions: [
           IconButton(
             icon: Icon(Icons.refresh, color: Colors.white, size: 20),
@@ -467,7 +470,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
               // Health Status Card
               _buildCompactHealthCard(),
               SizedBox(height: 12),
-              
+
               // Summary Cards Grid
               GridView.count(
                 crossAxisCount: 3,
@@ -519,12 +522,12 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                   ),
                 ],
               ),
-              
+
               SizedBox(height: 12),
-              
+
               // Quick Actions Section
               _buildCompactActions(),
-              
+
               SizedBox(height: 12),
             ],
           ),

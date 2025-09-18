@@ -1,21 +1,83 @@
-import 'package:Simba/screens/home_screen/lost_assets/compact_lost_asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_model.dart';
 import '../screen/asset_upload_dialog.dart';
 
-class AssetInfoWidget extends StatelessWidget {
+const warnaColor = Colors.white;
+const primaryColor = Color(0xFF405189);
+
+class AssetInfoWidget extends StatefulWidget {
   final LogisticAsset asset;
+  final VoidCallback? onUploadSuccess; 
 
   const AssetInfoWidget({
     Key? key,
     required this.asset,
+    this.onUploadSuccess,
   }) : super(key: key);
+
+  @override
+  State<AssetInfoWidget> createState() => _AssetInfoWidgetState();
+}
+
+class _AssetInfoWidgetState extends State<AssetInfoWidget> {
+  late LogisticAsset asset;
+
+  @override
+  void initState() {
+    super.initState();
+    asset = widget.asset;
+  }
 
   void _showUploadDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AssetUploadDialog(asset: asset),
+    ).then((result) {
+      if (result == true) {
+        // Panggil callback untuk update photos_count di parent
+        if (widget.onUploadSuccess != null) {
+          widget.onUploadSuccess!();
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Foto asset berhasil diupload!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    });
+  }
+
+  void _showFullImage(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: InteractiveViewer(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.white,
+                    height: 300,
+                    child: Center(
+                      child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -41,13 +103,6 @@ class AssetInfoWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(7),
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Colors.black.withOpacity(0.05),
-            //     blurRadius: 10,
-            //     offset: Offset(0, 2),
-            //   ),
-            // ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,8 +129,7 @@ class AssetInfoWidget extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color:
-                          _getStatusColor(asset.assetStatus).withOpacity(0.1),
+                      color: _getStatusColor(asset.assetStatus).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(7),
                     ),
                     child: Text(
@@ -117,14 +171,6 @@ class AssetInfoWidget extends StatelessWidget {
 
         // Information Card
         _buildInfoCard('Full Information', [
-          // Title(
-          //   color: Colors.black,
-          //   // title: 'Asset Summary',
-          //   child: Divider(
-          //     color: Colors.grey[300],
-          //     thickness: 1,
-          //   ),
-          // ),
           const SizedBox(height: 8),
           _buildInfoRow('Title', asset.title),
           _buildInfoRow('Asset No', asset.assetNo),
@@ -133,7 +179,6 @@ class AssetInfoWidget extends StatelessWidget {
           _buildInfoRow('Sub Category', asset.subCategory),
           _buildInfoRow('Subsidiary Account', asset.subsidiaryAccount),
           _buildInfoRow('Asset Specification', asset.assetSpecification),
-          // _buildInfoRow('Asset Specification', asset.assetSpecification),
           _buildInfoRow(
               'Acquisition Date',
               asset.acquisitionDate != null
@@ -145,19 +190,8 @@ class AssetInfoWidget extends StatelessWidget {
           _buildInfoRow('Control Department', asset.controlDepartment),
           _buildInfoRow('Cost Center', asset.costCenter),
           _buildInfoRow('Asset Status', asset.assetStatus),
-          _buildInfoRow(
-              'Remarks', asset.remarks.isNotEmpty ? asset.remarks : '-')
+          _buildInfoRow('Remarks', asset.remarks.isNotEmpty ? asset.remarks : '-')
         ]),
-
-        // SizedBox(height: 16),
-
-        // _buildInfoCard('Asset Details', [
-        //   _buildInfoRow('Acquisition Date', asset.acquisitionDate != null
-        //       ? DateFormat('dd MMM yyyy').format(asset.acquisitionDate!)
-        //       : '-'),
-        //   _buildInfoRow('Aging', asset.aging),
-        //   _buildInfoRow('Total Quantity', asset.quantity.toString()),
-        // ]),
 
         SizedBox(height: 16),
 
@@ -167,13 +201,6 @@ class AssetInfoWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(7),
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Colors.black.withOpacity(0.05),
-            //     blurRadius: 10,
-            //     offset: Offset(0, 2),
-            //   ),
-            // ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,13 +218,11 @@ class AssetInfoWidget extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _buildStatusCard(
-                        'Available', asset.available, Colors.green),
+                    child: _buildStatusCard('Available', asset.available, Colors.green),
                   ),
                   SizedBox(width: 12),
                   Expanded(
-                    child:
-                        _buildStatusCard('Broken', asset.broken, Colors.orange),
+                    child: _buildStatusCard('Broken', asset.broken, Colors.orange),
                   ),
                   SizedBox(width: 12),
                   Expanded(
@@ -211,21 +236,157 @@ class AssetInfoWidget extends StatelessWidget {
 
         SizedBox(height: 16),
 
-        // Remarks
-        if (asset.remarks.isNotEmpty)
+        // Asset Photo Section
+        Text(
+          'Foto Asset',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
+            fontFamily: 'Maison Bold',
+          ),
+        ),
+        const SizedBox(height: 16),
 
-        if (asset.remarks.isNotEmpty)
+        if (asset.primaryPhoto != null && asset.primaryPhoto!.fileUrl.isNotEmpty) ...[
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Foto Asset Saat Ini',
+                  style: TextStyle(
+                    fontFamily: 'Maison Bold',
+                    fontSize: 14,
+                    color: Color(0xFF405189),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () => _showFullImage(context, asset.primaryPhoto!.fileUrl),
+                  child: Container(
+                    width: double.infinity,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        asset.primaryPhoto!.fileUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[100],
+                            child: const Center(
+                              child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                            ),
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey[100],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: const Color(0xFF405189),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Tap untuk memperbesar foto',
+                  style: TextStyle(
+                    fontFamily: 'Maison Book',
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+        ] else if (asset.photos != null && asset.photos!.isNotEmpty) ...[
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Foto Asset Saat Ini',
+                  style: TextStyle(
+                    fontFamily: 'Maison Bold',
+                    fontSize: 14,
+                    color: Color(0xFF405189),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () => _showFullImage(context, asset.photos!.first.fileUrl),
+                  child: Container(
+                    width: double.infinity,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        asset.photos!.first.fileUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[100],
+                            child: const Center(
+                              child: Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Tap untuk memperbesar foto',
+                  style: TextStyle(
+                    fontFamily: 'Maison Book',
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+        ],
 
-                        Text(
-                          'Foto Asset',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
-                            fontFamily: 'Maison Bold',
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+        // Upload Photo Section
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(20),
@@ -236,13 +397,6 @@ class AssetInfoWidget extends StatelessWidget {
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(7),
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: primaryColor.withOpacity(0.3),
-            //     blurRadius: 10,
-            //     offset: Offset(0, 5),
-            //   ),
-            // ],
           ),
           child: Column(
             children: [
@@ -291,8 +445,15 @@ class AssetInfoWidget extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  // icon: Icon(Icons.camera_alt),
-                  label: Text('Upload Foto Asset'),
+                  icon: Icon(Icons.camera_alt, color: primaryColor),
+                  label: Text(
+                    'Upload Foto Asset',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontFamily: 'Maison Bold',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: primaryColor,
@@ -321,13 +482,6 @@ class AssetInfoWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(7),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black.withOpacity(0.05),
-        //     blurRadius: 10,
-        //     offset: Offset(0, 2),
-        //   ),
-        // ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,13 +559,7 @@ class AssetInfoWidget extends StatelessWidget {
                   color: color,
                   size: 30,
                 )
-              :
-              // : Icon(
-              //     Icons.error,
-              //     color: color,
-              //     size: 30,
-              //   ),
-              Text(
+              : Text(
                   count.toString(),
                   style: TextStyle(
                     fontFamily: 'Maison Bold',
@@ -439,11 +587,17 @@ class AssetInfoWidget extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'active':
+      case 'available':
         return Colors.green;
       case 'inactive':
+      case 'broken':
+      case 'damaged':
         return Colors.orange;
       case 'disposed':
+      case 'lost':
         return Colors.red;
+      case 'maintenance':
+        return Colors.blue;
       default:
         return Colors.grey;
     }

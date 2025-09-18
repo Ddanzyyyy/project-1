@@ -6,14 +6,17 @@ import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_mo
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
 class AssetDetailModal extends StatefulWidget {
   final Asset asset;
   final bool showUploadPhotoButton;
+  final VoidCallback? onPhotoUploaded; 
 
   const AssetDetailModal({
     Key? key,
     required this.asset,
     this.showUploadPhotoButton = false,
+    this.onPhotoUploaded,
   }) : super(key: key);
 
   @override
@@ -30,12 +33,11 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
     asset = widget.asset;
   }
 
-  /// PATCH photos_count setiap kali upload foto sukses
   Future<void> _refreshPhotosCount() async {
     setState(() { isLoading = true; });
     try {
       final recentAssetId = asset.id;
-      final url = Uri.parse('http://192.168.1.4:8000/api/recent-assets/$recentAssetId/photos-count');
+      final url = Uri.parse('http://192.168.8.138:8000/api/recent-assets/$recentAssetId/photos-count');
       final response = await http.patch(url);
 
       if (response.statusCode == 200) {
@@ -43,25 +45,32 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
         if (data['success'] == true && data['data'] != null) {
           setState(() {
             asset = asset.copyWith(photosCount: data['data']['photos_count']);
-          });
+          }); 
         }
       }
     } catch (e) {}
     setState(() { isLoading = false; });
   }
 
-  /// Setelah upload foto, PATCH photos_count otomatis
   Future<void> _showUploadPhotoDialog(BuildContext context) async {
     final logisticAsset = _assetToLogisticAsset(asset);
     final result = await showDialog(
       context: context,
       builder: (ctx) => AssetUploadDialog(asset: logisticAsset),
     );
+    
     if (result == true) {
-      /// PATCH otomatis ke backend setelah upload
       await _refreshPhotosCount();
+      
+      if (widget.onPhotoUploaded != null) {
+        widget.onPhotoUploaded!();
+      }
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Foto asset berhasil diupload!'), backgroundColor: Colors.green),
+        SnackBar(
+          content: Text('Foto asset berhasil diupload!'), 
+          backgroundColor: Colors.green
+        ),
       );
     }
   }
@@ -138,7 +147,7 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
       ),
       child: Column(
         children: [
-          // Drag Handle & Header
+          // Header
           Container(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -176,7 +185,7 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
             ),
           ),
           
-          // Scrollable Content
+          // Content
           Expanded(
             child: isLoading
                 ? Center(child: CircularProgressIndicator())
@@ -265,7 +274,7 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
 
                   const SizedBox(height: 16),
 
-                  // Full Information (tambah Photos Count)
+                  // Full Information
                   _buildInfoCard('Full Information', [
                     _buildInfoRow('Title', asset.name),
                     _buildInfoRow('Asset No', asset.assetCode),
@@ -286,7 +295,7 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
                     _buildInfoRow('Control Department', asset.controlDepartment ?? '-'),
                     _buildInfoRow('Cost Center', asset.costCenter ?? '-'),
                     _buildInfoRow('Remarks', asset.remarks?.isNotEmpty == true ? asset.remarks! : '-'),
-                    _buildInfoRow('Photos Count', asset.photosCount?.toString() ?? '0'), // <-- Tampilkan photos_count
+                    _buildInfoRow('Photos Count', asset.photosCount?.toString() ?? '0'),
                   ]),
 
                   const SizedBox(height: 16),
@@ -505,13 +514,12 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
                     const SizedBox(height: 16),
                   ],
 
-                  // TOMBOL UPLOAD FOTO ASSET hanya muncul jika showUploadPhotoButton == true
                   if (widget.showUploadPhotoButton)
                     Container(
                       width: double.infinity,
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ElevatedButton.icon(
-                        icon: const Icon(Icons.upload, color: Colors.white),
+                        icon: const Icon(Icons.camera_alt, color: Colors.white),
                         label: const Text(
                           'Upload Foto Asset',
                           style: TextStyle(

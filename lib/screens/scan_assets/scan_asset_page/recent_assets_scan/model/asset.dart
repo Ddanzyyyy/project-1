@@ -62,7 +62,7 @@ class Asset {
     this.remarks,
     this.photos,
     this.primaryPhoto,
-    this.photosCount, // Tambahkan ke constructor
+    this.photosCount, 
   });
 
   factory Asset.fromJson(Map<String, dynamic> json) {

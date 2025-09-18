@@ -189,13 +189,21 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       await _loadRecentScannedAssetsDb();
     }
 
-    // Show asset details only!
     _showAssetDetailsModal(foundAsset);
 
-    // --- Jangan panggil upload foto otomatis di sini ---
-    // SchedulerBinding.instance.addPostFrameCallback((_) {
-    //   _handlePhotoUpload(foundAsset);
-    // });
+    // PERUBAHAN: Update photos_count tanpa menampilkan upload dialog otomatis
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _updatePhotosCountOnly();
+    });
+  }
+
+  Future<void> _updatePhotosCountOnly() async {
+    await Future.delayed(Duration(milliseconds: 300));
+    if (!mounted) return;
+
+    await _updatePhotosCount();
+    
+    _showSuccessSnackBarSafe('Asset berhasil di-scan! Silakan upload foto jika diperlukan.');
   }
 
   Future<void> _handlePhotoUpload(Asset foundAsset) async {
@@ -303,18 +311,22 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   }
 
   void _showAssetDetailsModal(Asset asset) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    useRootNavigator: true,
-    enableDrag: true,
-    builder: (context) => AssetDetailModal(
-      asset: asset,
-      showUploadPhotoButton: true,
-    ),
-  );
-}
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      useRootNavigator: true,
+      enableDrag: true,
+      builder: (context) => AssetDetailModal(
+        asset: asset,
+        showUploadPhotoButton: true, // Enable tombol upload foto
+        onPhotoUploaded: () async {
+          // Callback untuk refresh photos_count setelah upload
+          await _updatePhotosCount();
+        },
+      ),
+    );
+  }
 
   void _showAssetNotRegisteredDialog(String qrCode) {
     showDialog(

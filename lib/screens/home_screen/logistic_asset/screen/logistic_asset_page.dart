@@ -5,7 +5,6 @@ import 'dart:io';
 import '../model/logistic_asset_model.dart';
 import '../service/logistic_asset_service.dart';
 import 'logistic_asset_detail_page.dart';
-import 'logistic_asset_scan_page.dart';
 import '../../analytic_logistic/logistic_asset_analytics_page.dart'; 
 
 class LogisticAssetPage extends StatefulWidget {
@@ -169,43 +168,26 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                   color: Color(0xFF405189),
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => LogisticAssetAnalyticsPage(),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Color(0xFF405189).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.analytics,
-                        size: 16,
-                        color: Color(0xFF405189),
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        'View Analytics',
-                        style: TextStyle(
-                          fontFamily: 'Maison Bold',
-                          fontSize: 12,
-                          color: Color(0xFF405189),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // InkWell(
+              //   // onTap: () {
+              //   //   Navigator.push(
+              //   //     context,
+              //   //     MaterialPageRoute(
+              //   //       builder: (_) => LogisticAssetAnalyticsPage(),
+              //   //     ),
+              //   //   );
+              //   // },
+              //   // child: Container(
+              //   //   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              //   //   decoration: BoxDecoration(
+              //   //     color: Color(0xFF405189).withOpacity(0.1),
+              //   //     borderRadius: BorderRadius.circular(20),
+              //   //   ),
+              //   //   child: Row(
+              //   //     mainAxisSize: MainAxisSize.min
+              //   //   ),
+              //   // ),
+              // ),
             ],
           ),
           SizedBox(height: 16),
@@ -323,26 +305,26 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
         ),
         actions: [
           // Tombol Analytics di AppBar
-          IconButton(
-            icon: Icon(Icons.analytics, color: Colors.white),
-            tooltip: 'Analytics',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => LogisticAssetAnalyticsPage()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.qr_code_scanner, color: Colors.white),
-            tooltip: 'Scan Asset',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => LogisticAssetScanPage()),
-              );
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.analytics, color: Colors.white),
+          //   tooltip: 'Analytics',
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (_) => LogisticAssetAnalyticsPage()),
+          //     );
+          //   },
+          // ),
+          // IconButton(
+          //   icon: Icon(Icons.qr_code_scanner, color: Colors.white),
+          //   tooltip: 'Scan Asset',
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (_) => LogisticAssetScanPage()),
+          //     );
+          //   },
+          // ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, color: Colors.white),
             onSelected: (value) {
@@ -356,17 +338,17 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
-                // backgroundColor: Colors.white,
-                value: 'analytics',
-                child: Row(
-                  children: [
-                    Icon(Icons.analytics, color: Color(0xFF405189), size: 20),
-                    SizedBox(width: 8),
-                    Text('View Analytics', style: TextStyle(fontFamily: 'Maison Bold')),
-                  ],
-                ),
-              ),
+              // PopupMenuItem(
+              //   // backgroundColor: Colors.white,
+              //   value: 'analytics',
+              //   child: Row(
+              //     children: [
+              //       Icon(Icons.analytics, color: Color(0xFF405189), size: 20),
+              //       SizedBox(width: 8),
+              //       Text('View Analytics', style: TextStyle(fontFamily: 'Maison Bold')),
+              //     ],
+              //   ),
+              // ),
               PopupMenuItem(
                 value: 'import',
                 child: Row(

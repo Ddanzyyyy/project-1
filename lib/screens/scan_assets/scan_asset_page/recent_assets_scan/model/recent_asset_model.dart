@@ -49,7 +49,7 @@ class RecentAsset {
 
   factory RecentAsset.fromJson(Map<String, dynamic> json) {
     print("DEBUG: Creating RecentAsset from JSON: $json");
-    
+
     return RecentAsset(
       id: json['id'],
       assetNo: json['asset_no'],
@@ -59,8 +59,8 @@ class RecentAsset {
       category: json['category'],
       subCategory: json['sub_category'],
       subsidiaryAccount: json['subsidiary_account'],
-      acquisitionDate: json['acquisition_date'] != null 
-          ? DateTime.tryParse(json['acquisition_date']) 
+      acquisitionDate: json['acquisition_date'] != null
+          ? DateTime.tryParse(json['acquisition_date'])
           : null,
       aging: json['aging'],
       quantity: json['quantity'],
@@ -68,7 +68,7 @@ class RecentAsset {
       controlDepartment: json['control_department'],
       costCenter: json['cost_center'],
       remarks: json['remarks'],
-      status: json['asset_status'], 
+      status: json['asset_status'],
       available: json['available'] ?? 0,
       broken: json['broken'] ?? 0,
       lost: json['lost'] ?? 0,
@@ -103,5 +103,56 @@ class RecentAsset {
       'scanned_at': scannedAt.toIso8601String(),
       'photos_count': photosCount,
     };
+  }
+
+  // Tambahkan method copyWith untuk mengatasi error
+  RecentAsset copyWith({
+    int? id,
+    String? assetNo,
+    String? title,
+    String? assetSpecification,
+    String? generalAccount,
+    String? category,
+    String? subCategory,
+    String? subsidiaryAccount,
+    DateTime? acquisitionDate,
+    String? aging,
+    int? quantity,
+    String? department,
+    String? controlDepartment,
+    String? costCenter,
+    String? remarks,
+    String? status,
+    int? available,
+    int? broken,
+    int? lost,
+    String? scannedBy,
+    DateTime? scannedAt,
+    int? photosCount,
+  }) {
+    return RecentAsset(
+      id: id ?? this.id,
+      assetNo: assetNo ?? this.assetNo,
+      title: title ?? this.title,
+      assetSpecification: assetSpecification ?? this.assetSpecification,
+      generalAccount: generalAccount ?? this.generalAccount,
+      category: category ?? this.category,
+      subCategory: subCategory ?? this.subCategory,
+      subsidiaryAccount: subsidiaryAccount ?? this.subsidiaryAccount,
+      acquisitionDate: acquisitionDate ?? this.acquisitionDate,
+      aging: aging ?? this.aging,
+      quantity: quantity ?? this.quantity,
+      department: department ?? this.department,
+      controlDepartment: controlDepartment ?? this.controlDepartment,
+      costCenter: costCenter ?? this.costCenter,
+      remarks: remarks ?? this.remarks,
+      status: status ?? this.status,
+      available: available ?? this.available,
+      broken: broken ?? this.broken,
+      lost: lost ?? this.lost,
+      scannedBy: scannedBy ?? this.scannedBy,
+      scannedAt: scannedAt ?? this.scannedAt,
+      photosCount: photosCount ?? this.photosCount,
+    );
   }
 }

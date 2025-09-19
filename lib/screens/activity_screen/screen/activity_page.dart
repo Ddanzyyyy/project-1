@@ -314,14 +314,14 @@ class _ActivityPageState extends State<ActivityPage> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            ClipRRect(
-              child: Image.asset(
-                'assets/images/indocement_logo.png',
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            ),
+            // ClipRRect(
+            //   child: Image.asset(
+            //     'assets/images/indocement_logo.png',
+            //     width: 40,
+            //     height: 40,
+            //     fit: BoxFit.cover,
+            //   ),
+            // ),
           ],
         ),
         centerTitle: false,

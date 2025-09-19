@@ -44,7 +44,7 @@ class SettingsAboutCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              'SIMBA Indocement v0.0.1',
+              'IvenTra Indocement v0.0.1',
               style: TextStyle(
                 fontFamily: 'Maison Book',
                 fontSize: 11,
@@ -239,7 +239,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            "Syarat dan Ketentuan SIMBA Indocement - Sistem Manajemen Barang",
+            "Syarat dan Ketentuan IvenTra Indocement - Sistem Manajemen Barang",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 15,
@@ -258,7 +258,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Dengan menggunakan SIMBA Indocement, Anda setuju untuk mematuhi seluruh syarat dan ketentuan yang berlaku. Aplikasi ini dirancang khusus untuk kebutuhan manajemen barang dan aset di lingkungan PT Indocement Tunggal Prakarsa Tbk.",
+            "Dengan menggunakan IvenTra Indocement, Anda setuju untuk mematuhi seluruh syarat dan ketentuan yang berlaku. Aplikasi ini dirancang khusus untuk kebutuhan manajemen barang dan aset di lingkungan PT Indocement Tunggal Prakarsa Tbk.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -286,7 +286,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Data yang dimasukkan ke dalam SIMBA Indocement sepenuhnya merupakan tanggung jawab pengguna. Setiap informasi barang, aset, lokasi, dan status harus akurat dan sesuai dengan kondisi sebenarnya di lapangan.",
+            "Data yang dimasukkan ke dalam IvenTra Indocement sepenuhnya merupakan tanggung jawab pengguna. Setiap informasi barang, aset, lokasi, dan status harus akurat dan sesuai dengan kondisi sebenarnya di lapangan.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -300,7 +300,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "SIMBA Indocement berkomitmen menjaga keamanan data pengguna dan aset perusahaan. Data akan diakses dan diproses sesuai kebijakan internal Indocement terkait privasi dan perlindungan data.",
+            "IvenTra Indocement berkomitmen menjaga keamanan data pengguna dan aset perusahaan. Data akan diakses dan diproses sesuai kebijakan internal Indocement terkait privasi dan perlindungan data.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -372,7 +372,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            "Kebijakan Privasi SIMBA Indocement",
+            "Kebijakan Privasi IvenTra Indocement",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 15,
@@ -390,11 +390,6 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
             ),
           ),
           SizedBox(height: 8),
-          Text(
-            "SIMBA Indocement mengumpulkan data akun pengguna (username, email, ID karyawan), data barang/aset (deskripsi, lokasi, status, histori perawatan), serta data perangkat (tipe dan versi OS).",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
           Text(
             "2. Penggunaan Data",
             style: TextStyle(

@@ -5,7 +5,7 @@ import 'dart:io';
 import '../model/logistic_asset_model.dart';
 import '../service/logistic_asset_service.dart';
 import 'logistic_asset_detail_page.dart';
-import '../../analytic_logistic/logistic_asset_analytics_page.dart'; 
+import '../../analytic_logistic/screen/logistic_asset_analytics_page.dart'; 
 
 class LogisticAssetPage extends StatefulWidget {
   @override

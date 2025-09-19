@@ -14,9 +14,12 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  List<AssetModel> _searchResults = [];
+  List<Asset> _searchResults = [];
   bool _isLoading = false;
   Timer? _debounce;
+  String _selectedSearchType = 'all';
+
+  final String baseUrl = 'http://192.168.8.138:8000';
 
   @override
   void initState() {
@@ -49,20 +52,33 @@ class _SearchPageState extends State<SearchPage> {
       });
       return;
     }
+
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final url = Uri.parse('http://192.168.8.138:8000/api/assets?search=$query');
+      var params = {
+        'keyword': query,
+        'search_type': _selectedSearchType,
+        'per_page': '50',
+      };
+      final url = Uri.parse('$baseUrl/api/assets/search').replace(queryParameters: params);
+
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        final List data = json.decode(response.body);
-        final results = data.map((e) => AssetModel.fromJson(e)).toList();
+        final responseData = json.decode(response.body);
+
+        List<dynamic> data = [];
+        if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+          data = responseData['data'] as List;
+        }
+
+        final results = data.map((e) => Asset.fromJson(e)).toList();
 
         setState(() {
-          _searchResults = results.cast<AssetModel>();
+          _searchResults = results;
           _isLoading = false;
         });
       } else {
@@ -76,24 +92,80 @@ class _SearchPageState extends State<SearchPage> {
         _searchResults = [];
         _isLoading = false;
       });
+      print('Search error: $e');
     }
   }
 
-  Widget _buildAssetCard(AssetModel asset) {
+  Widget _buildSearchTypeChips() {
+    final searchTypes = [
+      {'key': 'all', 'label': 'All'},
+      {'key': 'name', 'label': 'Name'},
+      {'key': 'code', 'label': 'Asset No'},
+      {'key': 'category', 'label': 'Category'},
+      {'key': 'location', 'label': 'Department'},
+      {'key': 'pic', 'label': 'Control Dept'},
+      {'key': 'status', 'label': 'Status'},
+    ];
+
+    return Container(
+      height: 40,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        itemCount: searchTypes.length,
+        itemBuilder: (context, index) {
+          final type = searchTypes[index];
+          final isSelected = _selectedSearchType == type['key'];
+
+          return Padding(
+            padding: EdgeInsets.only(right: 8),
+            child: FilterChip(
+              label: Text(
+                type['label']!,
+                style: TextStyle(
+                  fontFamily: 'Maison Bold',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.white : Color(0xFF405189),
+                ),
+              ),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  _selectedSearchType = type['key']!;
+                });
+                if (_searchController.text.isNotEmpty) {
+                  _searchAssets(_searchController.text);
+                }
+              },
+              selectedColor: Color(0xFF405189),
+              backgroundColor: Colors.white,
+              checkmarkColor: Colors.white,
+              side: BorderSide(
+                color: isSelected ? Color(0xFF405189) : Color(0xFF405189).withOpacity(0.3),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildAssetCard(Asset asset) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 4,
-            offset: Offset(0, 1),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         onTap: () {
           Navigator.push(
             context,
@@ -103,90 +175,143 @@ class _SearchPageState extends State<SearchPage> {
           );
         },
         child: Padding(
-          padding: EdgeInsets.all(12),
+          padding: EdgeInsets.all(16),
           child: Row(
             children: [
-              // Asset Image
               Container(
-                width: 48,
-                height: 48,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: Color(0xFF405189).withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: asset.imageUrl.isNotEmpty
-                      ? Image.network(
-                          asset.imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.inventory_2_outlined,
-                              color: Color(0xFF405189),
-                              size: 24,
-                            );
-                          },
-                        )
-                      : Icon(
-                          Icons.inventory_2_outlined,
-                          color: Color(0xFF405189),
-                          size: 24,
-                        ),
+                  borderRadius: BorderRadius.circular(10),
+                  child: _buildAssetImage(asset),
                 ),
               ),
-              SizedBox(width: 12),
-              // Asset Info
+              SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      asset.name,
+                      asset.title,
                       style: TextStyle(
                         fontFamily: 'Maison Bold',
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: Color(0xFF1A1A1A),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 2),
-                    if (asset.category != null && asset.category!.isNotEmpty)
+                    SizedBox(height: 4),
+                    if (asset.assetNo.isNotEmpty)
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: Color(0xFF405189).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          asset.category!,
+                          asset.assetNo,
                           style: TextStyle(
                             fontFamily: 'Maison Bold',
-                            fontSize: 10,
+                            fontSize: 11,
                             color: Color(0xFF405189),
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                    SizedBox(height: 2),
-                    if (asset.description != null && asset.description!.isNotEmpty)
-                      Text(
-                        asset.description!,
-                        style: TextStyle(
-                          fontFamily: 'Maison Book',
-                          color: Colors.grey[600],
-                          fontSize: 11,
-                          height: 1.2,
+                    SizedBox(height: 6),
+                    Row(
+                      children: [
+                        if (asset.category.isNotEmpty) ...[
+                          Icon(Icons.category_outlined, size: 12, color: Colors.grey[600]),
+                          SizedBox(width: 4),
+                          Text(
+                            asset.category,
+                            style: TextStyle(
+                              fontFamily: 'Maison Book',
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                        if (asset.category.isNotEmpty && asset.department.isNotEmpty) ...[
+                          SizedBox(width: 8),
+                          Text('•', style: TextStyle(color: Colors.grey[400])),
+                          SizedBox(width: 8),
+                        ],
+                        if (asset.department.isNotEmpty) ...[
+                          Icon(Icons.location_on_outlined, size: 12, color: Colors.grey[600]),
+                          SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              asset.department,
+                              style: TextStyle(
+                                fontFamily: 'Maison Book',
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(asset.assetStatus).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            asset.assetStatus,
+                            style: TextStyle(
+                              fontFamily: 'Maison Bold',
+                              fontSize: 10,
+                              color: _getStatusColor(asset.assetStatus),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        if (asset.quantity > 0) ...[
+                          SizedBox(width: 8),
+                          Icon(Icons.inventory_outlined, size: 12, color: Colors.grey[600]),
+                          SizedBox(width: 2),
+                          Text(
+                            'Qty: ${asset.quantity}',
+                            style: TextStyle(
+                              fontFamily: 'Maison Book',
+                              color: Colors.grey[600],
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                        if (asset.photosCount != null && asset.photosCount! > 0) ...[
+                          SizedBox(width: 8),
+                          Icon(Icons.photo_library_outlined, size: 12, color: Colors.grey[600]),
+                          SizedBox(width: 2),
+                          Text(
+                            '${asset.photosCount}',
+                            style: TextStyle(
+                              fontFamily: 'Maison Book',
+                              color: Colors.grey[600],
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
               ),
-              // Arrow Icon
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
@@ -199,15 +324,61 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
+  Widget _buildAssetImage(Asset asset) {
+    String? imageUrl = asset.primaryImageUrl;
+
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildPlaceholderIcon();
+        },
+      );
+    } else {
+      return _buildPlaceholderIcon();
+    }
+  }
+
+  Widget _buildPlaceholderIcon() {
+    return Icon(
+      Icons.inventory_2_outlined,
+      color: Color(0xFF405189),
+      size: 28,
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'registered':
+      case 'active':
+        return Color(0xFF10B981);
+      case 'unscanned':
+      case 'pending':
+        return Color(0xFFF59E0B);
+      case 'damaged':
+      case 'broken':
+        return Color(0xFFEF4444);
+      case 'lost':
+        return Color(0xFFDC2626);
+      case 'maintenance':
+        return Color(0xFF8B5CF6);
+      case 'available':
+        return Color(0xFF059669);
+      default:
+        return Color(0xFF6B7280);
+    }
+  }
+
   Widget _buildResultsList() {
     return ListView.builder(
       physics: AlwaysScrollableScrollPhysics(),
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.all(16),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final asset = _searchResults[index];
         return Padding(
-          padding: EdgeInsets.only(bottom: 8),
+          padding: EdgeInsets.only(bottom: 12),
           child: _buildAssetCard(asset),
         );
       },
@@ -223,23 +394,26 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[400]),
-              SizedBox(height: 12),
+              Icon(Icons.search_off_outlined, size: 64, color: Colors.grey[400]),
+              SizedBox(height: 16),
               Text(
                 'No assets found',
                 style: TextStyle(
-                    fontFamily: 'Maison Bold',
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w700),
+                  fontFamily: 'Maison Bold',
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              SizedBox(height: 6),
+              SizedBox(height: 8),
               Text(
-                'Try adjusting your search',
+                'Try adjusting your search terms\nor change the search filter',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontFamily: 'Maison Book',
-                    fontSize: 13,
-                    color: Colors.grey[500]),
+                  fontFamily: 'Maison Book',
+                  fontSize: 14,
+                  color: Colors.grey[500],
+                ),
               ),
             ],
           ),
@@ -257,23 +431,26 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.search_outlined, size: 48, color: Colors.grey[400]),
-              SizedBox(height: 12),
+              Icon(Icons.search_outlined, size: 64, color: Colors.grey[400]),
+              SizedBox(height: 16),
               Text(
                 'Start searching',
                 style: TextStyle(
-                    fontFamily: 'Maison Bold',
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w700),
+                  fontFamily: 'Maison Bold',
+                  fontSize: 18,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              SizedBox(height: 6),
+              SizedBox(height: 8),
               Text(
-                'Search assets by title/name only.',
+                'Search assets by name, asset no, category,\ndepartment, control dept, or status',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontFamily: 'Maison Book',
-                    fontSize: 13,
-                    color: Colors.grey[500]),
+                  fontFamily: 'Maison Book',
+                  fontSize: 14,
+                  color: Colors.grey[500],
+                ),
               ),
             ],
           ),
@@ -284,8 +461,6 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final statusBarHeight = MediaQuery.of(context).padding.top;
-
     return Scaffold(
       backgroundColor: Color(0xFFF8F9FA),
       appBar: AppBar(
@@ -300,8 +475,8 @@ class _SearchPageState extends State<SearchPage> {
           'Search Asset',
           style: TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
             fontFamily: 'Maison Bold',
           ),
         ),
@@ -310,58 +485,103 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           Container(
             color: Color(0xFF405189),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(12, statusBarHeight + 8, 12, 16),
-              child: Container(
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  focusNode: _focusNode,
-                  onChanged: _onSearchChanged,
-                  style: TextStyle(fontSize: 14, fontFamily: 'Maison Book'),
-                  decoration: InputDecoration(
-                    hintText: 'Search asset title...',
-                    hintStyle: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[500],
-                        fontFamily: 'Maison Book'),
-                    prefixIcon: Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Icon(Icons.search,
-                          color: Color(0xFF405189), size: 18),
-                    ),
-                    border: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? GestureDetector(
-                            onTap: () {
-                              _searchController.clear();
-                              _onSearchChanged('');
-                            },
-                            child: Icon(Icons.clear,
-                                color: Colors.grey, size: 20),
-                          )
-                        : null,
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Container(
+              height: 44,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
                   ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                focusNode: _focusNode,
+                onChanged: _onSearchChanged,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontFamily: 'Maison Book',
+                ),
+                decoration: InputDecoration(
+                  hintText: _getSearchHint(),
+                  hintStyle: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[500],
+                    fontFamily: 'Maison Book',
+                  ),
+                  prefixIcon: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Icon(
+                      Icons.search,
+                      color: Color(0xFF405189),
+                      size: 20,
+                    ),
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            _searchController.clear();
+                            _onSearchChanged('');
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Icon(
+                              Icons.clear,
+                              color: Colors.grey[400],
+                              size: 20,
+                            ),
+                          ),
+                        )
+                      : null,
                 ),
               ),
             ),
           ),
+          Container(
+            color: Color(0xFFF8F9FA),
+            child: _buildSearchTypeChips(),
+          ),
+          SizedBox(height: 8),
+          if (_searchResults.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${_searchResults.length} assets found',
+                    style: TextStyle(
+                      fontFamily: 'Maison Book',
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Text(
+                    'Search: ${_selectedSearchType.toUpperCase()}',
+                    style: TextStyle(
+                      fontFamily: 'Maison Bold',
+                      fontSize: 11,
+                      color: Color(0xFF405189),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF405189),
+                    ),
+                  )
                 : (_searchResults.isEmpty && _searchController.text.isNotEmpty)
                     ? _buildNoResults()
                     : (_searchResults.isEmpty)
@@ -371,5 +591,25 @@ class _SearchPageState extends State<SearchPage> {
         ],
       ),
     );
+  }
+
+  String _getSearchHint() {
+    switch (_selectedSearchType) {
+      case 'name':
+        return 'Search by asset name...';
+      case 'code':
+        return 'Search by asset no...';
+      case 'category':
+        return 'Search by category...';
+      case 'location':
+        return 'Search by department...';
+      case 'pic':
+        return 'Search by control department...';
+      case 'status':
+        return 'Search by status...';
+      case 'all':
+      default:
+        return 'Search assets...';
+    }
   }
 }

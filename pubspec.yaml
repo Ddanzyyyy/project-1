@@ -45,7 +45,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/SIMBA.png
+    # - assets/images/SIMBA.png
     - assets/images/LOGO_INDOCEMENT.jpg
     - assets/images/icons/BOX.png
     - assets/images/icons/warning.png
@@ -74,6 +74,8 @@ flutter:
     - assets/images/icons/lost_page/warning.png
     - assets/images/icons/welcome_page/analytic.png
     - assets/images/icons/welcome_page/box_icon.png
+    - assets/images/icons/gif/iventory.gif
+    - assets/images/iventra.png
 
 
 

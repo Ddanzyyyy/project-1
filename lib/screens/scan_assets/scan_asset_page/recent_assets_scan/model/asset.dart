@@ -30,7 +30,7 @@ class Asset {
   final String? remarks;
   final List<AssetPhoto>? photos;
   final AssetPhoto? primaryPhoto;
-  final int? photosCount; // Tambahkan field ini
+  final int? photosCount; 
 
   Asset({
     required this.id,

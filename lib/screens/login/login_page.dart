@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Simba/screens/welcome_page/welcome_page.dart'; 
+import 'package:Simba/screens/welcome_page/welcome_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,13 +20,13 @@ class _LoginPageState extends State<LoginPage> {
   String apiWarning = '';
   bool isLoading = false;
 
-  static const Color blueDark = Color(0xFF27519D);
+  static const Color blueDark = Color(0xFF405189);
 
   String getBaseUrl() {
     if (Platform.isAndroid) {
       return 'http://192.168.8.138:8000/api/login';
     } else {
-      return 'http://127.0.0.1:8000/api/login'; // If IOS Console 
+      return 'http://127.0.0.1:8000/api/login';
     }
   }
 
@@ -114,78 +114,61 @@ class _LoginPageState extends State<LoginPage> {
     final media = MediaQuery.of(context);
     final screenHeight = media.size.height;
     final screenWidth = media.size.width;
-    // final isPortrait = media.orientation == Orientation.portrait;
     final isSmallDevice = screenWidth < 400;
 
-    // Responsive paddings and sizes
-    final horizontalPad = isSmallDevice ? 18.0 : 32.0;
-    final logoWidth = isSmallDevice ? 90.0 : 120.0;
-    final logoHeight = isSmallDevice ? 90.0 : 120.0;
-    final simbaWidth = isSmallDevice ? 160.0 : 270.0;
-    final simbaHeight = isSmallDevice ? 18.0 : 30.0;
+    final horizontalPad = screenWidth * 0.08;
     final inputWidth = isSmallDevice ? double.infinity : 300.0;
     final buttonWidth = isSmallDevice ? double.infinity : 300.0;
-    final inputFontSize = isSmallDevice ? 12.0 : 13.0;
+    final inputFontSize = isSmallDevice ? 13.0 : 14.0;
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background circles (tidak diubah, tetap sesuai desain awal)
+          // Curved accent background top left
           Positioned(
-            top: -100,
-            right: -100,
+            top: -screenHeight * 0.23,
+            left: -screenWidth * 0.25,
             child: Container(
-              width: 200,
-              height: 200,
+              width: screenWidth * 0.7,
+              height: screenHeight * 0.4,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF27519D),
-                    const Color.fromARGB(255, 144, 160, 190),
-                    const Color(0x00C4C4C4),
-                  ],
+                color: blueDark.withOpacity(0.07),
+                borderRadius: BorderRadius.only(
+                  bottomRight: Radius.circular(screenWidth * 0.6),
+                  bottomLeft: Radius.circular(screenWidth * 0.2),
                 ),
               ),
             ),
           ),
+          // Curved accent background bottom right
           Positioned(
-            top: screenHeight * 0.15,
-            right: screenWidth * 0.12,
+            bottom: -screenHeight * 0.19,
+            right: -screenWidth * 0.18,
             child: Container(
-              width: 60,
-              height: 60,
+              width: screenWidth * 0.6,
+              height: screenHeight * 0.32,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF27519D),
-                    const Color.fromARGB(255, 144, 160, 190),
-                    const Color(0x00C4C4C4),
-                  ],
+                color: blueDark.withOpacity(0.09),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(screenWidth * 0.5),
+                  topRight: Radius.circular(screenWidth * 0.2),
                 ),
               ),
             ),
           ),
+          // Dynamic company logo in top right
           Positioned(
-            bottom: -100,
-            left: -100,
+            top: screenHeight * 0.03,
+            right: screenWidth * 0.04,
             child: Container(
-              width: 210,
-              height: 210,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF27519D),
-                    const Color.fromARGB(255, 144, 160, 190),
-                    const Color(0x00C4C4C4),
-                  ],
-                ),
-              ),
+              padding: EdgeInsets.all(screenWidth * 0.015),
+              // child: Image.asset(
+              //   'assets/images/indocement_logo.png',
+              //   width: screenWidth * 0.13,
+              //   height: screenWidth * 0.13,
+              //   fit: BoxFit.contain,
+              // ),
             ),
           ),
           SafeArea(
@@ -195,236 +178,274 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: logoWidth,
-                      height: logoHeight,
-                      child: Image.asset(
-                        'assets/images/LOGO_INDOCEMENT.jpg',
+                    // Illustration
+                    SizedBox(
+                      width: 200,
+                      height: 190,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 37), 
+                        child: Image.asset(
+                          'assets/images/icons/gif/iventory.gif',
+                          fit: BoxFit.contain,
+                        ),
+                      ),  
+                    ),
+                    SizedBox(height: screenHeight * 0.04),
+                    // Custom "IvenTra" text
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.105,
+                          fontFamily: 'Maison Bold',
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.5,
+                        ),
+                        // children: [
+                        //   TextSpan(
+                        //     text: 'Iven',
+                        //     style: TextStyle(
+                        //       color: blueDark,
+                        //     ),
+                        //   ),
+                        //   TextSpan(
+                        //     text: 'T',
+                        //     style: TextStyle(
+                        //       color: Colors.red,
+                        //     ),
+                        //   ),
+                        //   TextSpan(
+                        //     text: 'ra',
+                        //     style: TextStyle(
+                        //       color: blueDark,
+                        //     ),
+                        //   ),
+                        // ],
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.025),
+                    // Subtitle
+                    Text(
+                      'Goods and Asset Logistic Management Information System',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: blueDark,
+                        fontSize: screenWidth * 0.048,
+                        fontFamily: 'Maison Book',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.038),
+                    // Username
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Username',
+                        style: TextStyle(
+                          fontFamily: 'Maison Bold',
+                          color: blueDark,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      width: inputWidth,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 47,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: usernameWarning.isNotEmpty
+                                    ? Colors.red
+                                    : blueDark,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: TextField(
+                              controller: usernameController,
+                              style: TextStyle(
+                                fontFamily: 'Maison Book',
+                                fontSize: inputFontSize,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'Enter Username',
+                                hintStyle: const TextStyle(
+                                  fontFamily: 'Maison Book',
+                                  color: Colors.grey,
+                                ),
+                                prefixIcon: const Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 15, right: 10),
+                                  child: Icon(Icons.person_outline,
+                                      color: Colors.grey, size: 18),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.only(
+                                    top: 11, bottom: 11),
+                              ),
+                            ),
+                          ),
+                          if (usernameWarning.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 4, left: 4, right: 4),
+                              child: Text(
+                                usernameWarning,
+                                style: const TextStyle(
+                                  fontFamily: 'Maison Book',
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Image.asset(
-                      'assets/images/SIMBA.png',
-                      width: simbaWidth,
-                      height: simbaHeight,
-                      fit: BoxFit.contain,
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Goods and Asset Management\nInformation System',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Maison Bold',
-                        color: Color(0xFF27519D),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    // Password
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Password',
+                        style: TextStyle(
+                          fontFamily: 'Maison Bold',
+                          color: blueDark,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Username',
-                            style: TextStyle(
-                              fontFamily: 'Maison Bold',
-                              color: blueDark,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
+                    const SizedBox(height: 4),
+                    SizedBox(
+                      width: inputWidth,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 47,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: passwordWarning.isNotEmpty
+                                    ? Colors.red
+                                    : blueDark,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: TextField(
+                              controller: passwordController,
+                              obscureText: true,
+                              style: TextStyle(
+                                fontFamily: 'Maison Book',
+                                fontSize: inputFontSize,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: 'Enter Password',
+                                hintStyle: const TextStyle(
+                                  fontFamily: 'Maison Book',
+                                  color: Colors.grey,
+                                ),
+                                prefixIcon: const Padding(
+                                  padding: EdgeInsets.only(
+                                      left: 15, right: 10),
+                                  child: Icon(Icons.lock_outline,
+                                      color: Colors.grey, size: 18),
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.only(
+                                    top: 11, bottom: 11),
+                              ),
                             ),
                           ),
+                          if (passwordWarning.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 4, left: 4, right: 4),
+                              child: Text(
+                                passwordWarning,
+                                style: const TextStyle(
+                                  fontFamily: 'Maison Bold',
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (apiWarning.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 4, left: 4, right: 4),
+                        child: Text(
+                          apiWarning,
+                          style: const TextStyle(
+                            fontFamily: 'Maison Bold',
+                            color: Colors.red,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                        const SizedBox(height: 4),
-                        SizedBox(
-                          width: inputWidth,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 47,
-                                decoration: BoxDecoration(
+                      ),
+                    const SizedBox(height: 25),
+                    SizedBox(
+                      width: buttonWidth,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed:
+                            isLoading ? null : () => handleLogin(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: blueDark,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: isLoading
+                            ? const SizedBox(
+                                width: 26,
+                                height: 26,
+                                child: CircularProgressIndicator(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(
-                                    color: usernameWarning.isNotEmpty
-                                        ? Colors.red
-                                        : const Color(0xFF405189),
-                                    width: 1.5,
-                                  ),
+                                  strokeWidth: 3,
                                 ),
-                                child: TextField(
-                                  controller: usernameController,
-                                  style: TextStyle(
-                                    fontFamily: 'Maison Book',
-                                    fontSize: inputFontSize,
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter Username',
-                                    hintStyle: const TextStyle(
-                                      fontFamily: 'Maison Book',
-                                      color: Colors.grey,
-                                    ),
-                                    prefixIcon: const Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 15, right: 10),
-                                      child: Icon(Icons.person_outline,
-                                          color: Colors.grey, size: 18),
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 11, bottom: 11),
-                                  ),
-                                ),
-                              ),
-                              if (usernameWarning.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4, left: 4, right: 4),
-                                  child: Text(
-                                    usernameWarning,
-                                    style: const TextStyle(
-                                      fontFamily: 'Maison Book',
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Password',
-                            style: const TextStyle(
-                              fontFamily: 'Maison Bold',
-                              color: Color(0xFF405189),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        SizedBox(
-                          width: inputWidth,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 47,
-                                decoration: BoxDecoration(
+                              )
+                            : const Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontFamily: 'Maison Bold',
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(
-                                    color: passwordWarning.isNotEmpty
-                                        ? Colors.red
-                                        : const Color(0xFF405189),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: TextField(
-                                  controller: passwordController,
-                                  obscureText: true,
-                                  style: TextStyle(
-                                    fontFamily: 'Maison Book',
-                                    fontSize: inputFontSize,
-                                  ),
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter Password',
-                                    hintStyle: const TextStyle(
-                                      fontFamily: 'Maison Book',
-                                      color: Colors.grey,
-                                    ),
-                                    prefixIcon: const Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 15, right: 10),
-                                      child: Icon(Icons.lock_outline,
-                                          color: Colors.grey, size: 18),
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 11, bottom: 11),
-                                  ),
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              if (passwordWarning.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 4, left: 4, right: 4),
-                                  child: Text(
-                                    passwordWarning,
-                                    style: const TextStyle(
-                                      fontFamily: 'Maison Bold',
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        if (apiWarning.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 4, left: 4, right: 4),
-                            child: Text(
-                              apiWarning,
-                              style: const TextStyle(
-                                fontFamily: 'Maison Bold',
-                                color: Colors.red,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        const SizedBox(height: 25),
-                        SizedBox(
-                          width: buttonWidth,
-                          height: 48,
-                          child: ElevatedButton(
-                            onPressed:
-                                isLoading ? null : () => handleLogin(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF405189),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              elevation: 2,
-                            ),
-                            child: isLoading
-                                ? const SizedBox(
-                                    width: 26,
-                                    height: 26,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 3,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      fontFamily: 'Maison Bold',
-                                      color: Colors.white,
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        SizedBox(height: isSmallDevice ? 24 : 32),
-                      ],
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.025),
+                    Text(
+                      'The data you submit will be processed in accordance with our Privacy Policy. By continuing you agree to Terms.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Maison Book',
+                        fontSize: screenWidth * 0.034,
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

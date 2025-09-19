@@ -486,14 +486,14 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               ),
             ),
             const SizedBox(width: 10),
-            ClipRRect(
-              child: Image.asset(
-                'assets/images/indocement_logo.png',
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            ),
+            // ClipRRect(
+            //   child: Image.asset(
+            //     'assets/images/indocement_logo.png',
+            //     width: 40,
+            //     height: 40,
+            //     fit: BoxFit.cover,
+            //   ),
+            // ),
           ],
         ),
         centerTitle: false,

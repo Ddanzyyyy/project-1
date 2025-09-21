@@ -1,18 +1,19 @@
 import 'package:Simba/screens/activity_screen/screen/activity_page.dart';
 import 'package:Simba/screens/home_screen/analytic_logistic/screen/logistic_asset_analytics_page.dart';
+import 'package:Simba/screens/home_screen/learn_page/learn_page.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/screen/logistic_asset_page.dart';
 import 'package:Simba/screens/home_screen/logistic_asset_scan_menu/screen/logistic_asset_scan_menu.dart';
 // import 'package:Simba/screens/home_screen/lost_assets/lost_asset.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 // import 'package:Simba/screens/home_screen/damaged_assets/damaged_asset.dart';
 // import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_assets.dart';
-import 'package:Simba/screens/registered_page/asset_service.dart'
+import 'package:Simba/screens/NoImplementedHere/registered_page/asset_service.dart'
     as registered_asset_service;
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_asset_page.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Simba/screens/home_screen/unscanned_assets/unscanned_asset_service.dart';
+import 'package:Simba/screens/NoImplementedHere/unscanned_assets/unscanned_asset_service.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AppBottomNavBar extends StatelessWidget {
@@ -584,6 +585,15 @@ class _WelcomePageState extends State<WelcomePage> {
           description: 'Asset analytics & reports',
           color: const Color(0xFF8B5CF6),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LogisticAssetAnalyticsPage())),
+        ),
+        const SizedBox(height: 12),
+        AssetCardMinimalist(
+          title: 'How To Use This App',
+          image: Image.asset('assets/images/icons/welcome_page/learn.png', width: 28, height: 28),
+          count: '∞',
+          description: 'Learn how to use IvenTra',
+          color: const Color.fromARGB(255, 100, 246, 92),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LearnPage())),
         ),
         const SizedBox(height: 12),
         // Search Assets (goes to LogisticAssetPage with search focus)

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:Simba/screens/registered_page/asset_service.dart';
+import 'package:Simba/screens/NoImplementedHere/registered_page/asset_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;

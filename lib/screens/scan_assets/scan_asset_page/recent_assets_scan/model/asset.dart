@@ -147,7 +147,6 @@ class Asset {
     };
   }
 
-  // Tambahkan agar bisa update field tertentu tanpa membuat instance baru
   Asset copyWith({
     int? id,
     String? name,

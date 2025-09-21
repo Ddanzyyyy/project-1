@@ -34,7 +34,7 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.8.138:8000/api/recent-assets/${recentAsset.id}'),
+        Uri.parse('http://192.168.1.4:8000/api/recent-assets/${recentAsset.id}'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -76,7 +76,7 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
   Future<void> _updatePhotosCount() async {
     try {
       final response = await http.patch(
-        Uri.parse('http://192.168.8.138:8000/api/recent-assets/${recentAsset.id}/photos-count'),
+        Uri.parse('http://192.168.1.4:8000/api/recent-assets/${recentAsset.id}/photos-count'),
         headers: {'Content-Type': 'application/json'},
       );
 

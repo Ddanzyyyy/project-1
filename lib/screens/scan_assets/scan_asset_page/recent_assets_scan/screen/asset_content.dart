@@ -52,11 +52,11 @@ class AssetsContent extends StatelessWidget {
         onChanged: onFilterAssets,
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search, color: Color(0xFF405189), size: 20),
-          hintText: 'Search assets...',
+          hintText: 'Search Category, Asstet ID',
           hintStyle: TextStyle(
             fontFamily: 'Maison Book',
             color: Colors.grey[500],
-            fontSize: 14,
+            fontSize: 12,
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),

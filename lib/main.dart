@@ -3,9 +3,9 @@ import 'package:Simba/screens/setting_screen/notification_service.dart';
 import 'package:Simba/screens/setting_screen/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'screens/login/login_splash_page.dart';
-import 'screens/login/login_page.dart';
-import 'screens/login/forgot_password_page.dart';
+import 'screens/login/screen/login_splash_page.dart';
+import 'screens/login/screen/login_page.dart';
+// import 'screens/login/screen/forgot_password_page.dart';
 import 'screens/welcome_page/welcome_page.dart';
 
 void main() async {
@@ -96,7 +96,7 @@ class SimbaApp extends StatelessWidget {
       home: LoginSplashPage(),
       routes: {
         '/login': (context) => LoginPage(),
-        '/forgot-password': (context) => ForgotPasswordPage(),
+        // '/forgot-password': (context) => ForgotPasswordPage(),
         '/welcome': (context) => WelcomePage(),
         '/scan-assets': (context) => ScanAssetPage(),
         '/settings': (context) => SettingsPage(),

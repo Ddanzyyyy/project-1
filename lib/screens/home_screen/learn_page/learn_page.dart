@@ -160,7 +160,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
-            fontSize: 20,
+            fontSize: 16,
             fontFamily: 'Maison Bold',
           ),
         ),
@@ -218,7 +218,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
             'Total: ${_sections.length} topik',
             style: TextStyle(
               color: primaryColor.withOpacity(0.7),
-              fontSize: 14,
+              fontSize: 12,
               fontFamily: 'Maison Book',
             ),
           ),
@@ -265,7 +265,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
                       section.title,
                       style: TextStyle(
                         fontFamily: 'Maison Bold',
-                        fontSize: 16,
+                        fontSize: 14,
                         color: primaryColor,
                         fontWeight: FontWeight.w600,
                       ),
@@ -275,7 +275,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
                       section.subtitle,
                       style: TextStyle(
                         fontFamily: 'Maison Book',
-                        fontSize: 13,
+                        fontSize: 12,
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
                       ),
@@ -336,7 +336,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
                             section.title,
                             style: TextStyle(
                               fontFamily: 'Maison Bold',
-                              fontSize: 18,
+                              fontSize: 15,
                               color: primaryColor,
                               fontWeight: FontWeight.w700,
                             ),
@@ -346,7 +346,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
                             section.subtitle,
                             style: TextStyle(
                               fontFamily: 'Maison Book',
-                              fontSize: 14,
+                              fontSize: 12,
                               color: Colors.grey[700],
                               fontWeight: FontWeight.w500,
                             ),
@@ -361,7 +361,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
                   section.description,
                   style: TextStyle(
                     fontFamily: 'Maison Book',
-                    fontSize: 14,
+                    fontSize: 12,
                     color: Colors.grey[700],
                   ),
                 ),
@@ -371,7 +371,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
                   style: TextStyle(
                     fontFamily: 'Maison Bold',
                     color: primaryColor,
-                    fontSize: 15,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -408,7 +408,7 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
                 style: TextStyle(
                   fontFamily: 'Maison Bold',
                   color: primaryColor,
-                  fontSize: 11,
+                  fontSize: 12,
                 ),
               ),
             ),

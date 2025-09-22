@@ -30,6 +30,8 @@ dependencies:
   flutter_image_compress: ^2.4.0
   path_provider: ^2.1.5
   lottie: ^3.2.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.4
   # qr_code_scanner: ^1.0.1
   # mime: ^1.0.4
   # intl: ^0.18.0
@@ -41,6 +43,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+flutter_icons:
+    image_path: "assets/images/icons/image.png"
+    android: true
+    ios: true
 
 flutter:
   uses-material-design: true
@@ -77,10 +83,7 @@ flutter:
     - assets/images/icons/gif/iventory.gif
     - assets/images/iventra.png
     - assets/images/icons/welcome_page/learn.png
-
-
-
-    
+    # - E:\Flutter Project\simba_indocement\simba\android\app\src\main\res\mipmap-hdpi\image.png
     # - assets/lottie/Inventory.lottie
     # - assets/lottie/Logistic.lottie
     # - assets/lottie/Trader.lottie
@@ -107,3 +110,14 @@ flutter:
     - family: Maison Book
       fonts:
         - asset: assets/fonts/fonnts.com-Maison_Neue_Book.ttf
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: "assets/images/icons/image.png"
+  android: true
+  ios: true
+  web: false
+  # android_gravity: center
+  # ios_content_mode: scaleAspectFill
+  # android_disable_fullscreen: true
+  # fill: true

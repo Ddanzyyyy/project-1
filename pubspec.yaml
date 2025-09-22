@@ -44,7 +44,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
 flutter_icons:
-    image_path: "assets/images/icons/image.png"
+    image_path: "assets/images/SIMAP_LOGO_SPLASH.png"
     android: true
     ios: true
 
@@ -80,8 +80,8 @@ flutter:
     - assets/images/icons/lost_page/warning.png
     - assets/images/icons/welcome_page/analytic.png
     - assets/images/icons/welcome_page/box_icon.png
-    - assets/images/icons/gif/iventory.gif
-    - assets/images/iventra.png
+    - assets/images/icons/gif/SIMAP_LOGO.gif
+    - assets/images/SIMAP.png
     - assets/images/icons/welcome_page/learn.png
     # - E:\Flutter Project\simba_indocement\simba\android\app\src\main\res\mipmap-hdpi\image.png
     # - assets/lottie/Inventory.lottie
@@ -113,11 +113,7 @@ flutter:
 
 flutter_native_splash:
   color: "#ffffff"
-  image: "assets/images/icons/image.png"
+  image: "assets/images/SIMAP_LOGO_SPLASH.png"
   android: true
   ios: true
   web: false
-  # android_gravity: center
-  # ios_content_mode: scaleAspectFill
-  # android_disable_fullscreen: true
-  # fill: true

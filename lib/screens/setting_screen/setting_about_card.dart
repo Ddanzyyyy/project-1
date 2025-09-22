@@ -44,7 +44,7 @@ class SettingsAboutCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              'IvenTra Indocement v0.0.1',
+              'SIMAP Indocement v0.0.1',
               style: TextStyle(
                 fontFamily: 'Maison Book',
                 fontSize: 11,
@@ -239,7 +239,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            "Syarat dan Ketentuan IvenTra Indocement - Sistem Manajemen Barang",
+            "Syarat dan Ketentuan SIMAP Indocement - Sistem Manajemen Asset",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 15,
@@ -258,7 +258,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Dengan menggunakan IvenTra Indocement, Anda setuju untuk mematuhi seluruh syarat dan ketentuan yang berlaku. Aplikasi ini dirancang khusus untuk kebutuhan manajemen barang dan aset di lingkungan PT Indocement Tunggal Prakarsa Tbk.",
+            "Dengan menggunakan SIMAP Indocement, Anda setuju untuk mematuhi seluruh syarat dan ketentuan yang berlaku. Aplikasi ini dirancang khusus untuk kebutuhan manajemen Asset dan aset di lingkungan PT Indocement Tunggal Prakarsa Tbk.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -277,7 +277,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 16),
           Text(
-            "3. Pengelolaan Data Barang dan Aset",
+            "3. Pengelolaan Data Asset dan Aset",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 13,
@@ -286,7 +286,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Data yang dimasukkan ke dalam IvenTra Indocement sepenuhnya merupakan tanggung jawab pengguna. Setiap informasi barang, aset, lokasi, dan status harus akurat dan sesuai dengan kondisi sebenarnya di lapangan.",
+            "Data yang dimasukkan ke dalam SIMAP Indocement sepenuhnya merupakan tanggung jawab pengguna. Setiap informasi Asset, aset, lokasi, dan status harus akurat dan sesuai dengan kondisi sebenarnya di lapangan.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -300,7 +300,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "IvenTra Indocement berkomitmen menjaga keamanan data pengguna dan aset perusahaan. Data akan diakses dan diproses sesuai kebijakan internal Indocement terkait privasi dan perlindungan data.",
+            "SIMAP Indocement berkomitmen menjaga keamanan data pengguna dan aset perusahaan. Data akan diakses dan diproses sesuai kebijakan internal Indocement terkait privasi dan perlindungan data.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -328,7 +328,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Fitur scan dan QR code dalam aplikasi hanya boleh digunakan untuk keperluan inventarisasi dan pemeliharaan barang di lingkungan Indocement. Penggunaan di luar keperluan resmi dilarang.",
+            "Fitur scan dan QR code dalam aplikasi hanya boleh digunakan untuk keperluan inventarisasi dan pemeliharaan Asset di lingkungan Indocement. Penggunaan di luar keperluan resmi dilarang.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),
@@ -372,7 +372,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            "Kebijakan Privasi IvenTra Indocement",
+            "Kebijakan Privasi SIMAP Indocement",
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 15,
@@ -400,7 +400,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           ),
           SizedBox(height: 8),
           Text(
-            "Data digunakan untuk mendukung operasional manajemen barang, pelaporan, analisis, dan peningkatan proses inventarisasi di Indocement.",
+            "Data digunakan untuk mendukung operasional manajemen Asset, pelaporan, analisis, dan peningkatan proses inventarisasi di Indocement.",
             style: TextStyle(fontSize: 12),
           ),
           SizedBox(height: 16),

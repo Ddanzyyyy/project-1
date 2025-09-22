@@ -221,7 +221,7 @@ class _WelcomePageState extends State<WelcomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Image.asset(
-                            'assets/images/iventra.png',
+                            'assets/images/SIMAP.png',
                             width: 120,
                             height: 40,
                             fit: BoxFit.contain,
@@ -591,7 +591,7 @@ class _WelcomePageState extends State<WelcomePage> {
           title: 'How To Use This App',
           image: Image.asset('assets/images/icons/welcome_page/learn.png', width: 28, height: 28),
           count: '∞',
-          description: 'Learn how to use IvenTra',
+          description: 'Learn how to use SIMAP',
           color: const Color.fromARGB(255, 100, 246, 92),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LearnPage())),
         ),

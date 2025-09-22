@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String getBaseUrl() {
     if (Platform.isAndroid) {
-      return 'http://192.168.8.129:8000/api/login';
+      return 'http://192.168.1.4:8000/api/login';
     } else {
       return 'http://127.0.0.1:8000/api/login';
     }
@@ -180,18 +180,18 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     // Illustration
                     SizedBox(
-                      width: 200,
-                      height: 190,
+                      width: 250,
+                      height: 180,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 37), 
+                        padding: EdgeInsets.only(top: 40), 
                         child: Image.asset(
-                          'assets/images/icons/gif/iventory.gif',
+                          'assets/images/icons/gif/SIMAP_LOGO.gif',
                           fit: BoxFit.contain,
                         ),
                       ),  
                     ),
-                    SizedBox(height: screenHeight * 0.04),
-                    // Custom "IvenTra" text
+                    SizedBox(height: 18),
+                    // Custom "SIMAP" text
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
@@ -223,19 +223,19 @@ class _LoginPageState extends State<LoginPage> {
                         // ],
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.025),
+                    SizedBox(height: 9),
                     // Subtitle
                     Text(
                       'Goods and Asset Logistic Management Information System',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: blueDark,
-                        fontSize: screenWidth * 0.048,
+                        fontSize: screenWidth * 0.041,
                         fontFamily: 'Maison Book',
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.038),
+                    SizedBox(height: 12),
                     // Username
                     Align(
                       alignment: Alignment.centerLeft,
@@ -249,14 +249,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     SizedBox(
                       width: inputWidth,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: 47,
+                            height: 45,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(15),
@@ -287,14 +287,14 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.only(
-                                    top: 11, bottom: 11),
+                                    top: 10, bottom: 10),
                               ),
                             ),
                           ),
                           if (usernameWarning.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(
-                                  top: 4, left: 4, right: 4),
+                                  top: 3, left: 4, right: 4),
                               child: Text(
                                 usernameWarning,
                                 style: const TextStyle(
@@ -308,7 +308,7 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     // Password
                     Align(
                       alignment: Alignment.centerLeft,
@@ -322,14 +322,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     SizedBox(
                       width: inputWidth,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: 47,
+                            height: 45,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(15),
@@ -361,14 +361,14 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: const EdgeInsets.only(
-                                    top: 11, bottom: 11),
+                                    top: 10, bottom: 10),
                               ),
                             ),
                           ),
                           if (passwordWarning.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(
-                                  top: 4, left: 4, right: 4),
+                                  top: 3, left: 4, right: 4),
                               child: Text(
                                 passwordWarning,
                                 style: const TextStyle(
@@ -382,11 +382,11 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     if (apiWarning.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(
-                            top: 4, left: 4, right: 4),
+                            top: 2, left: 4, right: 4),
                         child: Text(
                           apiWarning,
                           style: const TextStyle(
@@ -397,10 +397,10 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 19),
                     SizedBox(
                       width: buttonWidth,
-                      height: 48,
+                      height: 44,
                       child: ElevatedButton(
                         onPressed:
                             isLoading ? null : () => handleLogin(context),
@@ -431,7 +431,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.025),
+                    SizedBox(height: 12),
                     Text(
                       'The data you submit will be processed in accordance with our Privacy Policy. By continuing you agree to Terms.',
                       textAlign: TextAlign.center,

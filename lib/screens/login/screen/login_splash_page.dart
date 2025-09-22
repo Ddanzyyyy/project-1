@@ -95,12 +95,12 @@ class _LoginSplashPageState extends State<LoginSplashPage> {
                           width: 200,
                           height: 160,
                           child: Image.asset(
-                            'assets/images/icons/gif/iventory.gif',
+                            'assets/images/icons/gif/SIMAP_LOGO.gif',
                             fit: BoxFit.contain,
                           ),
                         ),
                         SizedBox(height: screenHeight * 0.04),
-                        // Custom "IvenTra" text
+                        // Custom "SIMAP" text
                         RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(

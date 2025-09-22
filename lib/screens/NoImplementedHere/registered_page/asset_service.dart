@@ -4,7 +4,7 @@ import 'package:Simba/screens/setting_screen/notification_service.dart';
 import 'package:http/http.dart' as http;
 import 'asset_model.dart';
 
-const String apiUrl = "http://192.168.8.129:8000/api/assets";
+const String apiUrl = "http://192.168.1.4:8000/api/assets";
 
 class AssetService {
   static Future<List<Asset>> getAssets({String? search, String? category}) async {

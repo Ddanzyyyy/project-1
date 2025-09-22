@@ -2,7 +2,7 @@ import 'package:Simba/screens/setting_screen/setting_about_card.dart';
 import 'package:Simba/screens/setting_screen/setting_acount_card.dart';
 import 'package:Simba/screens/setting_screen/setting_header.dart';
 import 'package:Simba/screens/setting_screen/setting_section.dart';
-import 'package:Simba/screens/setting_screen/setting_notification.dart';
+// import 'package:Simba/screens/setting_screen/setting_notification.dart';
 import 'package:Simba/screens/activity_screen/screen/activity_page.dart';
 import 'package:Simba/screens/home_screen/profile/edit_profile_page.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/scan_asset_page.dart';
@@ -80,8 +80,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _notificationsEnabled = true;
-  bool _pushNotifications = true;
+  // bool _notificationsEnabled = true;
+  // bool _pushNotifications = true;
 
   String _userName = '';
   String _userUsername = '';
@@ -177,24 +177,24 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SettingsSectionHeader(title: 'Notifications'),
-                  const SizedBox(height: 12),
-                  SettingsNotificationCard(
-                    notificationsEnabled: _notificationsEnabled,
-                    pushNotifications: _pushNotifications,
-                    onNotificationsChanged: (val) {
-                      setState(() {
-                        _notificationsEnabled = val;
-                        if (!val) _pushNotifications = false;
-                      });
-                    },
-                    onPushChanged: (val) {
-                      setState(() {
-                        _pushNotifications = val;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 28),
+                  // SettingsSectionHeader(title: 'Notifications'),
+                  // const SizedBox(height: 12),
+                  // SettingsNotificationCard(
+                  //   notificationsEnabled: _notificationsEnabled,
+                  //   pushNotifications: _pushNotifications,
+                  //   onNotificationsChanged: (val) {
+                  //     setState(() {
+                  //       _notificationsEnabled = val;
+                  //       if (!val) _pushNotifications = false;
+                  //     });
+                  //   },
+                  //   onPushChanged: (val) {
+                  //     setState(() {
+                  //       _pushNotifications = val;
+                  //     });
+                  //   },
+                  // ),
+                  // const SizedBox(height: 7),
                   SettingsSectionHeader(title: 'Account'),
                   const SizedBox(height: 12),
                   SettingsAccountCard(

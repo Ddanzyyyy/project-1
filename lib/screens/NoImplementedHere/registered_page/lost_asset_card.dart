@@ -18,7 +18,7 @@ class LostAssetCard extends StatelessWidget {
             asset['image_path'].toString().isNotEmpty)
         ? (asset['image_path'].toString().startsWith('http')
             ? asset['image_path']
-            : 'http://192.168.1.4:8000/storage/' + asset['image_path'])
+            : 'http://192.168.8.144:8000/storage/' + asset['image_path'])
         : '';
 
     return GestureDetector(

@@ -8,7 +8,6 @@ import 'package:Simba/screens/home_screen/logistic_asset/model/logistic_asset_mo
 import 'package:Simba/screens/scan_assets/scan_asset_page/service/recent_asset_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Definisikan primaryColor
 const primaryColor = Color(0xFF405189);
 
 class LogisticAssetScanMenuPage extends StatefulWidget {

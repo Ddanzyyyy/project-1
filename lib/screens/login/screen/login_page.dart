@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String getBaseUrl() {
     if (Platform.isAndroid) {
-      return 'http://192.168.1.4:8000/api/login';
+      return 'http://192.168.8.144:8000/api/login';
     } else {
       return 'http://127.0.0.1:8000/api/login';
     }

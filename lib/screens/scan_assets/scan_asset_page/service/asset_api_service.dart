@@ -4,7 +4,7 @@ import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/mod
 import 'package:http/http.dart' as http;
 
 class AssetApiService {
-  static const String baseUrl = 'http://192.168.1.4:8000/api';
+  static const String baseUrl = 'http://192.168.8.144:8000/api';
 
   static Map<String, String> get headers => {
         'Content-Type': 'application/json',
@@ -31,72 +31,70 @@ class AssetApiService {
           if (dataList is List && dataList.isNotEmpty) {
             final assetData = dataList[0];
             print(
-                '✅ LogisticAsset found: ${assetData['title']} (Asset No: ${assetData['asset_no']})');
+                'LogisticAsset found: ${assetData['title']} (Asset No: ${assetData['asset_no']})');
             return Asset.fromJson(assetData);
           } else {
-            print('❌ Asset "data" list kosong!');
+            print('Asset "data" list kosong!');
             return null;
           }
         } else {
           print(
-              '⚠️ Unexpected response format (no data): ${rawData.runtimeType}');
+              'Unexpected response format (no data): ${rawData.runtimeType}');
           return null;
         }
       } else if (response.statusCode == 404) {
-        print('❌ Asset not found in logistic_assets');
+        print('Asset not found in logistic_assets');
         return null;
       } else {
-        print('⚠️ API Error: ${response.statusCode}');
+        print('API Error: ${response.statusCode}');
         throw Exception('Error scanning QR: ${response.statusCode}');
       }
     } catch (e) {
-      print('💥 Exception in getAssetByQr: $e');
+      print('Exception in getAssetByQr: $e');
       throw Exception('Error scanning QR: $e');
     }
   }
 
   static Future<Asset?> getAssetByAssetCode(String assetCode) async {
     try {
-      print('🔍 Searching for logistic asset with Asset Code: $assetCode');
+      print('Searching for logistic asset with Asset Code: $assetCode');
 
-      // Prioritaskan endpoint logistic-assets
       final urls = [
         '$baseUrl/logistic-assets/qr?qr_code=$assetCode',
         '$baseUrl/logistic-assets?search=$assetCode',
       ];
 
       for (String url in urls) {
-        print('📡 Trying URL: $url');
+        print('Trying URL: $url');
 
         final response = await http.get(Uri.parse(url), headers: headers);
 
-        print('📊 Response Status: ${response.statusCode}');
-        print('📄 Response Body: ${response.body}');
+        print('Response Status: ${response.statusCode}');
+        print('Response Body: ${response.body}');
 
         if (response.statusCode == 200) {
           final dynamic rawData = json.decode(response.body);
 
-          // Jika backend mengembalikan { data: [...] }
           if (rawData is Map<String, dynamic> && rawData.containsKey('data')) {
             final dataList = rawData['data'];
             if (dataList is List && dataList.isNotEmpty) {
               final assetData = dataList[0];
-              print('✅ LogisticAsset found in array: ${assetData['title']}');
+              print('LogisticAsset found in array: ${assetData['title']}');
               return Asset.fromJson(assetData);
             }
           }
           else if (rawData is Map<String, dynamic> &&
               rawData.containsKey('title')) {
-            print('✅ LogisticAsset found (single): ${rawData['title']}');
+            print('LogisticAsset found (single): ${rawData['title']}');
             return Asset.fromJson(rawData);
           }
         }
       }
 
-      print('❌ LogisticAsset not found in any endpoint');
+      print('LogisticAsset not found in any endpoint');
       return null;
     } catch (e) {
-      print('💥 Exception in getAssetByAssetCode: $e');
+      print('Exception in getAssetByAssetCode: $e');
       throw Exception('Error searching asset: $e');
     }
   }
@@ -121,7 +119,7 @@ class AssetApiService {
                 .join('&');
       }
 
-      print('📡 Loading assets from: $url');
+      print('Loading assets from: $url');
       final response = await http.get(Uri.parse(url), headers: headers);
 
       if (response.statusCode == 200) {
@@ -141,11 +139,10 @@ class AssetApiService {
               }
             }
             print(
-                '✅ Loaded ${assets.length} assets (from logistic_assets.data)');
+                'Loaded ${assets.length} assets (from logistic_assets.data)');
             return assets;
           }
         }
-        // Jika API mengembalikan langsung List (jarang, fallback)
         else if (rawData is List) {
           List<Asset> assets = [];
           for (dynamic item in rawData) {
@@ -171,15 +168,15 @@ class AssetApiService {
 
   static Future<Asset> addAsset(Asset asset) async {
     try {
-      print('📝 Adding asset to logistic_assets: ${asset.name}');
+      print('Adding asset to logistic_assets: ${asset.name}');
       final response = await http.post(
         Uri.parse('$baseUrl/logistic-assets'),
         headers: headers,
         body: json.encode(asset.toJson()),
       );
 
-      print('📊 Add Asset Response Status: ${response.statusCode}');
-      print('📄 Add Asset Response Body: ${response.body}');
+      print('Add Asset Response Status: ${response.statusCode}');
+      print('Add Asset Response Body: ${response.body}');
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
@@ -204,22 +201,22 @@ class AssetApiService {
         throw Exception('Failed to add asset: $errorMessage');
       }
     } catch (e) {
-      print('💥 Exception in addAsset: $e');
+      print('Exception in addAsset: $e');
       throw Exception('Error adding asset: $e');
     }
   }
 
   static Future<Asset> updateAsset(String assetNo, Asset asset) async {
     try {
-      print('📝 Updating logistic asset Asset No: $assetNo');
+      print('Updating logistic asset Asset No: $assetNo');
       final response = await http.put(
         Uri.parse('$baseUrl/logistic-assets/$assetNo'),
         headers: headers,
         body: json.encode(asset.toJson()),
       );
 
-      print('📊 Update Asset Response Status: ${response.statusCode}');
-      print('📄 Update Asset Response Body: ${response.body}');
+      print('Update Asset Response Status: ${response.statusCode}');
+      print('Update Asset Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
@@ -244,20 +241,20 @@ class AssetApiService {
         throw Exception('Failed to update asset: $errorMessage');
       }
     } catch (e) {
-      print('💥 Exception in updateAsset: $e');
+      print('Exception in updateAsset: $e');
       throw Exception('Error updating asset: $e');
     }
   }
 
   static Future<void> deleteAsset(String assetNo) async {
     try {
-      print('🗑️ Deleting logistic asset Asset No: $assetNo');
+      print('Deleting logistic asset Asset No: $assetNo');
       final response = await http.delete(
         Uri.parse('$baseUrl/logistic-assets/$assetNo'),
         headers: headers,
       );
 
-      print('📊 Delete Asset Response Status: ${response.statusCode}');
+      print('Delete Asset Response Status: ${response.statusCode}');
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         final dynamic errorData = json.decode(response.body);
@@ -278,11 +275,11 @@ class AssetApiService {
   static Future<List<AssetPhoto>> getAssetPhotos(String assetId) async {
     try {
       final url = '$baseUrl/logistic-assets/$assetId/photos';
-      print('📡 Loading asset photos from: $url');
+      print('Loading asset photos from: $url');
       final response = await http.get(Uri.parse(url), headers: headers);
 
-      print('📊 Response Status: ${response.statusCode}');
-      print('📄 Response Body: ${response.body}');
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final dynamic rawData = json.decode(response.body);
@@ -300,7 +297,7 @@ class AssetApiService {
                 photos.add(AssetPhoto.fromJson(data));
               }
             }
-            print('✅ Loaded ${photos.length} asset photos');
+            print('Loaded ${photos.length} asset photos');
             return photos;
           }
         } else if (rawData is List) {
@@ -313,7 +310,7 @@ class AssetApiService {
               photos.add(AssetPhoto.fromJson(data));
             }
           }
-          print('✅ Loaded ${photos.length} asset photos');
+          print('Loaded ${photos.length} asset photos');
           return photos;
         }
         throw Exception(

@@ -2,23 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 const Color primaryColor = Color(0xFF405189);
+
 class LearnPage extends StatefulWidget {
   @override
   _LearnPageState createState() => _LearnPageState();
 }
 
-class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _slideAnimation;
-  PageController _pageController = PageController();
-  final Color primaryColor = Color(0xFF405189);
+class _LearnPageState extends State<LearnPage> {
+  final PageController _pageController = PageController();
 
   final List<LearnSection> _sections = [
     LearnSection(
-      title: "Welcome to IvenTra",
+      title: "Welcome to SIMAP",
       subtitle: "Your Complete Asset Management Solution",
       description:
-          "IvenTra helps you manage, track, and monitor your assets efficiently with powerful features designed for modern businesses.",
+          "SIMAP helps you manage, track, and monitor your assets efficiently with powerful features designed for modern businesses.",
       icon: Icons.inventory_2_outlined,
       steps: [
         "Sistem pelacakan aset modern",
@@ -27,19 +25,6 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
         "Mobilitas & akses di mana saja"
       ],
     ),
-    // LearnSection(
-    //   title: "Getting Started",
-    //   subtitle: "Set Up Your Profile",
-    //   description:
-    //       "Begin your journey by setting up your user profile and understanding the main dashboard.",
-    //   icon: Icons.person_add_outlined,
-    //   steps: [
-    //     "Tap your profile card on the home screen",
-    //     "Enter your name and username",
-    //     "Save your profile information",
-    //     "Explore the main dashboard"
-    //   ],
-    // ),
     LearnSection(
       title: "Logistic Assets",
       subtitle: "Import & Manage Your Assets",
@@ -95,25 +80,11 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
         "Generate custom reports"
       ],
     ),
-    // LearnSection(
-    //   title: "Asset Status Management",
-    //   subtitle: "Track Asset Conditions",
-    //   description:
-    //       "Learn how to manage and update asset statuses including damaged and lost items.",
-    //   icon: Icons.assignment_turned_in_outlined,
-    //   steps: [
-    //     "Check 'Unscanned Assets' for pending items",
-    //     "Review 'Damaged Assets' section",
-    //     "Monitor 'Lost Assets' inventory",
-    //     "Update asset status as needed",
-    //     "Generate status reports"
-    //   ],
-    // ),
     LearnSection(
       title: "Best Practices",
       subtitle: "Tips for Effective Asset Management",
       description:
-          "Follow these best practices to get the most out of your IvenTra experience.",
+          "Follow these best practices to get the most out of your SIMAP experience.",
       icon: Icons.lightbulb_outlined,
       steps: [
         "Regularly scan and update asset status",
@@ -126,26 +97,23 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: Duration(milliseconds: 800),
-      vsync: this,
-    );
-    _slideAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOut,
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: primaryColor,
+      statusBarIconBrightness: Brightness.light, 
+      statusBarBrightness: Brightness.dark, 
     ));
-    _animationController.forward();
   }
 
   @override
-  void dispose() {
-    _animationController.dispose();
-    _pageController.dispose();
-    super.dispose();
-  }
+void dispose() {
+  _pageController.dispose();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: primaryColor,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+  ));
+  super.dispose();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +136,11 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
           icon: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: primaryColor,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Container(
@@ -177,32 +149,21 @@ class _LearnPageState extends State<LearnPage> with TickerProviderStateMixin {
           ),
         ),
       ),
-      body: AnimatedBuilder(
-        animation: _slideAnimation,
-        builder: (context, child) {
-          return Transform.translate(
-            offset: Offset(0, 20 * (1 - _slideAnimation.value)),
-            child: Opacity(
-              opacity: _slideAnimation.value,
-              child: Column(
-                children: [
-                  _buildProgressIndicator(),
-                  Expanded(
-                    child: ListView.separated(
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      itemCount: _sections.length,
-                      separatorBuilder: (_, __) => SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        final section = _sections[index];
-                        return _buildListItem(section, index);
-                      },
-                    ),
-                  ),
-                ],
-              ),
+      body: Column(
+        children: [
+          _buildProgressIndicator(),
+          Expanded(
+            child: ListView.separated(
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+              itemCount: _sections.length,
+              separatorBuilder: (_, __) => SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final section = _sections[index];
+                return _buildListItem(section, index);
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

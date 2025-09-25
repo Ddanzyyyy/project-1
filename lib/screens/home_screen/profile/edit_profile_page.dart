@@ -124,7 +124,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     try {
       print('🔄 Loading profile from API for user ID: $_userId');
       final response = await http.get(
-        Uri.parse('http://192.168.8.144:8000/api/users/$_userId'),
+        Uri.parse('http://192.168.1.4:8000/api/users/$_userId'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

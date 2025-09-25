@@ -5,7 +5,7 @@ import 'dart:io';
 import '../model/logistic_asset_model.dart';
 import '../service/logistic_asset_service.dart';
 import 'logistic_asset_detail_page.dart';
-import '../../analytic_logistic/screen/logistic_asset_analytics_page.dart'; 
+import '../../analytic_logistic/screen/logistic_asset_analytics_page.dart';
 
 class LogisticAssetPage extends StatefulWidget {
   @override
@@ -70,16 +70,15 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
 
       if (result != null && result.files.single.path != null) {
         setState(() => isImporting = true);
-        
+
         final file = File(result.files.single.path!);
         final importResult = await LogisticAssetService.importExcel(file);
-        
+
         setState(() => isImporting = false);
-        
+
         _showSuccessSnackBar(
-          'Import successful: ${importResult['imported']} assets imported, ${importResult['failed']} failed'
-        );
-        
+            'Import successful: ${importResult['imported']} assets imported, ${importResult['failed']} failed');
+
         await _loadAssets();
       }
     } catch (e) {
@@ -133,113 +132,68 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
     if (assets.isEmpty) return SizedBox.shrink();
 
     final totalAssets = assets.length;
-    final totalQuantity = assets.fold(0, (sum, asset) => sum + asset.quantity);
-    final totalAvailable = assets.fold(0, (sum, asset) => sum + asset.available);
+    final totalAvailable =
+        assets.fold(0, (sum, asset) => sum + asset.available);
     final totalBroken = assets.fold(0, (sum, asset) => sum + asset.broken);
     final totalLost = assets.fold(0, (sum, asset) => sum + asset.lost);
 
     return Container(
       margin: EdgeInsets.all(16),
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: Offset(0, 2),
+            color: Colors.grey.withOpacity(0.08),
+            blurRadius: 16,
+            offset: Offset(0, 8),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              SizedBox(width: 8),
               Text(
                 'Quick Overview',
                 style: TextStyle(
                   fontFamily: 'Maison Bold',
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF405189),
                 ),
               ),
-              // InkWell(
-              //   // onTap: () {
-              //   //   Navigator.push(
-              //   //     context,
-              //   //     MaterialPageRoute(
-              //   //       builder: (_) => LogisticAssetAnalyticsPage(),
-              //   //     ),
-              //   //   );
-              //   // },
-              //   // child: Container(
-              //   //   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              //   //   decoration: BoxDecoration(
-              //   //     color: Color(0xFF405189).withOpacity(0.1),
-              //   //     borderRadius: BorderRadius.circular(20),
-              //   //   ),
-              //   //   child: Row(
-              //   //     mainAxisSize: MainAxisSize.min
-              //   //   ),
-              //   // ),
-              // ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 18),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                child: _buildAnalyticsCard(
-                  'Total Assets',
-                  '$totalAssets',
-                  Icons.inventory,
-                  Color(0xFF405189),
-                ),
+              _buildSimpleAnalyticsCard(
+                value: '$totalAssets',
+                label: 'Total',
+                iconImage: 'assets/images/icons/welcome_page/box_icon.png',
+                color: Color(0xFF405189),
               ),
-              SizedBox(width: 12),
-              Expanded(
-                child: _buildAnalyticsCard(
-                  'Total Qty',
-                  '$totalQuantity',
-                  Icons.category,
-                  Colors.blue,
-                ),
+              _buildSimpleAnalyticsCard(
+                value: '$totalAvailable',
+                label: 'Available',
+                iconImage: 'assets/images/icons/activity_page/status.png',
+                color: Colors.green,
               ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildAnalyticsCard(
-                  'Available',
-                  '$totalAvailable',
-                  Icons.check_circle,
-                  Colors.green,
-                ),
+              _buildSimpleAnalyticsCard(
+                value: '$totalBroken',
+                label: 'Broken',
+                iconImage: 'assets/images/icons/activity_page/alert.png',
+                color: Colors.orange,
               ),
-              SizedBox(width: 8),
-              Expanded(
-                child: _buildAnalyticsCard(
-                  'Broken',
-                  '$totalBroken',
-                  Icons.error,
-                  Colors.orange,
-                ),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: _buildAnalyticsCard(
-                  'Lost',
-                  '$totalLost',
-                  Icons.warning,
-                  Colors.red,
-                ),
+              _buildSimpleAnalyticsCard(
+                value: '$totalLost',
+                label: 'Lost',
+                iconImage: 'assets/images/icons/activity_page/damage.png',
+                color: Colors.red,
               ),
             ],
           ),
@@ -248,35 +202,45 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
     );
   }
 
-  Widget _buildAnalyticsCard(String title, String value, IconData icon, Color color) {
+  Widget _buildSimpleAnalyticsCard({
+    required String value,
+    required String label,
+    IconData? icon,
+    String? iconImage,
+    required Color color,
+  }) {
     return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
+      width: 70,
       child: Column(
         children: [
-          Icon(icon, size: 20, color: color),
-          SizedBox(height: 4),
+          Container(
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            padding: EdgeInsets.all(10),
+            child: iconImage != null 
+                ? Image.asset(iconImage, width: 22, height: 22)
+                : Icon(icon, color: color, size: 22),
+          ),
+          SizedBox(height: 8),
           Text(
             value,
             style: TextStyle(
               fontFamily: 'Maison Bold',
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
+          SizedBox(height: 2),
           Text(
-            title,
+            label,
             style: TextStyle(
               fontFamily: 'Maison Book',
-              fontSize: 10,
+              fontSize: 11,
               color: Colors.grey[600],
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -304,27 +268,6 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          // Tombol Analytics di AppBar
-          // IconButton(
-          //   icon: Icon(Icons.analytics, color: Colors.white),
-          //   tooltip: 'Analytics',
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (_) => LogisticAssetAnalyticsPage()),
-          //     );
-          //   },
-          // ),
-          // IconButton(
-          //   icon: Icon(Icons.qr_code_scanner, color: Colors.white),
-          //   tooltip: 'Scan Asset',
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (_) => LogisticAssetScanPage()),
-          //     );
-          //   },
-          // ),
           PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, color: Colors.white),
             onSelected: (value) {
@@ -333,29 +276,20 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
               } else if (value == 'analytics') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => LogisticAssetAnalyticsPage()),
+                  MaterialPageRoute(
+                      builder: (_) => LogisticAssetAnalyticsPage()),
                 );
               }
             },
             itemBuilder: (context) => [
-              // PopupMenuItem(
-              //   // backgroundColor: Colors.white,
-              //   value: 'analytics',
-              //   child: Row(
-              //     children: [
-              //       Icon(Icons.analytics, color: Color(0xFF405189), size: 20),
-              //       SizedBox(width: 8),
-              //       Text('View Analytics', style: TextStyle(fontFamily: 'Maison Bold')),
-              //     ],
-              //   ),
-              // ),
               PopupMenuItem(
                 value: 'import',
                 child: Row(
                   children: [
                     Icon(Icons.file_upload, color: Color(0xFF405189), size: 20),
                     SizedBox(width: 8),
-                    Text('Import Excel', style: TextStyle(fontFamily: 'Maison Bold')),
+                    Text('Import Excel',
+                        style: TextStyle(fontFamily: 'Maison Bold')),
                   ],
                 ),
               ),
@@ -387,10 +321,13 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                       style: TextStyle(fontSize: 14, fontFamily: 'Maison Book'),
                       decoration: InputDecoration(
                         hintText: 'Search by Asset No or Title...',
-                        hintStyle: TextStyle(fontSize: 13, color: Colors.grey[500]),
-                        prefixIcon: Icon(Icons.search, color: Color(0xFF405189), size: 20),
+                        hintStyle:
+                            TextStyle(fontSize: 13, color: Colors.grey[500]),
+                        prefixIcon: Icon(Icons.search,
+                            color: Color(0xFF405189), size: 20),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       ),
                     ),
                   ),
@@ -412,9 +349,12 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                               _loadAssets();
                             },
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -422,8 +362,12 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                                 style: TextStyle(
                                   fontFamily: 'Maison Book',
                                   fontSize: 12,
-                                  color: isSelected ? Color(0xFF405189) : Colors.white,
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected
+                                      ? Color(0xFF405189)
+                                      : Colors.white,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                 ),
                               ),
                             ),
@@ -452,7 +396,8 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                             Center(
                               child: Column(
                                 children: [
-                                  Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
+                                  Icon(Icons.inventory_2_outlined,
+                                      size: 64, color: Colors.grey[400]),
                                   SizedBox(height: 16),
                                   Text(
                                     'No logistic assets found',
@@ -580,7 +525,8 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(asset.assetStatus).withOpacity(0.1),
+                        color:
+                            _getStatusColor(asset.assetStatus).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -619,7 +565,8 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                 SizedBox(height: 8),
                 Row(
                   children: [
-                    _buildStatusChip('Available', asset.available, Colors.green),
+                    _buildStatusChip(
+                        'Available', asset.available, Colors.green),
                     SizedBox(width: 8),
                     _buildStatusChip('Broken', asset.broken, Colors.orange),
                     SizedBox(width: 8),

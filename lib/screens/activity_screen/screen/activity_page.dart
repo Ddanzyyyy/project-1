@@ -90,7 +90,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   void initState() {
     super.initState();
-    activityService = ActivityService(baseUrl: 'http://192.168.8.144:8000');
+    activityService = ActivityService(baseUrl: 'http://192.168.1.4:8000');
     _loadUserData();
   }
 
@@ -314,14 +314,6 @@ class _ActivityPageState extends State<ActivityPage> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            // ClipRRect(
-            //   child: Image.asset(
-            //     'assets/images/indocement_logo.png',
-            //     width: 40,
-            //     height: 40,
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
           ],
         ),
         centerTitle: false,
@@ -548,11 +540,7 @@ class _ActivityPageState extends State<ActivityPage> {
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Icon(
-                  _iconForType(activity.activityType),
-                  color: _colorForType(activity.activityType),
-                  size: 20,
-                ),
+                child: _iconForType(activity.activityType),
               ),
             ),
             const SizedBox(width: 12),
@@ -677,24 +665,37 @@ class _ActivityPageState extends State<ActivityPage> {
     );
   }
 
-  // Tambahkan method ini untuk mengganti yang lama
-IconData _iconForType(String type) {
+Widget _iconForType(String type) {
+  String iconPath;
   switch (type) {
     case 'scan_asset':
-      return Icons.qr_code_scanner;
+      iconPath = 'assets/images/icons/activity_page/scan.png';
+      break;
     case 'upload_photo':
-      return Icons.photo_camera;
+      iconPath = 'assets/images/icons/activity_page/image.png';
+      break;
     case 'update_status':
-      return Icons.edit;
+      iconPath = 'assets/images/icons/activity_page/status.png';
+      break;
     case 'import_assets':
-      return Icons.file_upload;
+      iconPath = 'assets/images/icons/BOX.png';
+      break;
     case 'search_asset':
-      return Icons.search;
+      iconPath = 'assets/images/icons/activity_page/searching.png';
+      break;
     case 'view_photos':
-      return Icons.photo_library;
+      iconPath = 'assets/images/icons/activity_page/view.png';
+      break;
     default:
-      return Icons.info_outline;
+      iconPath = 'assets/images/icons/activity_page/alert.png';
+      break;
   }
+  return Image.asset(
+    iconPath,
+    width: 20,
+    height: 20,
+    fit: BoxFit.contain,
+  );
 }
 
 String _titleForType(String type) {

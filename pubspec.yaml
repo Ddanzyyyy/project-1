@@ -83,6 +83,14 @@ flutter:
     - assets/images/icons/gif/SIMAP_LOGO.gif
     - assets/images/SIMAP.png
     - assets/images/icons/welcome_page/learn.png
+    - assets/images/icons/activity_page/alert.png
+    - assets/images/icons/activity_page/damage.png
+    - assets/images/icons/barcode_scan.png
+    - assets/images/icons/image.png
+    - assets/images/icons/activity_page/searching.png
+    - assets/images/icons/activity_page/scan.png
+    - assets/images/icons/activity_page/image.png
+    - assets/images/icons/activity_page/view.png
     # - E:\Flutter Project\simba_indocement\simba\android\app\src\main\res\mipmap-hdpi\image.png
     # - assets/lottie/Inventory.lottie
     # - assets/lottie/Logistic.lottie

@@ -133,8 +133,8 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
   static const Color successColor = Color(0xFF10B981);
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color errorColor = Color(0xFFEF4444);
-  static const Color infoColor = Color(0xFF3B82F6);
-  static const Color purpleColor = Color(0xFF8B5CF6);
+  // static const Color infoColor = Color(0xFF3B82F6);
+  // static const Color purpleColor = Color(0xFF8B5CF6);
 
   Widget _buildCompactSummaryCard(
       String title, String value, IconData icon, Color color,
@@ -486,12 +486,12 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                     Icons.inventory_2,
                     primaryColor,
                   ),
-                  _buildCompactSummaryCard(
-                    'Total Quantity',
-                    '$totalQuantity',
-                    Icons.category,
-                    infoColor,
-                  ),
+                  // _buildCompactSummaryCard(
+                  //   'Total Quantity',
+                  //   '$totalQuantity',
+                  //   Icons.category,
+                  //   infoColor,
+                  // ),
                   _buildCompactSummaryCard(
                     'Available',
                     '$totalAvailable',
@@ -499,13 +499,13 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                     successColor,
                     subtitle: '${availabilityRate.toStringAsFixed(1)}%',
                   ),
-                  _buildCompactSummaryCard(
-                    'In Use',
-                    '$totalInUse',
-                    Icons.work,
-                    purpleColor,
-                    subtitle: '${utilizationRate.toStringAsFixed(1)}%',
-                  ),
+                  // _buildCompactSummaryCard(
+                  //   'In Use',
+                  //   '$totalInUse',
+                  //   Icons.work,
+                  //   purpleColor,
+                  //   subtitle: '${utilizationRate.toStringAsFixed(1)}%',
+                  // ),
                   _buildCompactSummaryCard(
                     'Broken',
                     '$totalBroken',

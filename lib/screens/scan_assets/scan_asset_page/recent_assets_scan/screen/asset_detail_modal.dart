@@ -37,7 +37,7 @@ class _AssetDetailModalState extends State<AssetDetailModal> {
     setState(() { isLoading = true; });
     try {
       final recentAssetId = asset.id;
-      final url = Uri.parse('http://192.168.8.144:8000/api/recent-assets/$recentAssetId/photos-count');
+      final url = Uri.parse('http://192.168.1.4:8000/api/recent-assets/$recentAssetId/photos-count');
       final response = await http.patch(url);
 
       if (response.statusCode == 200) {

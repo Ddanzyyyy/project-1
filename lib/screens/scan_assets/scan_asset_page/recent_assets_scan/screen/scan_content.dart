@@ -3,7 +3,7 @@ import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/scr
 import 'package:flutter/material.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/recent_asset_model.dart';
 
-class ScanContent extends StatelessWidget {
+class ScanContent extends StatefulWidget {
   final TextEditingController qrController;
   final List<RecentAsset> recentAssets;
   final bool isLoading;
@@ -26,13 +26,21 @@ class ScanContent extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ScanContent> createState() => _ScanContentState();
+}
+
+class _ScanContentState extends State<ScanContent> {
+  // In-memory cache untuk foto asset
+  final Map<String, String?> photoCache = {};
+
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Scan Asset QR Code',
+            'Scan Asset',
             style: TextStyle(
               fontFamily: 'Maison Bold',
               fontSize: 18,
@@ -41,7 +49,7 @@ class ScanContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _buildScannerCard(),
+          _buildScannerCard(context),
           const SizedBox(height: 10),
           _buildManualInputSection(),
           const SizedBox(height: 20),
@@ -51,98 +59,94 @@ class ScanContent extends StatelessWidget {
     );
   }
 
-  Widget _buildScannerCard() {
-    return Container(
-      width: double.infinity,
-      height: 170,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white,
-            const Color(0xFFFFFFFF),
+  Widget _buildScannerCard(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              blurRadius: 7,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF405189), width: 2),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.grey.withOpacity(0.1),
-        //     blurRadius: 10,
-        //     offset: const Offset(0, 4),
-        //   ),
-        // ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: onOpenQRScanner,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFF405189),
-                      const Color(0xFF405189).withOpacity(0.8),
-                    ],
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: widget.onOpenQRScanner,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF405189).withOpacity(0.12),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF405189),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: const Icon(Icons.qr_code_scanner, color: Color(0xFF405189), size: 26),
                   ),
-                  borderRadius: BorderRadius.circular(35),
-                  boxShadow: [
-                    // BoxShadow(
-                    //   color: const Color(0xFF405189).withOpacity(0.3),
-                    //   blurRadius: 15,
-                    //   offset: const Offset(0, 5),
-                    // ),
-                  ],
-                ),
-                child: const Icon(Icons.qr_code_scanner, color: Colors.white, size: 30),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Tap to Open Mobile Scanner',
-                style: TextStyle(
-                  fontFamily: 'Maison Bold',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF405189),
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Smart QR detection with auto-focus',
-                style: TextStyle(
-                  fontFamily: 'Maison Book',
-                  fontSize: 11,
-                  color: const Color(0xFF757575),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'Enhanced Scanner v5.1.1',
-                  style: TextStyle(
-                    fontFamily: 'Maison Book',
-                    fontSize: 9,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          'Tap to Scan QR Code',
+                          style: TextStyle(
+                            fontFamily: 'Maison Bold',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF405189),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Smart QR detection with auto-focus',
+                          style: TextStyle(
+                            fontFamily: 'Maison Book',
+                            fontSize: 11,
+                            color: Color(0xFF757575),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.13),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.green,
+                        width: 0.7,
+                      ),
+                    ),
+                    child: const Text(
+                      'v5.1.1',
+                      style: TextStyle(
+                        fontFamily: 'Maison Book',
+                        fontSize: 9,
+                        color: Colors.green,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -174,9 +178,13 @@ class ScanContent extends StatelessWidget {
                 offset: const Offset(0, 2),
               ),
             ],
+            border: Border.all(
+              color: const Color(0xFF405189),
+              width: 1,
+            ),
           ),
           child: TextField(
-            controller: qrController,
+            controller: widget.qrController,
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.qr_code, color: Color(0xFF405189), size: 20),
               hintText: 'Enter asset code...',
@@ -187,25 +195,25 @@ class ScanContent extends StatelessWidget {
               ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(14),
-              suffixIcon: qrController.text.isNotEmpty
+              suffixIcon: widget.qrController.text.isNotEmpty
                   ? IconButton(
                       onPressed: () {
-                        qrController.clear();
-                        onQRCodeChanged('');
+                        widget.qrController.clear();
+                        widget.onQRCodeChanged('');
                       },
                       icon: const Icon(Icons.clear, color: Colors.grey, size: 18),
                     )
                   : null,
             ),
             style: const TextStyle(fontSize: 14, fontFamily: 'Maison Bold'),
-            onChanged: onQRCodeChanged,
+            onChanged: widget.onQRCodeChanged,
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: qrController.text.isNotEmpty ? onSimulateScan : null,
+            onPressed: widget.qrController.text.isNotEmpty ? widget.onSimulateScan : null,
             icon: const Icon(Icons.search, color: Colors.white, size: 18),
             label: const Text(
               'Search Asset',
@@ -217,14 +225,14 @@ class ScanContent extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: qrController.text.isNotEmpty
+              backgroundColor: widget.qrController.text.isNotEmpty
                   ? const Color(0xFF405189)
                   : Colors.grey[400],
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
-              elevation: qrController.text.isNotEmpty ? 2 : 0,
+              elevation: widget.qrController.text.isNotEmpty ? 2 : 0,
             ),
           ),
         ),
@@ -239,7 +247,7 @@ class ScanContent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Recent Assets (${recentAssets.length})',
+              'Recent Assets (${widget.recentAssets.length})',
               style: const TextStyle(
                 fontFamily: 'Maison Bold',
                 fontSize: 15,
@@ -248,9 +256,9 @@ class ScanContent extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: onViewAllAssets,
+              onPressed: widget.onViewAllAssets,
               child: Text(
-                'View All ($totalAssets)',
+                'View All (${widget.totalAssets})',
                 style: TextStyle(
                   fontFamily: 'Maison Book',
                   fontSize: 12,
@@ -263,9 +271,9 @@ class ScanContent extends StatelessWidget {
         const SizedBox(height: 10),
         SizedBox(
           height: 200,
-          child: isLoading
+          child: widget.isLoading
               ? ShimmerLoading.recentAssetsList()
-              : recentAssets.isEmpty
+              : widget.recentAssets.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -298,9 +306,12 @@ class ScanContent extends StatelessWidget {
                       ),
                     )
                   : ListView.builder(
-                      itemCount: recentAssets.length,
+                      itemCount: widget.recentAssets.length,
                       itemBuilder: (context, index) {
-                        return RecentAssetCard(asset: recentAssets[index]);
+                        return RecentAssetCard(
+                          asset: widget.recentAssets[index],
+                          photoCache: photoCache, // <-- PENTING!
+                        );
                       },
                     ),
         ),

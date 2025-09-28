@@ -596,6 +596,7 @@ class _WelcomePageState extends State<WelcomePage> {
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LearnPage())),
         ),
         const SizedBox(height: 12),
+        
         // Search Assets (goes to LogisticAssetPage with search focus)
         // AssetCardMinimalist(
         //   title: 'Search Assets',

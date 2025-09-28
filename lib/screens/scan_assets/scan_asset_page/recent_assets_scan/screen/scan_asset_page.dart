@@ -41,7 +41,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   @override
   void initState() {
     super.initState();
-    print("DEBUG: ScanAssetPage initState started");
     _loadUserSession();
     _loadAssets();
     _loadRecentScannedAssetsDb();
@@ -55,7 +54,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   }
 
   Future<void> _loadUserSession() async {
-    print("DEBUG: Loading user session...");
     try {
       final prefs = await SharedPreferences.getInstance();
       final username = prefs.getString('username') ?? 'user';
@@ -129,8 +127,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   }
 
   Future<void> _processScannedQr(String qrCode) async {
-    print("DEBUG: === Processing scanned QR: $qrCode ===");
-
     setState(() {
       _qrController.text = qrCode;
       isLoading = true;
@@ -166,13 +162,9 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       print("DEBUG: getAssetByAssetCode error: $e");
     }
 
-    // Pencarian manual di list
     final allAssets = await AssetApiService.getAssets(search: qrCode);
     for (Asset asset in allAssets) {
-      print(
-          'DEBUG: Compare assetCode=${asset.assetCode}, assetNo=${asset.assetCode}, id=${asset.id}, name=${asset.name}');
       if (asset.assetCode.toLowerCase() == qrCode.toLowerCase() ||
-          asset.assetCode.toLowerCase() == qrCode.toLowerCase() ||
           asset.id.toString() == qrCode ||
           asset.name.toLowerCase().contains(qrCode.toLowerCase())) {
         return asset;
@@ -191,7 +183,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
 
     _showAssetDetailsModal(foundAsset);
 
-    // PERUBAHAN: Update photos_count tanpa menampilkan upload dialog otomatis
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _updatePhotosCountOnly();
     });
@@ -200,10 +191,9 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
   Future<void> _updatePhotosCountOnly() async {
     await Future.delayed(Duration(milliseconds: 300));
     if (!mounted) return;
-
     await _updatePhotosCount();
-    
-    _showSuccessSnackBarSafe('Asset berhasil di-scan! Silakan upload foto jika diperlukan.');
+    _showSuccessSnackBarSafe(
+        'Asset berhasil di-scan! Silakan upload foto jika diperlukan.');
   }
 
   Future<void> _handlePhotoUpload(Asset foundAsset) async {
@@ -227,7 +217,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     await Future.delayed(Duration(milliseconds: 1000));
     if (recentScannedAssetsDb.isNotEmpty) {
       final targetRecentAsset = recentScannedAssetsDb.first;
-      final updateSuccess = await RecentAssetService.updatePhotosCount(targetRecentAsset.id);
+      final updateSuccess =
+          await RecentAssetService.updatePhotosCount(targetRecentAsset.id);
       if (updateSuccess) {
         await _loadRecentScannedAssetsDb();
       }
@@ -319,9 +310,8 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
       enableDrag: true,
       builder: (context) => AssetDetailModal(
         asset: asset,
-        showUploadPhotoButton: true, // Enable tombol upload foto
+        showUploadPhotoButton: true,
         onPhotoUploaded: () async {
-          // Callback untuk refresh photos_count setelah upload
           await _updatePhotosCount();
         },
       ),
@@ -427,6 +417,11 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
     );
   }
 
+  List<Asset> get unscannedAssets {
+    final scannedAssetNos = recentScannedAssetsDb.map((e) => e.assetNo).toSet();
+    return assets.where((a) => !scannedAssetNos.contains(a.assetCode)).toList();
+  }
+
   Widget _buildTabContent() {
     switch (selectedTab) {
       case 'Scan':
@@ -441,9 +436,18 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
           onQRCodeChanged: (value) => setState(() {}),
         );
       case 'Assets':
+        final scannedAssetNos =
+            recentScannedAssetsDb.map((e) => e.assetNo).toSet();
+
         return AssetsContent(
           searchController: _searchController,
-          filteredAssets: filteredAssets,
+          scannedAssets: filteredAssets
+              .where((a) => scannedAssetNos.contains(a.assetCode))
+              .toList(),
+          unscannedAssets: filteredAssets
+              .where((a) => !scannedAssetNos.contains(a.assetCode))
+              .toList(),
+          recentScannedAssets: recentScannedAssetsDb, 
           isLoading: isLoading,
           onFilterAssets: _filterAssets,
           formatUpdatedTimeWIB: formatUpdatedTimeWIB,
@@ -486,14 +490,6 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
               ),
             ),
             const SizedBox(width: 10),
-            // ClipRRect(
-            //   child: Image.asset(
-            //     'assets/images/indocement_logo.png',
-            //     width: 40,
-            //     height: 40,
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
           ],
         ),
         centerTitle: false,

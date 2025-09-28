@@ -122,4 +122,6 @@ class RecentAssetService {
       return false;
     }
   }
+
+  static getRecentAssetsWithImages({required String scannedBy}) {}
 }

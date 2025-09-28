@@ -51,7 +51,6 @@ flutter_icons:
 flutter:
   uses-material-design: true
   assets:
-    # - assets/images/SIMBA.png
     - assets/images/LOGO_INDOCEMENT.jpg
     - assets/images/icons/BOX.png
     - assets/images/icons/warning.png

@@ -31,24 +31,125 @@ class AssetsContent extends StatefulWidget {
 
 class _AssetsContentState extends State<AssetsContent> {
   int selectedPage = 0; // 0: scannedAssets, 1: unscannedAssets
-  // In-memory photo cache
-  final Map<String, String?> photoCache = {};
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildHeaderTabs(),
-        const SizedBox(height: 10),
-        _buildSearchBox(),
-        const SizedBox(height: 15),
-        Expanded(
-          child: selectedPage == 0
-              ? _buildScannedAssetsSection(context)
-              : _buildUnscannedAssetsSection(context),
+    return CustomScrollView(
+      slivers: [
+        // Header Section (akan ikut scroll)
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              _buildHeaderTabs(),
+              const SizedBox(height: 10),
+              _buildSearchBox(),
+              const SizedBox(height: 15),
+            ],
+          ),
         ),
+
+        // Section Header
+        SliverToBoxAdapter(
+          child: _buildSectionHeader(
+            selectedPage == 0 ? 'Scanned Assets' : 'Assets Not Yet Scanned',
+            selectedPage == 0
+                ? widget.recentScannedAssets
+                    .where((recent) => widget.scannedAssets
+                        .any((a) => a.assetCode == recent.assetNo))
+                    .length
+                : widget.unscannedAssets.length,
+          ),
+        ),
+
+        const SliverToBoxAdapter(child: SizedBox(height: 10)),
+
+        // Content List (scrollable)
+        if (selectedPage == 0) _buildScannedAssetsList() else _buildUnscannedAssetsList(),
       ],
     );
+  }
+
+  Widget _buildScannedAssetsList() {
+    final scannedRecentAssets = widget.recentScannedAssets
+        .where((recent) =>
+            widget.scannedAssets.any((a) => a.assetCode == recent.assetNo))
+        .toList();
+
+    if (widget.isLoading) {
+      return SliverToBoxAdapter(
+        child: SizedBox(
+          height: 400,
+          child: ShimmerLoading.assetsList(),
+        ),
+      );
+    } else if (scannedRecentAssets.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Center(
+            child: Text(
+              'No assets have been scanned.',
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return RecentAssetCard(asset: scannedRecentAssets[index]);
+          },
+          childCount: scannedRecentAssets.length,
+        ),
+      );
+    }
+  }
+
+  Widget _buildUnscannedAssetsList() {
+    final filtered = widget.unscannedAssets;
+
+    if (widget.isLoading) {
+      return SliverToBoxAdapter(
+        child: SizedBox(
+          height: 400,
+          child: ShimmerLoading.assetsList(),
+        ),
+      );
+    } else if (filtered.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Center(
+            child: Text(
+              'All assets have been scanned.',
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            return AssetCard(
+              asset: filtered[index],
+              formatUpdatedTimeWIB: widget.formatUpdatedTimeWIB,
+            );
+          },
+          childCount: filtered.length,
+        ),
+      );
+    }
   }
 
   Widget _buildHeaderTabs() {
@@ -126,83 +227,6 @@ class _AssetsContentState extends State<AssetsContent> {
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),
       ),
-    );
-  }
-
-  Widget _buildScannedAssetsSection(BuildContext context) {
-    // Ambil recent asset (untuk card/foto dsb) sesuai asset yang sudah di scan
-    final scannedRecentAssets = widget.recentScannedAssets
-        .where((recent) =>
-            widget.scannedAssets.any((a) => a.assetCode == recent.assetNo))
-        .toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Scanned Assets', scannedRecentAssets.length),
-        const SizedBox(height: 10),
-        Expanded(
-          child: widget.isLoading
-              ? ShimmerLoading.assetsList()
-              : scannedRecentAssets.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No assets have been scanned.',
-                        style: TextStyle(
-                          fontFamily: 'Maison Bold',
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: scannedRecentAssets.length,
-                      itemBuilder: (context, index) {
-                        return RecentAssetCard(
-                          asset: scannedRecentAssets[index],
-                          photoCache: photoCache, // <-- WAJIB!
-                        );
-                      },
-                    ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUnscannedAssetsSection(BuildContext context) {
-    final filtered = widget.unscannedAssets;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Assets Not Yet Scanned', filtered.length),
-        const SizedBox(height: 10),
-        Expanded(
-          child: widget.isLoading
-              ? ShimmerLoading.assetsList()
-              : filtered.isEmpty
-                  ? Center(
-                      child: Text(
-                        'All assets have been scanned.',
-                        style: TextStyle(
-                          fontFamily: 'Maison Bold',
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: filtered.length,
-                      itemBuilder: (context, index) {
-                        return AssetCard(
-                          asset: filtered[index],
-                          formatUpdatedTimeWIB: widget.formatUpdatedTimeWIB,
-                        );
-                      },
-                    ),
-        ),
-      ],
     );
   }
 

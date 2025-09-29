@@ -71,7 +71,6 @@ class AppBottomNavBar extends StatelessWidget {
   }
 }
 
-
 class ActivityPage extends StatefulWidget {
   @override
   _ActivityPageState createState() => _ActivityPageState();
@@ -104,7 +103,7 @@ class _ActivityPageState extends State<ActivityPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      final username = prefs.getString('username') ?? 'caccarehana';
+      final username = prefs.getString('username') ?? 'user';
       final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'User';
       final firstName = prefs.getString('first_name') ?? '';
       final lastName = prefs.getString('last_name') ?? '';
@@ -140,7 +139,8 @@ class _ActivityPageState extends State<ActivityPage> {
     try {
       final result = await activityService.fetchActivities(userId: userId);
       setState(() {
-        activities = result;
+        // Hilangkan aktivitas "view_photos" dari daftar
+        activities = result.where((a) => a.activityType != 'view_photos').toList();
         isLoading = false;
       });
     } catch (e) {
@@ -544,52 +544,6 @@ class _ActivityPageState extends State<ActivityPage> {
               ),
             ),
             const SizedBox(width: 12),
-            // Container(
-            //   width: 40,
-            //   height: 40,
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(5),
-            //     color: Colors.grey[200],
-            //   ),
-            //   // child: ClipRRect(
-            //   //   borderRadius: BorderRadius.circular(5),
-            //   //   child: activity.assetDetail.imageUrl != null && activity.assetDetail.imageUrl!.isNotEmpty
-            //   //       ? Image.network(
-            //   //           activity.assetDetail.imageUrl!,
-            //   //           fit: BoxFit.cover,
-            //   //           errorBuilder: (context, error, stackTrace) {
-            //   //             return Icon(
-            //   //               Icons.image_not_supported,
-            //   //               size: 20,
-            //   //               color: Colors.grey[400],
-            //   //             );
-            //   //           },
-            //   //           loadingBuilder: (context, child, loadingProgress) {
-            //   //             if (loadingProgress == null) return child;
-            //   //             return Center(
-            //   //               child: SizedBox(
-            //   //                 width: 16,
-            //   //                 height: 16,
-            //   //                 child: CircularProgressIndicator(
-            //   //                   value: loadingProgress.expectedTotalBytes != null
-            //   //                       ? loadingProgress.cumulativeBytesLoaded /
-            //   //                           loadingProgress.expectedTotalBytes!
-            //   //                       : null,
-            //   //                   strokeWidth: 2,
-            //   //                   color: const Color(0xFF405189),
-            //   //                 ),
-            //   //               ),
-            //   //             );
-            //   //           },
-            //   //         )
-            //   //       : Icon(
-            //   //           Icons.image_not_supported,
-            //   //           size: 20,
-            //   //           color: Colors.grey[400],
-            //   //         ),
-            //   // ),
-            // ),
-            // const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -665,76 +619,69 @@ class _ActivityPageState extends State<ActivityPage> {
     );
   }
 
-Widget _iconForType(String type) {
-  String iconPath;
-  switch (type) {
-    case 'scan_asset':
-      iconPath = 'assets/images/icons/activity_page/scan.png';
-      break;
-    case 'upload_photo':
-      iconPath = 'assets/images/icons/activity_page/image.png';
-      break;
-    case 'update_status':
-      iconPath = 'assets/images/icons/activity_page/status.png';
-      break;
-    case 'import_assets':
-      iconPath = 'assets/images/icons/BOX.png';
-      break;
-    case 'search_asset':
-      iconPath = 'assets/images/icons/activity_page/searching.png';
-      break;
-    case 'view_photos':
-      iconPath = 'assets/images/icons/activity_page/view.png';
-      break;
-    default:
-      iconPath = 'assets/images/icons/activity_page/alert.png';
-      break;
+  Widget _iconForType(String type) {
+    String iconPath;
+    switch (type) {
+      case 'scan_asset':
+        iconPath = 'assets/images/icons/activity_page/scan.png';
+        break;
+      case 'upload_photo':
+        iconPath = 'assets/images/icons/activity_page/image.png';
+        break;
+      case 'update_status':
+        iconPath = 'assets/images/icons/activity_page/status.png';
+        break;
+      case 'import_assets':
+        iconPath = 'assets/images/icons/BOX.png';
+        break;
+      case 'search_asset':
+        iconPath = 'assets/images/icons/activity_page/searching.png';
+        break;
+      default:
+        iconPath = 'assets/images/icons/activity_page/alert.png';
+        break;
+    }
+    return Image.asset(
+      iconPath,
+      width: 20,
+      height: 20,
+      fit: BoxFit.contain,
+    );
   }
-  return Image.asset(
-    iconPath,
-    width: 20,
-    height: 20,
-    fit: BoxFit.contain,
-  );
-}
 
-String _titleForType(String type) {
-  switch (type) {
-    case 'scan_asset':
-      return 'Asset Scanned';
-    case 'upload_photo':
-      return 'Photo Uploaded';
-    case 'update_status':
-      return 'Status Updated';
-    case 'import_assets':
-      return 'Assets Imported';
-    case 'search_asset':
-      return 'Asset Searched';
-    case 'view_photos':
-      return 'Photos Viewed';
-    default:
-      return 'Other Activity';
+  String _titleForType(String type) {
+    switch (type) {
+      case 'scan_asset':
+        return 'Asset Scanned';
+      case 'upload_photo':
+        return 'Photo Uploaded';
+      case 'update_status':
+        return 'Status Updated';
+      case 'import_assets':
+        return 'Assets Imported';
+      case 'search_asset':
+        return 'Asset Searched';
+      default:
+        return 'Other Activity';
+    }
   }
-}
 
-Color _colorForType(String type) {
-  switch (type) {
-    case 'scan_asset':
-      return Colors.green;
-    case 'upload_photo':
-      return Colors.blue;
-    case 'update_status':
-      return Colors.orange;
-    case 'import_assets':
-      return const Color(0xFF405189);
-    case 'search_asset':
-      return Colors.grey;
-    case 'view_photos':
-      return Colors.purple;
-    default:
-      return Colors.black54;
+  Color _colorForType(String type) {
+    switch (type) {
+      case 'scan_asset':
+        return Colors.green;
+      case 'upload_photo':
+        return Colors.blue;
+      case 'update_status':
+        return Colors.orange;
+      case 'import_assets':
+        return const Color(0xFF405189);
+      case 'search_asset':
+        return Colors.grey;
+      default:
+        return Colors.black54;
+    }
   }
-}
 
   String _formatWibDate(DateTime dt) {
     DateTime wib = dt.toUtc().add(const Duration(hours: 7));

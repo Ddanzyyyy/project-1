@@ -30,32 +30,30 @@ class ScanContent extends StatefulWidget {
 }
 
 class _ScanContentState extends State<ScanContent> {
-  // In-memory cache untuk foto asset
   final Map<String, String?> photoCache = {};
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Scan Asset',
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF405189),
-            ),
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      children: [
+        const SizedBox(height: 8),
+        const Text(
+          'Scan Asset',
+          style: TextStyle(
+            fontFamily: 'Maison Bold',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF405189),
           ),
-          const SizedBox(height: 12),
-          _buildScannerCard(context),
-          const SizedBox(height: 10),
-          _buildManualInputSection(),
-          const SizedBox(height: 20),
-          _buildRecentAssetsSection(),
-        ],
-      ),
+        ),
+        const SizedBox(height: 12),
+        _buildScannerCard(context),
+        const SizedBox(height: 10),
+        _buildManualInputSection(),
+        const SizedBox(height: 20),
+        _buildRecentAssetsSection(),
+      ],
     );
   }
 
@@ -269,12 +267,15 @@ class _ScanContentState extends State<ScanContent> {
           ],
         ),
         const SizedBox(height: 10),
-        SizedBox(
-          height: 200,
-          child: widget.isLoading
-              ? ShimmerLoading.recentAssetsList()
-              : widget.recentAssets.isEmpty
-                  ? Center(
+        widget.isLoading
+            ? SizedBox(
+                height: 200,
+                child: ShimmerLoading.recentAssetsList(),
+              )
+            : widget.recentAssets.isEmpty
+                ? SizedBox(
+                    height: 200,
+                    child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -304,17 +305,17 @@ class _ScanContentState extends State<ScanContent> {
                           ),
                         ],
                       ),
-                    )
-                  : ListView.builder(
-                      itemCount: widget.recentAssets.length,
-                      itemBuilder: (context, index) {
-                        return RecentAssetCard(
-                          asset: widget.recentAssets[index],
-                          photoCache: photoCache, // <-- PENTING!
-                        );
-                      },
                     ),
-        ),
+                  )
+                : Column(
+                    children: [
+                      for (final asset in widget.recentAssets)
+                        RecentAssetCard(
+                          asset: asset,
+                          // photoCache: photoCache, // jika dipakai
+                        ),
+                    ],
+                  ),
       ],
     );
   }

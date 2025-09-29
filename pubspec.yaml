@@ -32,6 +32,8 @@ dependencies:
   lottie: ^3.2.0
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.4
+  sqflite: ^2.3.0
+  path: ^1.8.3
   # qr_code_scanner: ^1.0.1
   # mime: ^1.0.4
   # intl: ^0.18.0

@@ -3,40 +3,67 @@ import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/mod
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/widget/recent_asset_detail_widget.dart';
 import 'package:Simba/screens/home_screen/logistic_asset/service/logistic_asset_service.dart';
 import 'package:intl/intl.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
-class RecentAssetCardList extends StatefulWidget {
-  final List<RecentAsset> assets;
+class AssetImageCacheDb {
+  static Database? _db;
+  static const String tableName = "asset_image_cache";
 
-  const RecentAssetCardList({required this.assets, Key? key}) : super(key: key);
+  static Future<Database> get db async {
+    if (_db != null) return _db!;
+    _db = await openDatabase(
+      join(await getDatabasesPath(), "asset_image_cache.db"),
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE $tableName (
+            asset_no TEXT PRIMARY KEY,
+            file_url TEXT
+          )
+        ''');
+      },
+    );
+    return _db!;
+  }
 
-  @override
-  State<RecentAssetCardList> createState() => _RecentAssetCardListState();
-}
+  static Future<void> cacheImage(String assetNo, String fileUrl) async {
+    final database = await db;
+    await database.insert(
+      tableName,
+      {'asset_no': assetNo, 'file_url': fileUrl},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
 
-class _RecentAssetCardListState extends State<RecentAssetCardList> {
-  // Local cache for assetNo -> photoUrl
-  final Map<String, String?> _photoCache = {};
+  static Future<String?> getImage(String assetNo) async {
+    final database = await db;
+    final result = await database.query(
+      tableName,
+      where: 'asset_no = ?',
+      whereArgs: [assetNo],
+      limit: 1,
+    );
+    if (result.isNotEmpty) {
+      return result.first['file_url'] as String?;
+    }
+    return null;
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    final limitedAssets = widget.assets.take(5).toList();
-    return Column(
-      children: [
-        for (final asset in limitedAssets)
-          RecentAssetCard(
-            asset: asset,
-            photoCache: _photoCache,
-          ),
-      ],
+  static Future<void> removeImage(String assetNo) async {
+    final database = await db;
+    await database.delete(
+      tableName,
+      where: 'asset_no = ?',
+      whereArgs: [assetNo],
     );
   }
 }
 
 class RecentAssetCard extends StatefulWidget {
   final RecentAsset asset;
-  final Map<String, String?> photoCache; // In-memory cache
 
-  const RecentAssetCard({required this.asset, required this.photoCache, Key? key}) : super(key: key);
+  const RecentAssetCard({required this.asset, Key? key}) : super(key: key);
 
   @override
   State<RecentAssetCard> createState() => _RecentAssetCardState();
@@ -52,21 +79,52 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
     _loadPhoto();
   }
 
-  Future<void> _loadPhoto() async {
-    // Cek cache dulu
-    if (widget.photoCache.containsKey(widget.asset.assetNo)) {
+  // Fungsi refresh foto utama, update cache SQLite dan UI
+  Future<void> refreshPhoto() async {
+    setState(() {
+      loadingPhoto = true;
+    });
+
+    await AssetImageCacheDb.removeImage(widget.asset.assetNo);
+
+    final photos = await LogisticAssetService.getAssetPhotos(widget.asset.assetNo);
+    String? url;
+    if (photos.isNotEmpty) {
+      final primary = photos.firstWhere(
+        (p) => p.isPrimary == true,
+        orElse: () => photos.first,
+      );
+      url = primary.fileUrl;
+    }
+    if (url != null) {
+      await AssetImageCacheDb.cacheImage(widget.asset.assetNo, url);
+    }
+    if (mounted) {
       setState(() {
-        photoUrl = widget.photoCache[widget.asset.assetNo];
+        photoUrl = url;
         loadingPhoto = false;
       });
+    }
+  }
+
+  Future<void> _loadPhoto() async {
+    String? cachedUrl = await AssetImageCacheDb.getImage(widget.asset.assetNo);
+    if (cachedUrl != null) {
+      if (mounted) {
+        setState(() {
+          photoUrl = cachedUrl;
+          loadingPhoto = false;
+        });
+      }
       return;
     }
 
-    // Jika belum ada di cache, fetch dari network
     if (widget.asset.photosCount > 0) {
-      setState(() {
-        loadingPhoto = true;
-      });
+      if (mounted) {
+        setState(() {
+          loadingPhoto = true;
+        });
+      }
       final photos = await LogisticAssetService.getAssetPhotos(widget.asset.assetNo);
       String? url;
       if (photos.isNotEmpty) {
@@ -76,11 +134,15 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
         );
         url = primary.fileUrl;
       }
-      widget.photoCache[widget.asset.assetNo] = url;
-      setState(() {
-        photoUrl = url;
-        loadingPhoto = false;
-      });
+      if (url != null) {
+        await AssetImageCacheDb.cacheImage(widget.asset.assetNo, url);
+      }
+      if (mounted) {
+        setState(() {
+          photoUrl = url;
+          loadingPhoto = false;
+        });
+      }
     }
   }
 
@@ -126,6 +188,7 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
     Color statusColor;
     IconData statusIcon;
     switch ((widget.asset.status ?? '').toLowerCase()) {
+      case 'active':
       case 'available':
         statusColor = Colors.green;
         statusIcon = Icons.check_circle;
@@ -163,13 +226,18 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          // Navigasi ke detail, tunggu hasil pop
+          final changed = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => RecentAssetDetailWidget(recentAsset: widget.asset),
             ),
           );
+          if (changed == true) {
+            // Jika user ubah foto utama di detail, refresh card dan cache
+            await refreshPhoto();
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

@@ -15,6 +15,7 @@ void main() async {
   await NotificationService.initialize();
   await initializeDateFormatting('id_ID', null);
   
+  
   runApp(const SimbaApp());
 }
 

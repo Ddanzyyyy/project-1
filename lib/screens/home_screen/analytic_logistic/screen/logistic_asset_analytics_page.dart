@@ -481,7 +481,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                 mainAxisSpacing: 8,
                 children: [
                   _buildCompactSummaryCard(
-                    'Total Assets',
+                    'Total Data',
                     '$totalAssets',
                     Icons.inventory_2,
                     primaryColor,
@@ -497,7 +497,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                     '$totalAvailable',
                     Icons.check_circle,
                     successColor,
-                    subtitle: '${availabilityRate.toStringAsFixed(1)}%',
+                    // subtitle: '${availabilityRate.toStringAsFixed(1)}%',
                   ),
                   // _buildCompactSummaryCard(
                   //   'In Use',
@@ -511,14 +511,14 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                     '$totalBroken',
                     Icons.error,
                     errorColor,
-                    subtitle: '${maintenanceRate.toStringAsFixed(1)}%',
+                    // subtitle: '${maintenanceRate.toStringAsFixed(1)}%',
                   ),
                   _buildCompactSummaryCard(
                     'Lost',
                     '$totalLost',
                     Icons.report_problem,
                     warningColor,
-                    subtitle: '${lossRate.toStringAsFixed(1)}%',
+                    // subtitle: '${lossRate.toStringAsFixed(1)}%',
                   ),
                 ],
               ),

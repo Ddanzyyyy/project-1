@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:io';
+import 'dart:async';
 import '../model/logistic_asset_model.dart';
 import '../service/logistic_asset_service.dart';
 import 'logistic_asset_detail_page.dart';
@@ -20,10 +21,18 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
   bool isLoading = true;
   bool isImporting = false;
 
+  Timer? _debounce; 
+
   @override
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel(); 
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -247,6 +256,14 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
     );
   }
 
+  void _onSearchChanged(String value) {
+    setState(() => searchQuery = value);
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      _loadAssets();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -314,10 +331,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: TextField(
-                      onChanged: (value) {
-                        setState(() => searchQuery = value);
-                        _loadAssets();
-                      },
+                      onChanged: _onSearchChanged,
                       style: TextStyle(fontSize: 14, fontFamily: 'Maison Book'),
                       decoration: InputDecoration(
                         hintText: 'Search by Asset No or Title...',

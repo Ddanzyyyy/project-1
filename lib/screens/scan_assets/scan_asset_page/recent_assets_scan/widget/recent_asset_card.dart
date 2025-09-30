@@ -211,6 +211,9 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
         statusIcon = Icons.help_outline;
     }
 
+    // Image size
+    const double imageSize = 44; 
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10, left: 4, right: 4),
       decoration: BoxDecoration(
@@ -227,7 +230,6 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
-          // Navigasi ke detail, tunggu hasil pop
           final changed = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -235,7 +237,6 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
             ),
           );
           if (changed == true) {
-            // Jika user ubah foto utama di detail, refresh card dan cache
             await refreshPhoto();
           }
         },
@@ -244,19 +245,18 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // FOTO
               if (loadingPhoto)
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: imageSize,
+                  height: imageSize,
                   decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.11),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Center(
                     child: SizedBox(
-                      width: 16,
-                      height: 16,
+                      width: 18,
+                      height: 18,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: Color(0xFF405189),
@@ -273,17 +273,17 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
                       borderRadius: BorderRadius.circular(8),
                       child: Image.network(
                         photoUrl!,
-                        width: 32,
-                        height: 32,
+                        width: imageSize,
+                        height: imageSize,
                         fit: BoxFit.cover,
                         errorBuilder: (context, _, __) => Container(
-                          width: 32,
-                          height: 32,
+                          width: imageSize,
+                          height: imageSize,
                           color: Colors.grey[300],
                           child: Icon(
                             Icons.broken_image,
                             color: Colors.grey,
-                            size: 16,
+                            size: 18,
                           ),
                         ),
                       ),
@@ -292,8 +292,8 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
                 )
               else
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: imageSize,
+                  height: imageSize,
                   decoration: BoxDecoration(
                     color: const Color(0xFF405189).withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -301,8 +301,8 @@ class _RecentAssetCardState extends State<RecentAssetCard> {
                   child: Center(
                     child: Image.asset(
                       'assets/images/icons/welcome_page/box_icon.png',
-                      width: 22,
-                      height: 22,
+                      width: 28,
+                      height: 28,
                     ),
                   ),
                 ),

@@ -81,18 +81,11 @@ class _ScanContentState extends State<ScanContent> {
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
               child: Row(
                 children: [
-                  Container(
+                  Image.asset(
+                    'assets/images/icons/welcome_page/barcode.png',
                     width: 44,
                     height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF405189).withOpacity(0.12),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF405189),
-                        width: 1.0,
-                      ),
-                    ),
-                    child: const Icon(Icons.qr_code_scanner, color: Color(0xFF405189), size: 26),
+                    fit: BoxFit.contain,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -100,7 +93,7 @@ class _ScanContentState extends State<ScanContent> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Text(
-                          'Tap to Scan QR Code',
+                          'Tap to Scan',
                           style: TextStyle(
                             fontFamily: 'Maison Bold',
                             fontSize: 15,

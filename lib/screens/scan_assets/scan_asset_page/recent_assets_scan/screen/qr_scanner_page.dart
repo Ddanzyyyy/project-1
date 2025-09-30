@@ -127,7 +127,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 40),
+                // const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 40),
                 const SizedBox(height: 12),
                 const Text(
                   'Arahkan QR ke area kotak',
@@ -150,22 +150,22 @@ class _QRScannerPageState extends State<QRScannerPage> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                if (currentUser.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.09),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Text(
-                      'User: @$currentUser',
-                      style: const TextStyle(
-                        fontFamily: 'Maison Book',
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
+                // if (currentUser.isNotEmpty)
+                //   Container(
+                //     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                //     decoration: BoxDecoration(
+                //       color: Colors.white.withOpacity(0.09),
+                //       borderRadius: BorderRadius.circular(18),
+                //     ),
+                //     // child: Text(
+                //     //   'User: @$currentUser',
+                //     //   style: const TextStyle(
+                //     //     fontFamily: 'Maison Book',
+                //     //     color: Colors.white,
+                //     //     fontSize: 13,
+                //     //   ),
+                //     // ),
+                //   ),
               ],
             ),
           ),

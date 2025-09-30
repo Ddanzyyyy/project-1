@@ -22,17 +22,25 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
 
   List<Color> statusColors = const [successColor, errorColor, warningColor];
   List<Color> chartColors = const [
-    Color(0xFF4F46E5),
-    Color(0xFF059669),
-    Color(0xFFDB2777),
-    Color(0xFFDC2626),
-    Color(0xFFD97706),
-    Color(0xFF7C3AED),
-    Color(0xFF0891B2),
-    Color(0xFFE11D48),
+    Color(0xFF4F46E5), // indigo
+    Color(0xFF059669), // green
+    Color(0xFFDB2777), // pink
+    Color(0xFFDC2626), // red
+    Color(0xFFD97706), // orange
+    Color(0xFF7C3AED), // violet
+    Color(0xFF0891B2), // cyan
+    Color(0xFFE11D48), // magenta
+    Color(0xFF22D3EE), // light-cyan
+    Color(0xFF6366F1), // blue-violet
+    Color(0xFF65A30D), // olive
+    Color(0xFFCA8A04), // yellow-brown
+    Color(0xFFF59E42), // soft orange
+    Color(0xFF14B8A6), // teal
+    Color(0xFF64748B), // muted blue
+    Color(0xFF3B82F6), // blue
+    Color(0xFF9333EA), // deep purple
   ];
 
-  /// ---- Analytics ----
   Map<String, int> get statusAnalytics {
     int totalAvailable = 0, totalBroken = 0, totalLost = 0;
     for (var asset in widget.assets) {
@@ -309,7 +317,7 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
                           text,
                           style: TextStyle(
                             fontSize: 10,
-                            color: Colors.grey[700],
+                            color: chartColors[value.toInt() % chartColors.length], // Use color indicator as label color
                             fontWeight: FontWeight.w500,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -357,13 +365,9 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
                       topLeft: Radius.circular(7),
                       topRight: Radius.circular(7),
                     ),
-                    gradient: LinearGradient(
-                      colors: [color, color.withOpacity(0.7)],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                    ),
                   ),
                 ],
+                barsSpace: 6,
               );
             }).toList(),
           ),
@@ -371,6 +375,7 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
       ),
     );
   }
+
   Widget _buildUtilizationChart() {
     final categoryData = categoryAnalytics.entries.take(6).toList();
     if (categoryData.isEmpty) return SizedBox.shrink();
@@ -409,7 +414,10 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
                       padding: EdgeInsets.only(top: 8),
                       child: Text(
                         text.length > 8 ? '${text.substring(0, 8)}...' : text,
-                        style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: chartColors[value.toInt() % chartColors.length],
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     );
@@ -441,31 +449,24 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
                 spots: spots,
                 isCurved: true,
                 curveSmoothness: 0.35,
-                color: primaryColor,
+                color: chartColors[0],
                 barWidth: 4,
                 dotData: FlDotData(
                   show: true,
                   getDotPainter: (spot, percent, barData, index) =>
                       FlDotCirclePainter(
                     radius: 6,
-                    color: primaryColor,
+                    color: chartColors[index % chartColors.length],
                     strokeWidth: 3,
                     strokeColor: Colors.white,
                   ),
                 ),
                 belowBarData: BarAreaData(
                   show: true,
-                  gradient: LinearGradient(
-                    colors: [
-                      primaryColor.withOpacity(0.3),
-                      primaryColor.withOpacity(0.05),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
+                  color: chartColors[0].withOpacity(0.16),
                 ),
                 shadow: Shadow(
-                  color: primaryColor.withOpacity(0.3),
+                  color: chartColors[0].withOpacity(0.18),
                   blurRadius: 8,
                   offset: Offset(0, 4),
                 ),
@@ -704,7 +705,7 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
           style: TextStyle(
             fontFamily: 'Maison Bold',
             color: Colors.white,
-            fontSize: 18,
+            fontSize: 16,
           ),
         ),
         backgroundColor: primaryColor,

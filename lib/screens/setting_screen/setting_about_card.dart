@@ -369,21 +369,23 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
   }
 
   Widget _buildPrivacyPolicy() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            "Kebijakan Privasi SIMAP Indocement",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF405189),
+    return Container(
+      color: Colors.white,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            Text(
+              "Kebijakan Privasi SIMAP Indocement",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF405189),
+              ),
             ),
-          ),
-          SizedBox(height: 16),
+            SizedBox(height: 16),
           Text(
             "1. Informasi yang Dikumpulkan",
             style: TextStyle(
@@ -479,6 +481,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           SizedBox(height: 16),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -92,6 +92,8 @@ flutter:
     - assets/images/icons/activity_page/scan.png
     - assets/images/icons/activity_page/image.png
     - assets/images/icons/activity_page/view.png
+    - assets/images/icons/welcome_page/waving_hand.png
+    - assets/images/icons/welcome_page/barcode.png
     # - E:\Flutter Project\simba_indocement\simba\android\app\src\main\res\mipmap-hdpi\image.png
     # - assets/lottie/Inventory.lottie
     # - assets/lottie/Logistic.lottie

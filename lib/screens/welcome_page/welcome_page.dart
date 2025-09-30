@@ -271,9 +271,9 @@ class _WelcomePageState extends State<WelcomePage> {
                                   // // Quick Actions (only Scan Asset now)
                                   // _buildQuickActions(),
                                   // const SizedBox(height: 2),
-                                  
-                                  // Core Logistic Assets (with Analytics added)
-                                  _buildSectionHeader("Core Asset Logistic", "Manage your logistics Assets"),
+
+                                  // Menu Asset (with Analytics added)
+                                  _buildSectionHeader("Menu Asset", "Manage the logistics Assets"),
                                   const SizedBox(height: 16),
                                   _buildLogisticAssetsGrid(),
                                   
@@ -440,16 +440,16 @@ class _WelcomePageState extends State<WelcomePage> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF405189).withOpacity(0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFF405189).withOpacity(0.2)),
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.waving_hand,
-            color: const Color(0xFF405189),
-            size: 28,
+          Image.asset(
+            'assets/images/icons/welcome_page/waving_hand.png',
+            width: 28,
+            height: 28,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -467,7 +467,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
                 // const SizedBox(height: 2),
                 Text(
-                  'Ready to manage your assets today?',
+                  'Ready to manage assets today?',
                   style: TextStyle(
                     fontFamily: 'Maison Book',
                     fontSize: 13,
@@ -557,8 +557,8 @@ class _WelcomePageState extends State<WelcomePage> {
               child: AssetCardMinimalist(
                 title: 'Logistic Assets',
                 image: Image.asset('assets/images/icons/activity_page/product.png', width: 28, height: 28),
-                count: '∞',
-                description: 'Import & manage',
+                // count: '∞',
+                description: 'Import Assets',
                 color: const Color(0xFF6B46C1),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LogisticAssetPage())),
               ),
@@ -568,7 +568,7 @@ class _WelcomePageState extends State<WelcomePage> {
               child: AssetCardMinimalist(
                 title: 'Scan Assets',
                 image: Image.asset('assets/images/icons/activity_page/research.png', width: 28, height: 28),
-                count: '∞',
+                // count: '∞',
                 description: 'Scan barcodes',
                 color: const Color(0xFF0085FF),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LogisticAssetScanMenuPage())),
@@ -581,7 +581,7 @@ class _WelcomePageState extends State<WelcomePage> {
         AssetCardMinimalist(
           title: 'Analytics Asset',
           image: Image.asset('assets/images/icons/welcome_page/analytic.png', width: 28, height: 28),
-          count: '∞',
+          // count: '∞',
           description: 'Asset analytics & reports',
           color: const Color(0xFF8B5CF6),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LogisticAssetAnalyticsPage())),
@@ -590,7 +590,7 @@ class _WelcomePageState extends State<WelcomePage> {
         AssetCardMinimalist(
           title: 'How To Use This App',
           image: Image.asset('assets/images/icons/welcome_page/learn.png', width: 28, height: 28),
-          count: '∞',
+          // count: '∞',
           description: 'Learn how to use SIMAP',
           color: const Color.fromARGB(255, 100, 246, 92),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LearnPage())),
@@ -675,7 +675,7 @@ class AssetCardMinimalist extends StatelessWidget {
   final String title;
   final IconData? icon;
   final Widget? image;
-  final String count;
+  // final String count;
   final String description;
   final Color color;
   final VoidCallback onTap;
@@ -685,7 +685,7 @@ class AssetCardMinimalist extends StatelessWidget {
     required this.title,
     this.icon,
     this.image,
-    required this.count,
+    // required this.count,
     required this.description,
     required this.color,
     required this.onTap,
@@ -717,15 +717,15 @@ class AssetCardMinimalist extends StatelessWidget {
                     child: image ?? (icon != null ? Icon(icon, color: color, size: 20) : null),
                   ),
                   const Spacer(),
-                  Text(
-                    count,
-                    style: TextStyle(
-                      fontFamily: 'Maison Bold',
-                      fontWeight: FontWeight.w700,
-                      color: color,
-                      fontSize: 18,
-                    ),
-                  ),
+                  // Text(
+                  //   count,
+                  //   style: TextStyle(
+                  //     fontFamily: 'Maison Bold',
+                  //     fontWeight: FontWeight.w700,
+                  //     color: color,
+                  //     fontSize: 18,
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(height: 12),

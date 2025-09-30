@@ -79,7 +79,6 @@ class ActivityPage extends StatefulWidget {
 class _ActivityPageState extends State<ActivityPage> {
   List<ActivityLog> activities = [];
   bool isLoading = true;
-
   String userId = '1';
   String userName = '';
   String currentUser = 'User';
@@ -102,24 +101,20 @@ class _ActivityPageState extends State<ActivityPage> {
   Future<void> _loadUserData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-
       final username = prefs.getString('username') ?? 'user';
       final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'User';
       final firstName = prefs.getString('first_name') ?? '';
       final lastName = prefs.getString('last_name') ?? '';
-
       String displayName = fullName;
       if (displayName == 'User' && firstName.isNotEmpty) {
         displayName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
       }
-
       setState(() {
         userName = displayName;
         currentUser = username;
         userId = prefs.getString('user_id') ?? '1';
         isLoadingUserInfo = false;
       });
-
       await fetchActivities();
     } catch (e) {
       setState(() {
@@ -139,7 +134,6 @@ class _ActivityPageState extends State<ActivityPage> {
     try {
       final result = await activityService.fetchActivities(userId: userId);
       setState(() {
-        // Hilangkan aktivitas "view_photos" dari daftar
         activities = result.where((a) => a.activityType != 'view_photos').toList();
         isLoading = false;
       });
@@ -150,139 +144,104 @@ class _ActivityPageState extends State<ActivityPage> {
     }
   }
 
-  Widget _buildShimmerActivityCard() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 11),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 1),
-          ),
-        ],
-        border: Border.all(color: Colors.grey[200]!),
+  Future<void> deleteAllActivities() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      await activityService.deleteAllActivities(userId: userId);
+      await fetchActivities();
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _showDeleteMenu() async {
+    final option = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        MediaQuery.of(context).size.width - 180, 
+        80, 
+        12, 
+        0
       ),
-      child: Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
+      items: [
+        PopupMenuItem<String>(
+          value: 'all',
+          height: 40,
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.delete_forever, color: Colors.red, size: 18),
+              SizedBox(width: 8),
+              Text(
+                'Delete All Activities',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (option == 'all') {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+          ),
+          title: Text(
+            'Delete All Activities?',
+            style: TextStyle(
+              fontFamily: 'Maison Bold',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to delete all activities for this user?',
+            style: TextStyle(
+              fontFamily: 'Maison Book',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: 'Maison Book',
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
-            const SizedBox(width: 10),
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        height: 12,
-                        width: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        height: 11,
-                        width: 60,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    height: 12,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    height: 12,
-                    width: 180,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ],
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(
+                'Delete',
+                style: TextStyle(
+                  fontFamily: 'Maison Book',
+                  fontWeight: FontWeight.w400,
+                  color: Colors.red,
+                ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildShimmerActivitiesList() {
-    return ListView.builder(
-      itemCount: 8,
-      itemBuilder: (context, index) => _buildShimmerActivityCard(),
-    );
-  }
-
-  Widget _buildShimmerHeader() {
-    return Shimmer.fromColors(
-      baseColor: Colors.white.withOpacity(0.3),
-      highlightColor: Colors.white.withOpacity(0.1),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 16,
-            width: 200,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            height: 12,
-            width: 150,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-        ],
-      ),
-    );
+      );
+      if (confirm == true) await deleteAllActivities();
+    }
   }
 
   void _onNavTap(int index) {
     if (index == 0) {
       Navigator.push(context, MaterialPageRoute(builder: (_) => WelcomePage()));
     }
-    if (index == 1) {
-    }
+    if (index == 1) {}
     if (index == 2) {
       Navigator.push(context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
     }
@@ -314,6 +273,10 @@ class _ActivityPageState extends State<ActivityPage> {
                 fontWeight: FontWeight.w700,
               ),
             ),
+            IconButton(
+              icon: const Icon(Icons.more_vert, color: Colors.white, size: 24),
+              onPressed: _showDeleteMenu,
+            ),
           ],
         ),
         centerTitle: false,
@@ -339,16 +302,6 @@ class _ActivityPageState extends State<ActivityPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Welcome back, ${userName.isNotEmpty ? userName : 'User'}!',
-                        style: const TextStyle(
-                          fontFamily: 'Maison Bold',
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
                       Text(
                         activities.isNotEmpty
                             ? 'Last activity: ${_formatWibDate(activities.first.activityTime)}'
@@ -427,6 +380,7 @@ class _ActivityPageState extends State<ActivityPage> {
                                   itemCount: activities.length,
                                   itemBuilder: (context, idx) {
                                     final act = activities[idx];
+                                    // Tidak ada swipe/delete satuan
                                     return _buildActivityCard(act);
                                   },
                                 ),
@@ -686,5 +640,132 @@ class _ActivityPageState extends State<ActivityPage> {
   String _formatWibDate(DateTime dt) {
     DateTime wib = dt.toUtc().add(const Duration(hours: 7));
     return '${wib.hour.toString().padLeft(2, '0')}:${wib.minute.toString().padLeft(2, '0')} / ${wib.day.toString().padLeft(2, '0')}-${wib.month.toString().padLeft(2, '0')}-${wib.year}';
+  }
+
+  Widget _buildShimmerHeader() {
+    return Shimmer.fromColors(
+      baseColor: Colors.white.withOpacity(0.3),
+      highlightColor: Colors.white.withOpacity(0.1),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 16,
+            width: 200,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 12,
+            width: 150,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerActivityCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 11),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        height: 12,
+                        width: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        height: 11,
+                        width: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    height: 12,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 12,
+                    width: 180,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerActivitiesList() {
+    return ListView.builder(
+      itemCount: 8,
+      itemBuilder: (context, index) => _buildShimmerActivityCard(),
+    );
   }
 }

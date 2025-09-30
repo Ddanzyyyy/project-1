@@ -239,13 +239,18 @@ class _ScanContentState extends State<ScanContent> {
   }
 
   Widget _buildRecentAssetsSection() {
+    // Tampilkan hanya 5 asset terbaru
+    final List<RecentAsset> displayedAssets = widget.recentAssets.length > 5
+        ? widget.recentAssets.sublist(0, 5)
+        : widget.recentAssets;
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Recent Assets (${widget.recentAssets.length})',
+              'Scan History',
               style: const TextStyle(
                 fontFamily: 'Maison Bold',
                 fontSize: 15,
@@ -256,7 +261,7 @@ class _ScanContentState extends State<ScanContent> {
             TextButton(
               onPressed: widget.onViewAllAssets,
               child: Text(
-                'View All (${widget.totalAssets})',
+                'View All History (${widget.recentAssets.length})',
                 style: TextStyle(
                   fontFamily: 'Maison Book',
                   fontSize: 12,
@@ -309,10 +314,9 @@ class _ScanContentState extends State<ScanContent> {
                   )
                 : Column(
                     children: [
-                      for (final asset in widget.recentAssets)
+                      for (final asset in displayedAssets)
                         RecentAssetCard(
                           asset: asset,
-                          // photoCache: photoCache, // jika dipakai
                         ),
                     ],
                   ),

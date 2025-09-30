@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/widget/asset_card.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/widget/recent_asset_card.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/shimmer_loading.dart';
@@ -30,13 +31,34 @@ class AssetsContent extends StatefulWidget {
 }
 
 class _AssetsContentState extends State<AssetsContent> {
-  int selectedPage = 0; // 0: scannedAssets, 1: unscannedAssets
+  int selectedPage = 0;
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.searchController.removeListener(_onSearchChanged);
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    // Debounce
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      widget.onFilterAssets(widget.searchController.text);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        // Header Section (akan ikut scroll)
         SliverToBoxAdapter(
           child: Column(
             children: [
@@ -48,8 +70,6 @@ class _AssetsContentState extends State<AssetsContent> {
             ],
           ),
         ),
-
-        // Section Header
         SliverToBoxAdapter(
           child: _buildSectionHeader(
             selectedPage == 0 ? 'Scanned Assets' : 'Assets Not Yet Scanned',
@@ -61,11 +81,11 @@ class _AssetsContentState extends State<AssetsContent> {
                 : widget.unscannedAssets.length,
           ),
         ),
-
         const SliverToBoxAdapter(child: SizedBox(height: 10)),
-
-        // Content List (scrollable)
-        if (selectedPage == 0) _buildScannedAssetsList() else _buildUnscannedAssetsList(),
+        if (selectedPage == 0)
+          _buildScannedAssetsList()
+        else
+          _buildUnscannedAssetsList(),
       ],
     );
   }
@@ -214,9 +234,9 @@ class _AssetsContentState extends State<AssetsContent> {
       ),
       child: TextField(
         controller: widget.searchController,
-        onChanged: widget.onFilterAssets,
         decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.search, color: Color(0xFF405189), size: 20),
+          prefixIcon:
+              const Icon(Icons.search, color: Color(0xFF405189), size: 20),
           hintText: 'Search Category, Asset ID',
           hintStyle: TextStyle(
             fontFamily: 'Maison Book',

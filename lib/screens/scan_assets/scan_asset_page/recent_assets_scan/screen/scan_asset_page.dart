@@ -539,29 +539,29 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                             ),
                             const SizedBox(width: 8),
                           ],
-                          Text(
-                            isLoadingUserInfo
-                                ? 'Loading user...'
-                                : 'Logged in as: $currentUserName',
-                            style: const TextStyle(
-                              fontFamily: 'Maison Book',
-                              color: Colors.white70,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                          // Text(
+                          //   isLoadingUserInfo
+                          //       ? 'Loading user...'
+                          //       : 'Logged in as: $currentUserName',
+                          //   style: const TextStyle(
+                          //     fontFamily: 'Maison Book',
+                          //     color: Colors.white70,
+                          //     fontSize: 11,
+                          //     fontWeight: FontWeight.w400,
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        'Current Time: ${getCurrentTime()}',
-                        style: const TextStyle(
-                          fontFamily: 'Maison Book',
-                          color: Colors.white70,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                      // Text(
+                      //   'Current Time: ${getCurrentTime()}',
+                      //   style: const TextStyle(
+                      //     fontFamily: 'Maison Book',
+                      //     color: Colors.white70,
+                      //     fontSize: 10,
+                      //     fontWeight: FontWeight.w400,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],

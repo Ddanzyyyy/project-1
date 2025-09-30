@@ -44,7 +44,7 @@ class SettingsAboutCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              'SIMAP Indocement v0.0.1',
+              'SIMAP Indocement v 1.0.1',
               style: TextStyle(
                 fontFamily: 'Maison Book',
                 fontSize: 11,
@@ -233,11 +233,13 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
   }
 
   Widget _buildTermsOfService() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+    return Container(
+      color: Colors.white,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
           Text(
             "Syarat dan Ketentuan SIMAP Indocement - Sistem Manajemen Asset",
             style: TextStyle(
@@ -362,6 +364,7 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
           // SizedBox(height: 16),
         ],
       ),
+    ),
     );
   }
 

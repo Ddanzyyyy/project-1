@@ -18,6 +18,7 @@ class SettingsAccountCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -157,7 +158,7 @@ class SettingsAccountCard extends StatelessWidget {
               ),
             ),
             title: const Text(
-              'Profile Settings',
+              'Info Profile',
               style: TextStyle(
                 fontFamily: 'Maison Bold',
                 fontSize: 14,
@@ -166,7 +167,7 @@ class SettingsAccountCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              'Edit your profile information',
+              'Information about your profile',
               style: TextStyle(
                 fontFamily: 'Maison Book',
                 fontSize: 11,

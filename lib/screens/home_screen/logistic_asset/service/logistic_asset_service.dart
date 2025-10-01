@@ -12,11 +12,13 @@ class LogisticAssetService {
   static Future<List<LogisticAsset>> getLogisticAssets({
     String search = '',
     String category = 'All',
+    String status = 'All', // Parameter baru untuk filter status
   }) async {
     try {
       final queryParams = <String, String>{};
       if (search.isNotEmpty) queryParams['search'] = search;
       if (category != 'All') queryParams['category'] = category;
+      if (status != 'All') queryParams['status'] = status; // Tambahkan status ke query params
 
       final uri = Uri.parse('$baseUrl/logistic-assets')
           .replace(queryParameters: queryParams);

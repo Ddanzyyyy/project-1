@@ -16,8 +16,10 @@ class LogisticAssetPage extends StatefulWidget {
 class _LogisticAssetPageState extends State<LogisticAssetPage> {
   List<LogisticAsset> assets = [];
   List<String> categories = ['All'];
+  List<String> statusFilters = ['All', 'Available', 'Broken', 'Lost'];
   String searchQuery = '';
   String selectedCategory = 'All';
+  String selectedStatus = 'All';
   bool isLoading = true;
   bool isImporting = false;
 
@@ -42,12 +44,16 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
     ]);
   }
 
-  Future<void> _loadAssets() async {
-    setState(() => isLoading = true);
+  Future<void> _loadAssets({bool showLoader = true}) async {
+    if (showLoader) {
+      setState(() => isLoading = true);
+    }
+    
     try {
       final loadedAssets = await LogisticAssetService.getLogisticAssets(
         search: searchQuery,
         category: selectedCategory,
+        status: selectedStatus,
       );
       setState(() {
         assets = loadedAssets;
@@ -101,6 +107,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
       SnackBar(
         content: Text(message, style: TextStyle(fontFamily: 'Maison Book')),
         backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -110,6 +117,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
       SnackBar(
         content: Text(message, style: TextStyle(fontFamily: 'Maison Book')),
         backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -182,7 +190,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
             children: [
               _buildSimpleAnalyticsCard(
                 value: '$totalAssets',
-                label: 'Total',
+                label: 'Total Data',
                 iconImage: 'assets/images/icons/welcome_page/box_icon.png',
                 color: Color(0xFF405189),
               ),
@@ -260,7 +268,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
     setState(() => searchQuery = value);
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 600), () {
-      _loadAssets();
+      _loadAssets(showLoader: false);
     });
   }
 
@@ -316,7 +324,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
       ),
       body: Column(
         children: [
-          // Header with search and filter
+          // Header with search and filters
           Container(
             color: Color(0xFF405189),
             child: Padding(
@@ -360,7 +368,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                           child: InkWell(
                             onTap: () {
                               setState(() => selectedCategory = category);
-                              _loadAssets();
+                              _loadAssets(showLoader: false);
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(
@@ -383,6 +391,88 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                                       ? FontWeight.w700
                                       : FontWeight.w500,
                                 ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  // Status Filter
+                  Container(
+                    height: 32,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: statusFilters.length,
+                      itemBuilder: (context, index) {
+                        final status = statusFilters[index];
+                        final isSelected = selectedStatus == status;
+                        
+                        IconData? statusIcon;
+                        
+                        if (status == 'Available') {
+                          statusIcon = Icons.check_circle_outline;
+                        } else if (status == 'Broken') {
+                          statusIcon = Icons.warning_amber_outlined;
+                        } else if (status == 'Lost') {
+                          statusIcon = Icons.cancel_outlined;
+                        }
+                        
+                        return Padding(
+                          padding: EdgeInsets.only(right: 8),
+                          child: InkWell(
+                            onTap: () {
+                              setState(() => selectedStatus = status);
+                              _loadAssets(showLoader: false);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (statusIcon != null && isSelected)
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 4),
+                                      child: Icon(
+                                        statusIcon,
+                                        size: 14,
+                                        color: status == 'All' 
+                                            ? Color(0xFF405189) 
+                                            : (status == 'Available' 
+                                                ? Colors.green 
+                                                : (status == 'Broken' 
+                                                    ? Colors.orange 
+                                                    : Colors.red)),
+                                      ),
+                                    ),
+                                  Text(
+                                    status,
+                                    style: TextStyle(
+                                      fontFamily: 'Maison Book',
+                                      fontSize: 12,
+                                      color: isSelected
+                                          ? (status == 'All' 
+                                              ? Color(0xFF405189) 
+                                              : (status == 'Available' 
+                                                  ? Colors.green 
+                                                  : (status == 'Broken' 
+                                                      ? Colors.orange 
+                                                      : Colors.red)))
+                                          : Colors.white,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -423,7 +513,9 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    'Import Excel file to add assets',
+                                    selectedStatus != 'All'
+                                        ? 'No assets with status: $selectedStatus'
+                                        : 'Import Excel file to add assets',
                                     style: TextStyle(
                                       fontFamily: 'Maison Book',
                                       fontSize: 14,

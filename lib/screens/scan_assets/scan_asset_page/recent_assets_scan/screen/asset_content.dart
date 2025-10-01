@@ -33,6 +33,7 @@ class AssetsContent extends StatefulWidget {
 class _AssetsContentState extends State<AssetsContent> {
   int selectedPage = 0;
   Timer? _debounce;
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
@@ -47,9 +48,20 @@ class _AssetsContentState extends State<AssetsContent> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(AssetsContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Set first load to false after initial data is loaded
+    if (_isFirstLoad && !widget.isLoading) {
+      _isFirstLoad = false;
+    }
+  }
+
   void _onSearchChanged() {
-    // Debounce
+    // Cancel previous debounce
     if (_debounce?.isActive ?? false) _debounce!.cancel();
+    
+    // Debounce search to reduce server load
     _debounce = Timer(const Duration(milliseconds: 600), () {
       widget.onFilterAssets(widget.searchController.text);
     });
@@ -96,7 +108,8 @@ class _AssetsContentState extends State<AssetsContent> {
             widget.scannedAssets.any((a) => a.assetCode == recent.assetNo))
         .toList();
 
-    if (widget.isLoading) {
+    // Only show shimmer on first load
+    if (_isFirstLoad && widget.isLoading) {
       return SliverToBoxAdapter(
         child: SizedBox(
           height: 400,
@@ -134,7 +147,8 @@ class _AssetsContentState extends State<AssetsContent> {
   Widget _buildUnscannedAssetsList() {
     final filtered = widget.unscannedAssets;
 
-    if (widget.isLoading) {
+    // Only show shimmer on first load
+    if (_isFirstLoad && widget.isLoading) {
       return SliverToBoxAdapter(
         child: SizedBox(
           height: 400,
@@ -188,9 +202,13 @@ class _AssetsContentState extends State<AssetsContent> {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          setState(() {
-            selectedPage = value;
-          });
+          if (selectedPage != value) {
+            setState(() {
+              selectedPage = value;
+              // Clear search when switching tabs
+              widget.searchController.clear();
+            });
+          }
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -237,6 +255,15 @@ class _AssetsContentState extends State<AssetsContent> {
         decoration: InputDecoration(
           prefixIcon:
               const Icon(Icons.search, color: Color(0xFF405189), size: 20),
+          suffixIcon: widget.searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear, color: Colors.grey, size: 20),
+                  onPressed: () {
+                    widget.searchController.clear();
+                    widget.onFilterAssets('');
+                  },
+                )
+              : null,
           hintText: 'Search Category, Asset ID',
           hintStyle: TextStyle(
             fontFamily: 'Maison Book',

@@ -240,131 +240,117 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
-          Text(
-            "Syarat dan Ketentuan SIMAP Indocement - Sistem Manajemen Asset",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF405189),
+            Text(
+              "Syarat dan Ketentuan SIMAP Indocement - Sistem Manajemen Asset",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF405189),
+              ),
             ),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "1. Persetujuan Penggunaan",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 16),
+            Text(
+              "1. Persetujuan Penggunaan",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Dengan menggunakan SIMAP Indocement, Anda setuju untuk mematuhi seluruh syarat dan ketentuan yang berlaku. Aplikasi ini dirancang khusus untuk kebutuhan manajemen Asset dan aset di lingkungan PT Indocement Tunggal Prakarsa Tbk.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "2. Hak dan Akses Pengguna",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 8),
+            Text(
+              "Dengan menggunakan SIMAP Indocement, Anda setuju untuk mematuhi seluruh syarat dan ketentuan yang berlaku. Aplikasi ini dirancang khusus untuk kebutuhan manajemen Asset di lingkungan Logistic Division.",
+              style: TextStyle(fontSize: 12),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Setiap pengguna wajib menjaga kerahasiaan akun dan bertanggung jawab atas setiap aktivitas yang dilakukan melalui akun tersebut. Akses aplikasi hanya diberikan kepada karyawan atau pihak yang telah mendapat izin resmi dari Indocement.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "3. Pengelolaan Data Asset dan Aset",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 16),
+            Text(
+              "2. Hak dan Akses Pengguna",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Data yang dimasukkan ke dalam SIMAP Indocement sepenuhnya merupakan tanggung jawab pengguna. Setiap informasi Asset, aset, lokasi, dan status harus akurat dan sesuai dengan kondisi sebenarnya di lapangan.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "4. Keamanan & Privasi",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 8),
+            Text(
+              "Setiap pengguna wajib menjaga kerahasiaan akun dan bertanggung jawab atas setiap aktivitas yang dilakukan melalui akun tersebut. Akses aplikasi hanya diberikan kepada karyawan atau pihak yang telah mendapat izin resmi.",
+              style: TextStyle(fontSize: 12),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "SIMAP Indocement berkomitmen menjaga keamanan data pengguna dan aset perusahaan. Data akan diakses dan diproses sesuai kebijakan internal Indocement terkait privasi dan perlindungan data.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "5. Batasan Tanggung Jawab",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 16),
+            Text(
+              "3. Pengelolaan Data Asset dan Aset",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Indocement dan pengembang aplikasi tidak bertanggung jawab atas kerugian, kehilangan data, atau kesalahan input yang dilakukan oleh pengguna. Penggunaan aplikasi sepenuhnya menjadi tanggung jawab pengguna.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "6. Penggunaan Fitur QR Code dan Scan",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 8),
+            Text(
+              "Data yang dimasukkan ke dalam SIMAP sepenuhnya merupakan tanggung jawab pengguna. Setiap informasi Asset, lokasi, dan status harus akurat dan sesuai dengan kondisi sebenarnya di lapangan.",
+              style: TextStyle(fontSize: 12),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Fitur scan dan QR code dalam aplikasi hanya boleh digunakan untuk keperluan inventarisasi dan pemeliharaan Asset di lingkungan Indocement. Penggunaan di luar keperluan resmi dilarang.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "7. Perubahan dan Pengembangan Layanan",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 16),
+            Text(
+              "4. Keamanan & Privasi",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Indocement berhak untuk memperbarui, mengubah, atau menghentikan fitur aplikasi kapan saja sesuai kebutuhan operasional tanpa pemberitahuan terlebih dahulu.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          // Text(
-          //   "8. Hukum yang Berlaku",
-          //   style: TextStyle(
-          //     fontFamily: 'Maison Bold',
-          //     fontSize: 13,
-          //     fontWeight: FontWeight.bold,
-          //   ),
-          // ),
-          // SizedBox(height: 8),
-          // Text(
-          //   "Syarat dan ketentuan ini tunduk pada hukum yang berlaku di Republik Indonesia.",
-          //   style: TextStyle(fontSize: 12),
-          // ),
-          // SizedBox(height: 16),
-        ],
+            SizedBox(height: 8),
+            Text(
+              "SIMAP berkomitmen menjaga keamanan data pengguna dan aset perusahaan. Data akan diakses dan diproses sesuai kebijakan terkait privasi dan perlindungan data.",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "5. Penggunaan Fitur Barcode",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              "Fitur scan Barcode dalam aplikasi hanya boleh digunakan untuk keperluan inventarisasi dan pemeliharaan Asset di lingkungan Indocement.",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "7. Perubahan dan Pengembangan Layanan",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              "Pengembang berhak untuk memperbarui, mengubah, atau menghentikan fitur aplikasi kapan saja sesuai kebutuhan operasional tanpa pemberitahuan terlebih dahulu.",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(height: 16),
+            // Text(
+            //   "8. Hukum yang Berlaku",
+            //   style: TextStyle(
+            //     fontFamily: 'Maison Bold',
+            //     fontSize: 13,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
+            // SizedBox(height: 8),
+            // Text(
+            //   "Syarat dan ketentuan ini tunduk pada hukum yang berlaku di Republik Indonesia.",
+            //   style: TextStyle(fontSize: 12),
+            // ),
+            // SizedBox(height: 16),
+          ],
+        ),
       ),
-    ),
     );
   }
 
@@ -386,102 +372,93 @@ class _TermsAndPrivacyContentState extends State<TermsAndPrivacyContent>
               ),
             ),
             SizedBox(height: 16),
-          Text(
-            "1. Informasi yang Dikumpulkan",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            Text(
+              "1. Penggunaan Data",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "2. Penggunaan Data",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 8),
+            Text(
+              "Data digunakan untuk mendukung operasional manajemen Asset, pelaporan, analisis, dan peningkatan proses inventarisasi.",
+              style: TextStyle(fontSize: 12),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Data digunakan untuk mendukung operasional manajemen Asset, pelaporan, analisis, dan peningkatan proses inventarisasi di Indocement.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "3. Penyimpanan dan Keamanan Data",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 16),
+            Text(
+              "2. Penyimpanan dan Keamanan Data",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Data disimpan secara aman di server internal Indocement. Sistem keamanan diterapkan sesuai standar perusahaan untuk mencegah akses tidak sah.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "4. Hak Akses dan Kontrol Pengguna",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 8),
+            Text(
+              "Data disimpan secara aman di server internal. Sistem keamanan diterapkan sesuai standar perusahaan untuk mencegah akses tidak sah.",
+              style: TextStyle(fontSize: 12),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Pengguna dapat meminta akses, koreksi, atau penghapusan data pribadi melalui admin sistem atau Divisi IT Indocement.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "5. Pembagian Data",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 16),
+            Text(
+              "3. Hak Akses dan Kontrol Pengguna",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Data tidak akan dibagikan ke pihak eksternal kecuali atas persetujuan manajemen Indocement atau sesuai peraturan yang berlaku.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "6. Perubahan Kebijakan",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 8),
+            Text(
+              "Pengguna dapat meminta akses, koreksi, atau penghapusan data pribadi melalui admin sistem atau Divisi IT.",
+              style: TextStyle(fontSize: 12),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Indocement berhak memperbarui Kebijakan Privasi sesuai kebutuhan dan akan menginformasikan pengguna melalui aplikasi.",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-          Text(
-            "7. Kontak & Informasi Lebih Lanjut",
-            style: TextStyle(
-              fontFamily: 'Maison Bold',
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+            SizedBox(height: 16),
+            // Text(
+            //   "4. Pembagian Data",
+            //   style: TextStyle(
+            //     fontFamily: 'Maison Bold',
+            //     fontSize: 13,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
+            // SizedBox(height: 8),
+            // Text(
+            //   "Data tidak akan dibagikan ke pihak eksternal kecuali atas persetujuan manajemen Indocement atau sesuai peraturan yang berlaku.",
+            //   style: TextStyle(fontSize: 12),
+            // ),
+            // SizedBox(height: 16),
+            Text(
+              "4. Perubahan Kebijakan",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Untuk pertanyaan atau permintaan terkait privasi dan aplikasi, silakan hubungi Contact person: wildansobah69@gmail.com",
-            style: TextStyle(fontSize: 12),
-          ),
-          SizedBox(height: 16),
-        ],
+            SizedBox(height: 8),
+            Text(
+              "Tim berhak memperbarui Kebijakan Privasi sesuai kebutuhan dan akan menginformasikan pengguna melalui aplikasi.",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(height: 16),
+            Text(
+              "5. Kontak & Informasi Lebih Lanjut",
+              style: TextStyle(
+                fontFamily: 'Maison Bold',
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              "Untuk pertanyaan atau permintaan terkait privasi dan aplikasi, silakan hubungi Contact person: wildansobah69@gmail.com",
+              style: TextStyle(fontSize: 12),
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

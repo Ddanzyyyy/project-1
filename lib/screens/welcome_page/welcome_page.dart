@@ -570,7 +570,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 image: Image.asset('assets/images/icons/activity_page/research.png', width: 28, height: 28),
                 // count: '∞',
                 description: 'Scan barcodes',
-                color: const Color(0xFF0085FF),
+                color: const Color.fromARGB(255, 14, 40, 64),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LogisticAssetScanMenuPage())),
               ),
             ),

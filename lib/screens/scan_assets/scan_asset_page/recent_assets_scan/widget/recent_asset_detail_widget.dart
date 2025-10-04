@@ -62,7 +62,7 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
       print('Error loading recent asset detail: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal memuat detail asset: $e'),
+          content: Text('Gagal memuat detail asset'),
           backgroundColor: Colors.red,
         ),
       );
@@ -95,97 +95,13 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
     }
   }
 
-  void _showFullImage(BuildContext context, String imageUrl, {String? photoTitle}) {
+  void _showFullImageGallery(BuildContext context, int initialIndex) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(10),
-        child: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (photoTitle != null && photoTitle.isNotEmpty)
-                Container(
-                  margin: EdgeInsets.only(bottom: 16),
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    photoTitle,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Maison Bold',
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              Expanded(
-                child: InteractiveViewer(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.white,
-                          height: 300,
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.broken_image, size: 64, color: Colors.grey),
-                                SizedBox(height: 8),
-                                Text('Gagal memuat foto', style: TextStyle(color: Colors.grey)),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          color: Colors.white,
-                          height: 300,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                  : null,
-                              color: const Color(0xFF405189),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 16),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Tap untuk menutup',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: 'Maison Book',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+      barrierColor: Colors.black87,
+      builder: (context) => _FullImageGalleryDialog(
+        photos: uploadedPhotos,
+        initialIndex: initialIndex,
       ),
     );
   }
@@ -488,11 +404,7 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
                             itemBuilder: (context, index, realIdx) {
                               final photo = uploadedPhotos[index];
                               return GestureDetector(
-                                onTap: () => _showFullImage(
-                                  context,
-                                  photo.fileUrl,
-                                  photoTitle: photo.fileName ?? 'Foto ${index + 1}',
-                                ),
+                                onTap: () => _showFullImageGallery(context, index),
                                 child: Container(
                                   margin: EdgeInsets.symmetric(vertical: 8),
                                   decoration: BoxDecoration(
@@ -531,6 +443,7 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
                                             );
                                           },
                                         ),
+                                        // Tidak ada fileName di gambar
                                         Positioned(
                                           bottom: 0,
                                           left: 0,
@@ -547,16 +460,6 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                if (photo.fileName != null && photo.fileName!.isNotEmpty)
-                                                  Text(
-                                                    photo.fileName!,
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight: FontWeight.w600,
-                                                      fontFamily: 'Maison Bold',
-                                                      fontSize: 14,
-                                                    ),
-                                                  ),
                                                 if (photo.uploadedAt != null)
                                                   Text(
                                                     DateFormat('dd/MM/yyyy HH:mm').format(photo.uploadedAt!),
@@ -568,18 +471,6 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
                                                   ),
                                               ],
                                             ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 12,
-                                          right: 12,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.black.withOpacity(0.5),
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                            padding: EdgeInsets.all(4),
-                                            child: Icon(Icons.zoom_in, color: Colors.white, size: 18),
                                           ),
                                         ),
                                       ],
@@ -848,6 +739,211 @@ class AssetPhoto {
               ? DateTime.tryParse(json['created_at'])
               : null,
       description: json['description'],
+    );
+  }
+}
+
+class _FullImageGalleryDialog extends StatefulWidget {
+  final List<AssetPhoto> photos;
+  final int initialIndex;
+
+  const _FullImageGalleryDialog({
+    Key? key,
+    required this.photos,
+    required this.initialIndex,
+  }) : super(key: key);
+
+  @override
+  State<_FullImageGalleryDialog> createState() => _FullImageGalleryDialogState();
+}
+
+class _FullImageGalleryDialogState extends State<_FullImageGalleryDialog> {
+  late int currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    currentIndex = widget.initialIndex;
+  }
+
+  void _nextImage() {
+    setState(() {
+      currentIndex = (currentIndex + 1) % widget.photos.length;
+    });
+  }
+
+  void _prevImage() {
+    setState(() {
+      currentIndex = (currentIndex - 1 + widget.photos.length) % widget.photos.length;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AssetPhoto photo = widget.photos[currentIndex];
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(0),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // ONLY zoom/pan, tap area gambar tidak mengganti gambar!
+          Center(
+            child: GestureDetector(
+              onLongPress: () => Navigator.of(context).pop(),
+              child: InteractiveViewer(
+                panEnabled: true,
+                minScale: 1,
+                maxScale: 6,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Image.network(
+                    photo.fileUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.white,
+                        height: 300,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.broken_image, size: 64, color: Colors.grey),
+                              SizedBox(height: 8),
+                              Text('Gagal memuat foto', style: TextStyle(color: Colors.grey)),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.white,
+                        height: 300,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                : null,
+                            color: const Color(0xFF405189),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // LEFT ARROW ONLY tapable
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 80,
+              color: Colors.transparent,
+              child: Center(
+                child: GestureDetector(
+                  onTap: _prevImage,
+                  child: Icon(Icons.arrow_back_ios, color: Colors.white.withOpacity(0.7), size: 36),
+                ),
+              ),
+            ),
+          ),
+          // RIGHT ARROW ONLY tapable
+          Positioned(
+            right: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 80,
+              color: Colors.transparent,
+              child: Center(
+                child: GestureDetector(
+                  onTap: _nextImage,
+                  child: Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.7), size: 36),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 32,
+            left: 24,
+            right: 24,
+            child: Column(
+              children: [
+                if (photo.description != null && photo.description!.isNotEmpty)
+                  Container(
+                    margin: EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      photo.description!,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontFamily: 'Maison Book',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                if (photo.uploadedAt != null)
+                  Container(
+                    margin: EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Uploaded: ${DateFormat('dd/MM/yyyy HH:mm').format(photo.uploadedAt!)}',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 12,
+                        fontFamily: 'Maison Book',
+                      ),
+                    ),
+                  ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${currentIndex + 1} / ${widget.photos.length}',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 12,
+                      fontFamily: 'Maison Book',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 36,
+            right: 36,
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: EdgeInsets.all(8),
+                child: Icon(Icons.close, color: Colors.white, size: 28),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

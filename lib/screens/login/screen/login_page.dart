@@ -95,15 +95,21 @@ class _LoginPageState extends State<LoginPage> {
             });
           }
         } else {
-          final data = jsonDecode(response.body);
-          setState(() {
-            apiWarning = data['message'] ?? 'Login gagal';
-          });
+          try {
+            final data = jsonDecode(response.body);
+            setState(() {
+              apiWarning = data['message'] ?? 'Login gagal';
+            });
+          } catch (e) {
+            setState(() {
+              apiWarning = 'Gagal login ke server';
+            });
+          }
         }
       } catch (e) {
         setState(() {
           isLoading = false;
-          apiWarning = 'Gagal terhubung ke server: $e';
+          apiWarning = 'Gagal login ke server';
         });
       }
     }
@@ -183,12 +189,12 @@ class _LoginPageState extends State<LoginPage> {
                       width: 250,
                       height: 180,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 40), 
+                        padding: EdgeInsets.only(top: 40),
                         child: Image.asset(
                           'assets/images/icons/gif/SIMAP_LOGO.gif',
                           fit: BoxFit.contain,
                         ),
-                      ),  
+                      ),
                     ),
                     SizedBox(height: 18),
                     // Custom "SIMAP" text

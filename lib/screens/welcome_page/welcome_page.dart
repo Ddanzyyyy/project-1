@@ -462,7 +462,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     fontFamily: 'Maison Bold',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF405189),
+                    color: Colors.black,
                   ),
                 ),
                 // const SizedBox(height: 2),

@@ -51,17 +51,14 @@ class _AssetsContentState extends State<AssetsContent> {
   @override
   void didUpdateWidget(AssetsContent oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Set first load to false after initial data is loaded
     if (_isFirstLoad && !widget.isLoading) {
       _isFirstLoad = false;
     }
   }
 
   void _onSearchChanged() {
-    // Cancel previous debounce
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     
-    // Debounce search to reduce server load
     _debounce = Timer(const Duration(milliseconds: 600), () {
       widget.onFilterAssets(widget.searchController.text);
     });

@@ -105,7 +105,6 @@ class _AssetsContentState extends State<AssetsContent> {
             widget.scannedAssets.any((a) => a.assetCode == recent.assetNo))
         .toList();
 
-    // Only show shimmer on first load
     if (_isFirstLoad && widget.isLoading) {
       return SliverToBoxAdapter(
         child: SizedBox(

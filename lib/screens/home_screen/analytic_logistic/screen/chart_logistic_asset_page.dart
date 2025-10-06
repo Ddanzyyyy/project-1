@@ -694,7 +694,6 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
     );
   }
 
-  /// ----- Main -----
   @override
   Widget build(BuildContext context) {
     return Scaffold(

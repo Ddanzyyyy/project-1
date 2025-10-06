@@ -96,9 +96,32 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
         filteredAssets = loadedAssets;
       });
     } catch (e) {
-      _showErrorSnackBarSafe('Failed to load assets: $e');
+      // _showErrorSnackBarSafe('Failed to load assets: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white, size: 18),
+                SizedBox(width: 6),
+                Expanded(
+                    child: Text('Gagal memuat data, silakan coba lagi.',
+                        style: TextStyle(fontSize: 13))),
+              ],
+            ),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            // action: SnackBarAction(
+            //   label: 'Retry',
+            //   textColor: Colors.white,
+            //   onPressed: _loadAssets,
+            // ),
+          ),
+        );
+      }
     } finally {
       setState(() => isLoading = false);
+  
     }
   }
 

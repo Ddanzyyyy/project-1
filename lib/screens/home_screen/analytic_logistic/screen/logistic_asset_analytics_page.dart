@@ -52,7 +52,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
     } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage = e.toString();
+        errorMessage = 'Gagal memuat data, silakan coba lagi.';
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -62,17 +62,17 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
                 Icon(Icons.error, color: Colors.white, size: 18),
                 SizedBox(width: 6),
                 Expanded(
-                    child: Text('Error loading data: $e',
+                    child: Text('Gagal memuat data analitik, silakan coba lagi.',
                         style: TextStyle(fontSize: 13))),
               ],
             ),
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
-            action: SnackBarAction(
-              label: 'Retry',
-              textColor: Colors.white,
-              onPressed: _loadAssets,
-            ),
+            // action: SnackBarAction(
+            //   label: 'Retry',
+            //   textColor: Colors.white,
+            //   onPressed: _loadAssets,
+            // ),
           ),
         );
       }
@@ -342,7 +342,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
           ),
           SizedBox(height: 12),
           Text(
-            'Failed to load data',
+            'Gagal memuat data',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -351,7 +351,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
           ),
           SizedBox(height: 6),
           Text(
-            errorMessage.isNotEmpty ? errorMessage : 'Something went wrong',
+            'Silakan coba lagi nanti.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
@@ -369,7 +369,7 @@ class _LogisticAssetAnalyticsPageState extends State<LogisticAssetAnalyticsPage>
               ),
             ),
             icon: Icon(Icons.refresh, size: 18),
-            label: Text('Try Again', style: TextStyle(fontSize: 13)),
+            label: Text('Coba Lagi', style: TextStyle(fontSize: 13)),
             onPressed: _loadAssets,
           ),
         ],

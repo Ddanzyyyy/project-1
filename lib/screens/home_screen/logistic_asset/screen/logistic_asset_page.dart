@@ -22,8 +22,10 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
   String selectedStatus = 'All';
   bool isLoading = true;
   bool isImporting = false;
+  bool isError = false;
+  bool errorSnackbarShown = false; // ===> Untuk memastikan error hanya muncul sekali
 
-  Timer? _debounce; 
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -33,11 +35,17 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
 
   @override
   void dispose() {
-    _debounce?.cancel(); 
+    _debounce?.cancel();
     super.dispose();
   }
 
   Future<void> _loadData() async {
+    setState(() {
+      isError = false;
+      errorSnackbarShown = false;
+    });
+
+    // Jalankan kedua API secara paralel, error hanya trigger sekali!
     await Future.wait([
       _loadAssets(),
       _loadCategories(),
@@ -46,9 +54,11 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
 
   Future<void> _loadAssets({bool showLoader = true}) async {
     if (showLoader) {
-      setState(() => isLoading = true);
+      setState(() {
+        isLoading = true;
+        isError = false;
+      });
     }
-    
     try {
       final loadedAssets = await LogisticAssetService.getLogisticAssets(
         search: searchQuery,
@@ -58,10 +68,14 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
       setState(() {
         assets = loadedAssets;
         isLoading = false;
+        isError = false;
       });
     } catch (e) {
-      setState(() => isLoading = false);
-      _showErrorSnackBar('Failed to load assets: $e');
+      setState(() {
+        isLoading = false;
+        isError = true;
+      });
+      // _showErrorOnce("Failed load asset and category");
     }
   }
 
@@ -72,7 +86,32 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
         categories = ['All', ...loadedCategories];
       });
     } catch (e) {
-      _showErrorSnackBar('Failed to load categories: $e');
+      setState(() {
+        isError = true;
+      });
+      // _showErrorOnce("Gagal memuat data, silakan coba lagi.");
+  if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white, size: 18),
+                SizedBox(width: 6),
+                Expanded(
+                    child: Text('Gagal memuat data, silakan coba lagi.',
+                        style: TextStyle(fontSize: 13))),
+              ],
+            ),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            // action: SnackBarAction(
+            //   label: 'Retry',
+            //   textColor: Colors.white,
+            //   onPressed: _loadAssets,
+            // ),
+          ),
+        );
+      }
     }
   }
 
@@ -99,6 +138,13 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
     } catch (e) {
       setState(() => isImporting = false);
       _showErrorSnackBar('Import failed: $e');
+    }
+  }
+
+  void _showErrorOnce(String message) {
+    if (!errorSnackbarShown) {
+      errorSnackbarShown = true;
+      _showErrorSnackBar(message);
     }
   }
 
@@ -274,6 +320,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool totalError = isError;
     return Scaffold(
       backgroundColor: Color(0xFFF8F9FA),
       appBar: AppBar(
@@ -492,7 +539,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
               color: Color(0xFF405189),
               child: isLoading
                   ? _buildShimmerList()
-                  : assets.isEmpty
+                  : totalError
                       ? ListView(
                           physics: AlwaysScrollableScrollPhysics(),
                           children: [
@@ -500,11 +547,11 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                             Center(
                               child: Column(
                                 children: [
-                                  Icon(Icons.inventory_2_outlined,
-                                      size: 64, color: Colors.grey[400]),
+                                  Icon(Icons.error_outline,
+                                      size: 64, color: Colors.grey[500]),
                                   SizedBox(height: 16),
                                   Text(
-                                    'No logistic assets found',
+                                    "Failed load assets",
                                     style: TextStyle(
                                       fontFamily: 'Maison Bold',
                                       fontSize: 18,
@@ -513,9 +560,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    selectedStatus != 'All'
-                                        ? 'No assets with status: $selectedStatus'
-                                        : 'Import Excel file to add assets',
+                                    "Silakan coba refresh halaman.",
                                     style: TextStyle(
                                       fontFamily: 'Maison Book',
                                       fontSize: 14,
@@ -527,32 +572,67 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
                             ),
                           ],
                         )
-                      : CustomScrollView(
-                          physics: AlwaysScrollableScrollPhysics(),
-                          slivers: [
-                            // Quick Analytics Section
-                            SliverToBoxAdapter(
-                              child: _buildQuickAnalytics(),
-                            ),
-                            // Asset List
-                            SliverPadding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    final asset = assets[index];
-                                    return _buildAssetCard(asset);
-                                  },
-                                  childCount: assets.length,
+                      : assets.isEmpty
+                          ? ListView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              children: [
+                                SizedBox(height: 100),
+                                Center(
+                                  child: Column(
+                                    children: [
+                                      Icon(Icons.inventory_2_outlined,
+                                          size: 64, color: Colors.grey[400]),
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'No logistic assets found',
+                                        style: TextStyle(
+                                          fontFamily: 'Maison Bold',
+                                          fontSize: 18,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        selectedStatus != 'All'
+                                            ? 'No assets with status: $selectedStatus'
+                                            : 'Import Excel file to add assets',
+                                        style: TextStyle(
+                                          fontFamily: 'Maison Book',
+                                          fontSize: 14,
+                                          color: Colors.grey[500],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
+                              ],
+                            )
+                          : CustomScrollView(
+                              physics: AlwaysScrollableScrollPhysics(),
+                              slivers: [
+                                // Quick Analytics Section
+                                SliverToBoxAdapter(
+                                  child: _buildQuickAnalytics(),
+                                ),
+                                // Asset List
+                                SliverPadding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  sliver: SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                      (context, index) {
+                                        final asset = assets[index];
+                                        return _buildAssetCard(asset);
+                                      },
+                                      childCount: assets.length,
+                                    ),
+                                  ),
+                                ),
+                                // Bottom spacing
+                                SliverToBoxAdapter(
+                                  child: SizedBox(height: 16),
+                                ),
+                              ],
                             ),
-                            // Bottom spacing
-                            SliverToBoxAdapter(
-                              child: SizedBox(height: 16),
-                            ),
-                          ],
-                        ),
             ),
           ),
 

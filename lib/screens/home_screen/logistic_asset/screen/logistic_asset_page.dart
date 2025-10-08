@@ -23,7 +23,7 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
   bool isLoading = true;
   bool isImporting = false;
   bool isError = false;
-  bool errorSnackbarShown = false; // ===> Untuk memastikan error hanya muncul sekali
+  bool errorSnackbarShown = false;
 
   Timer? _debounce;
 
@@ -45,7 +45,6 @@ class _LogisticAssetPageState extends State<LogisticAssetPage> {
       errorSnackbarShown = false;
     });
 
-    // Jalankan kedua API secara paralel, error hanya trigger sekali!
     await Future.wait([
       _loadAssets(),
       _loadCategories(),

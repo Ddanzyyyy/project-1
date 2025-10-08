@@ -317,7 +317,7 @@ class _ChartLogisticAssetsPageState extends State<ChartLogisticAssetsPage> {
                           text,
                           style: TextStyle(
                             fontSize: 10,
-                            color: chartColors[value.toInt() % chartColors.length], // Use color indicator as label color
+                            color: chartColors[value.toInt() % chartColors.length],
                             fontWeight: FontWeight.w500,
                           ),
                           overflow: TextOverflow.ellipsis,

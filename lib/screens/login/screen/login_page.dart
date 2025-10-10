@@ -304,7 +304,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: Text(
                                 usernameWarning,
                                 style: const TextStyle(
-                                  fontFamily: 'Maison Book',
+                                  fontFamily: 'Maison Bold',
                                   color: Colors.red,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,

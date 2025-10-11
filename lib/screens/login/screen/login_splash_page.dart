@@ -55,7 +55,6 @@ class _LoginSplashPageState extends State<LoginSplashPage> {
                     ),
                   ),
                 ),
-                // Curved accent background bottom right
                 Positioned(
                   bottom: -screenHeight * 0.19,
                   right: -screenWidth * 0.18,

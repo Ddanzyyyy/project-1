@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-/// Utility class untuk menampilkan efek shimmer loading pada tampilan asset scan.
 class ShimmerLoading {
-  /// Membuat widget shimmer untuk card asset yang sedang loading.
   static Widget assetCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -73,14 +71,12 @@ class ShimmerLoading {
     );
   }
 
-  /// Membuat widget shimmer untuk list asset yang baru di-scan (hanya satu card).
   static Widget recentAssetsList() {
     return Column(
       children: List.generate(1, (index) => assetCard()),
     );
   }
 
-  /// Membuat widget shimmer untuk list asset (jumlah card: 6).
   static Widget assetsList() {
     return ListView.builder(
       padding: EdgeInsets.zero,

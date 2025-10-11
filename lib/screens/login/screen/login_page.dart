@@ -163,7 +163,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          // Dynamic company logo in top right
           Positioned(
             top: screenHeight * 0.03,
             right: screenWidth * 0.04,

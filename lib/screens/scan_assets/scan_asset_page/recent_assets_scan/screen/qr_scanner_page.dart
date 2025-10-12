@@ -42,7 +42,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
   }
 
   void _onDetect(BarcodeCapture capture) {
-    if (hasScanned) return; // Prevent multiple scans
+    if (hasScanned) return;
     final List<Barcode> barcodes = capture.barcodes;
     for (final barcode in barcodes) {
       final String? code = barcode.rawValue;
@@ -97,7 +97,6 @@ class _QRScannerPageState extends State<QRScannerPage> {
                     onPressed: () => Navigator.pop(context),
                   ),
                 ),
-                // Camera controls
                 Row(
                   children: [
                     IconButton(
@@ -263,7 +262,6 @@ class QrScannerOverlayShape extends ShapeBorder {
       _cutOutSize - borderOffset * 2,
     );
 
-    // Draw overlay
     canvas.saveLayer(rect, backgroundPaint);
     canvas.drawRect(rect, backgroundPaint);
     canvas.drawRRect(
@@ -272,13 +270,11 @@ class QrScannerOverlayShape extends ShapeBorder {
     );
     canvas.restore();
 
-    // Draw border corners
     final borderRect = RRect.fromRectAndRadius(
       cutOutRect,
       Radius.circular(borderRadius),
     );
 
-    // Top left corner
     canvas.drawPath(
       Path()
         ..moveTo(borderRect.left, borderRect.top + _borderLength)
@@ -287,7 +283,6 @@ class QrScannerOverlayShape extends ShapeBorder {
         ..lineTo(borderRect.left + _borderLength, borderRect.top),
       borderPaint,
     );
-    // Top right corner
     canvas.drawPath(
       Path()
         ..moveTo(borderRect.right - _borderLength, borderRect.top)
@@ -296,7 +291,6 @@ class QrScannerOverlayShape extends ShapeBorder {
         ..lineTo(borderRect.right, borderRect.top + _borderLength),
       borderPaint,
     );
-    // Bottom left corner
     canvas.drawPath(
       Path()
         ..moveTo(borderRect.left, borderRect.bottom - _borderLength)
@@ -305,7 +299,6 @@ class QrScannerOverlayShape extends ShapeBorder {
         ..lineTo(borderRect.left + _borderLength, borderRect.bottom),
       borderPaint,
     );
-    // Bottom right corner
     canvas.drawPath(
       Path()
         ..moveTo(borderRect.right - _borderLength, borderRect.bottom)

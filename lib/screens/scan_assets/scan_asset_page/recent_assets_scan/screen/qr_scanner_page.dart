@@ -275,6 +275,7 @@ class QrScannerOverlayShape extends ShapeBorder {
       Radius.circular(borderRadius),
     );
 
+    // Draw the borders at the corners
     canvas.drawPath(
       Path()
         ..moveTo(borderRect.left, borderRect.top + _borderLength)

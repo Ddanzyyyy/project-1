@@ -528,13 +528,13 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 15),
-              decoration: const BoxDecoration(
-                color: Color(0xFF405189),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-              ),
+              // decoration: const BoxDecoration(
+              //   // color: Color(0xFF405189),
+              //   // borderRadius: BorderRadius.only(
+              //   //   bottomLeft: Radius.circular(30),
+              //   //   bottomRight: Radius.circular(30),
+              //   // ), 
+              // ),
               child: Column(
                 children: [
                   Row(
@@ -547,7 +547,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                           child: _buildTabButton('Assets', Icons.inventory)),
                     ],
                   ),
-                  const SizedBox(height: 15),
+                  // const SizedBox(height: 10),
                   Column(
                     children: [
                       Row(
@@ -575,7 +575,7 @@ class _ScanAssetPageState extends State<ScanAssetPage> {
                           // ),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      // const SizedBox(height: 2),
                       // Text(
                       //   'Current Time: ${getCurrentTime()}',
                       //   style: const TextStyle(

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class ScanAssetTabButton extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final IconData? icon; // make nullable
   final bool isSelected;
   final VoidCallback onTap;
 
   const ScanAssetTabButton({
     required this.label,
-    required this.icon,
+    this.icon,
     required this.isSelected,
     required this.onTap,
     Key? key,
@@ -16,31 +16,34 @@ class ScanAssetTabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = const Color(0xFF405189);
+    final bgColor = isSelected ? selectedColor : Colors.white;
+    final contentColor = isSelected ? Colors.white : selectedColor;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+        height: 40,
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: isSelected ? Colors.transparent : Colors.white54,
-            width: 1,
-          ),
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+          border: isSelected
+              ? null
+              : Border.all(color: selectedColor.withOpacity(0.15), width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon,
-                color: isSelected ? const Color(0xFF405189) : Colors.white,
-                size: 16),
-            const SizedBox(width: 6),
+            // render icon only when provided
+            if (icon != null) ...[
+              Icon(icon, size: 18, color: isSelected ? Colors.white : Colors.grey),
+              const SizedBox(width: 8),
+            ],
             Text(
               label,
               style: TextStyle(
-                fontFamily: 'Maison Bold',
-                color: isSelected ? const Color(0xFF405189) : Colors.white,
-                fontSize: 11,
+                color: contentColor,
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
             ),

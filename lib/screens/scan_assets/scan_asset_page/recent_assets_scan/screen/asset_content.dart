@@ -5,6 +5,7 @@ import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/wid
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/screen/shimmer_loading.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/asset.dart';
 import 'package:Simba/screens/scan_assets/scan_asset_page/recent_assets_scan/model/recent_asset_model.dart';
+import 'scan_asset_tab_button.dart';
 
 class AssetsContent extends StatefulWidget {
   final TextEditingController searchController;
@@ -196,7 +197,10 @@ class _AssetsContentState extends State<AssetsContent> {
   Widget _buildTabButton(String label, int value) {
     final bool isSelected = selectedPage == value;
     return Expanded(
-      child: GestureDetector(
+      child: ScanAssetTabButton(
+        label: label,
+        // icon removed so tab shows only text
+        isSelected: isSelected,
         onTap: () {
           if (selectedPage != value) {
             setState(() {
@@ -206,28 +210,6 @@ class _AssetsContentState extends State<AssetsContent> {
             });
           }
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF405189) : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: const Color(0xFF405189),
-              width: isSelected ? 2 : 1,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Maison Bold',
-                fontSize: 14,
-                color: isSelected ? Colors.white : const Color(0xFF405189),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

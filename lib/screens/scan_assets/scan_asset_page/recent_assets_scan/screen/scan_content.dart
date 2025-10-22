@@ -37,7 +37,7 @@ class _ScanContentState extends State<ScanContent> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
       children: [
-        const SizedBox(height: 8),
+        // const SizedBox(height: 8),
         const Text(
           'Scan Asset',
           style: TextStyle(

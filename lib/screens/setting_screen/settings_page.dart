@@ -151,73 +151,41 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             const SizedBox(width: 10),
-            // ClipRRect(
-            //   // borderRadius: BorderRadius.circular(5),
-            //   child: Image.asset(
-            //     'assets/images/indocement_logo.png',
-            //     width: 40,
-            //     height: 40,
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
           ],
         ),
         centerTitle: false,
       ),
-      body: Column(
-        children: [
-          SettingsHeader(
-            userName: _userName,
-            userUsername: _userUsername,
-            lastLoginWIB: _lastLoginWIB,
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // SettingsSectionHeader(title: 'Notifications'),
-                  // const SizedBox(height: 12),
-                  // SettingsNotificationCard(
-                  //   notificationsEnabled: _notificationsEnabled,
-                  //   pushNotifications: _pushNotifications,
-                  //   onNotificationsChanged: (val) {
-                  //     setState(() {
-                  //       _notificationsEnabled = val;
-                  //       if (!val) _pushNotifications = false;
-                  //     });
-                  //   },
-                  //   onPushChanged: (val) {
-                  //     setState(() {
-                  //       _pushNotifications = val;
-                  //     });
-                  //   },
-                  // ),
-                  // const SizedBox(height: 7),
-                  SettingsSectionHeader(title: 'Account'),
-                  const SizedBox(height: 12),
-                  SettingsAccountCard(
-                    userName: _userName,
-                    lastLoginWIB: _lastLoginWIB,
-                    onProfileTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EditProfilePage()));
-                    },
-                    onLogout: _performLogout,
-                  ),
-                  const SizedBox(height: 28),
-                  SettingsSectionHeader(title: 'About'),
-                  const SizedBox(height: 12),
-                  const SettingsAboutCard(),
-                  const SizedBox(height: 40),
-                ],
-              ),
+      // <-- REPLACED: put header inside the scrollable ListView so it scrolls with the page
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            SettingsHeader(
+              userName: _userName,
+              userUsername: _userUsername,
+              lastLoginWIB: _lastLoginWIB,
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            SettingsSectionHeader(title: 'Account'),
+            const SizedBox(height: 12),
+            SettingsAccountCard(
+              userName: _userName,
+              lastLoginWIB: _lastLoginWIB,
+              onProfileTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditProfilePage()));
+              },
+              onLogout: _performLogout,
+            ),
+            const SizedBox(height: 28),
+            SettingsSectionHeader(title: 'About'),
+            const SizedBox(height: 12),
+            const SettingsAboutCard(),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
       bottomNavigationBar: AppBottomNavBar(
         selectedIndex: 3, // Setting

@@ -16,46 +16,20 @@ class SettingsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 18),
-      decoration: const BoxDecoration(
-        color: Color(0xFF405189),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
-      ),
+      padding: const EdgeInsets.fromLTRB(5, 5, 20, 18),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.22),
-                  Colors.white.withOpacity(0.09),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(26),
-              border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: Colors.grey[300],
             child: const Icon(
               Icons.person,
-              color: Colors.white,
+              color: Color(0xFF868686),
               size: 28,
             ),
           ),
-          const SizedBox(width: 16),
-          // User Info Column
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +38,7 @@ class SettingsHeader extends StatelessWidget {
                   userName.isNotEmpty ? userName : 'Loading...',
                   style: const TextStyle(
                     fontFamily: 'Maison Bold',
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.2,
@@ -77,7 +51,7 @@ class SettingsHeader extends StatelessWidget {
                   userUsername.isNotEmpty ? '@$userUsername' : '',
                   style: const TextStyle(
                     fontFamily: 'Maison Book',
-                    color: Colors.white70,
+                    color: Colors.black,
                     fontSize: 13,
                     fontWeight: FontWeight.w400,
                   ),
@@ -87,14 +61,13 @@ class SettingsHeader extends StatelessWidget {
                 const SizedBox(height: 3),
                 Row(
                   children: [
-                    // const Icon(Icons.access_time, color: Colors.white38, size: 15),
                     const SizedBox(width: 5),
                     Flexible(
                       child: Text(
                         'Last login: $lastLoginWIB',
                         style: const TextStyle(
                           fontFamily: 'Maison Book',
-                          color: Colors.white54,
+                          color: Colors.black,
                           fontSize: 11,
                           fontWeight: FontWeight.w400,
                         ),

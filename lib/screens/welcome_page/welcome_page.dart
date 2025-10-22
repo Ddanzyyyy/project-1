@@ -227,12 +227,12 @@ class _WelcomePageState extends State<WelcomePage> {
                             fit: BoxFit.contain,
                           ),
                           // Indocement logo (no box)
-                          Image.asset(
-                            'assets/images/indocement_logo.png',
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.contain,
-                          ),
+                          // Image.asset(
+                          //   'assets/images/indocement_logo.png',
+                          //   width: 40,
+                          //   height: 40,
+                          //   fit: BoxFit.contain,
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 24),

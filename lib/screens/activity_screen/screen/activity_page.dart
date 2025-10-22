@@ -12,7 +12,9 @@ class AppBottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onTap;
 
-  const AppBottomNavBar({required this.selectedIndex, required this.onTap, Key? key}) : super(key: key);
+  const AppBottomNavBar(
+      {required this.selectedIndex, required this.onTap, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,8 @@ class AppBottomNavBar extends StatelessWidget {
           children: [
             _buildNavItem(context, Icons.home_rounded, "Home", 0),
             _buildNavItem(context, Icons.timeline_rounded, "Activity", 1),
-            _buildNavItem(context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
+            _buildNavItem(
+                context, Icons.qr_code_scanner_rounded, "Scan Asset", 2),
             _buildNavItem(context, Icons.settings_rounded, "Setting", 3),
           ],
         ),
@@ -46,7 +49,8 @@ class AppBottomNavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+  Widget _buildNavItem(
+      BuildContext context, IconData icon, String label, int index) {
     final selected = index == selectedIndex;
     return GestureDetector(
       onTap: () => onTap(index),
@@ -54,9 +58,11 @@ class AppBottomNavBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 8),
-          Icon(icon, color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
+          Icon(icon,
+              color: selected ? Color(0xFF405189) : Colors.grey, size: 28),
           const SizedBox(height: 4),
-          Text(label,
+          Text(
+            label,
             style: TextStyle(
               fontFamily: 'Maison Bold',
               color: selected ? Color(0xFF405189) : Colors.grey,
@@ -102,7 +108,8 @@ class _ActivityPageState extends State<ActivityPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final username = prefs.getString('username') ?? 'user';
-      final fullName = prefs.getString('full_name') ?? prefs.getString('name') ?? 'User';
+      final fullName =
+          prefs.getString('full_name') ?? prefs.getString('name') ?? 'User';
       final firstName = prefs.getString('first_name') ?? '';
       final lastName = prefs.getString('last_name') ?? '';
       String displayName = fullName;
@@ -134,7 +141,8 @@ class _ActivityPageState extends State<ActivityPage> {
     try {
       final result = await activityService.fetchActivities(userId: userId);
       setState(() {
-        activities = result.where((a) => a.activityType != 'view_photos').toList();
+        activities =
+            result.where((a) => a.activityType != 'view_photos').toList();
         isLoading = false;
       });
     } catch (e) {
@@ -162,11 +170,7 @@ class _ActivityPageState extends State<ActivityPage> {
     final option = await showMenu<String>(
       context: context,
       position: RelativeRect.fromLTRB(
-        MediaQuery.of(context).size.width - 180, 
-        80, 
-        12, 
-        0
-      ),
+          MediaQuery.of(context).size.width - 180, 80, 12, 0),
       items: [
         PopupMenuItem<String>(
           value: 'all',
@@ -243,10 +247,12 @@ class _ActivityPageState extends State<ActivityPage> {
     }
     if (index == 1) {}
     if (index == 2) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => ScanAssetPage()));
     }
     if (index == 3) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => SettingsPage()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => SettingsPage()));
     }
   }
 
@@ -281,60 +287,61 @@ class _ActivityPageState extends State<ActivityPage> {
         ),
         centerTitle: false,
       ),
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: const BoxDecoration(
-              color: Color(0xFF405189),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (isLoadingUserInfo)
-                  _buildShimmerHeader()
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        activities.isNotEmpty
-                            ? 'Last activity: ${_formatWibDate(activities.first.activityTime)}'
-                            : 'No activity yet',
-                        style: const TextStyle(
-                          fontFamily: 'Maison Book',
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Current Time: ${getCurrentWibTime()}',
-                        style: const TextStyle(
-                          fontFamily: 'Maison Book',
-                          color: Colors.white60,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
+      body: RefreshIndicator(
+        onRefresh: fetchActivities,
+        color: const Color(0xFF405189),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            // Header (sekarang bagian dari scrollable content)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(
+                  20, 20, 20, 8), // kurangi jarak bawah header
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 10),
+                  if (isLoadingUserInfo)
+                    _buildShimmerHeader()
+                  else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          activities.isNotEmpty
+                              ? 'Last activity: ${_formatWibDate(activities.first.activityTime)}'
+                              : 'No activity yet',
+                          style: TextStyle(
+                            fontFamily: 'Maison Bold',
+                            color: Colors.black, // diubah menjadi hitam
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Current Time: ${getCurrentWibTime()}',
+                          style: TextStyle(
+                            fontFamily: 'Maison Book',
+                            color: Colors.black, // diubah menjadi hitam
+                            fontSize: 10,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            ),
+
+            // Konten utama
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  20, 8, 20, 20), // geser lebih dekat ke header
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -349,7 +356,8 @@ class _ActivityPageState extends State<ActivityPage> {
                       ),
                       if (!isLoading && activities.isNotEmpty)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: const Color(0xFF405189).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
@@ -366,31 +374,24 @@ class _ActivityPageState extends State<ActivityPage> {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: fetchActivities,
-                      color: Color(0xFF405189),
-                      child: isLoading
-                          ? _buildShimmerActivitiesList()
-                          : activities.isEmpty
-                              ? _buildEmptyState()
-                              : ListView.builder(
-                                  physics: const AlwaysScrollableScrollPhysics(),
-                                  itemCount: activities.length,
-                                  itemBuilder: (context, idx) {
-                                    final act = activities[idx];
-                                    // Tidak ada swipe/delete satuan
-                                    return _buildActivityCard(act);
-                                  },
-                                ),
+                  const SizedBox(height: 8),
+                  if (isLoading)
+                    Column(
+                      children:
+                          List.generate(6, (i) => _buildShimmerActivityCard()),
+                    )
+                  else if (activities.isEmpty)
+                    _buildEmptyState()
+                  else
+                    Column(
+                      children:
+                          activities.map((a) => _buildActivityCard(a)).toList(),
                     ),
-                  ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: AppBottomNavBar(
         selectedIndex: 1,
@@ -544,7 +545,8 @@ class _ActivityPageState extends State<ActivityPage> {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: const Color(0xFF405189).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),

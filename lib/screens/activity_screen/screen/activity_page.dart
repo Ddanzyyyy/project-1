@@ -88,7 +88,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   void initState() {
     super.initState();
-    activityService = ActivityService(baseUrl: 'http://192.168.1.4:8000');
+    activityService = ActivityService(baseUrl: 'http://192.168.1.7:8000');
     _loadUserData();
   }
 

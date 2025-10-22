@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class LostAssetService {
   final String baseUrl;
 
-  LostAssetService({this.baseUrl = "http://192.168.1.4:8000/api"});
+  LostAssetService({this.baseUrl = "http://192.168.1.7:8000/api"});
 
   Future<List<Map<String, dynamic>>> fetchLostAssets() async {
     try {

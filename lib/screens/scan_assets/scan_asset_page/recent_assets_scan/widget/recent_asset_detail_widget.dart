@@ -34,7 +34,7 @@ class _RecentAssetDetailWidgetState extends State<RecentAssetDetailWidget> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.1.4:8000/api/recent-assets/${recentAsset.id}'),
+        Uri.parse('http://192.168.1.7:8000/api/recent-assets/${recentAsset.id}'),
         headers: {'Content-Type': 'application/json'},
       );
 

@@ -19,7 +19,7 @@ class _SearchPageState extends State<SearchPage> {
   Timer? _debounce;
   String _selectedSearchType = 'all';
 
-  final String baseUrl = 'http://192.168.1.4:8000';
+  final String baseUrl = 'http://192.168.1.7:8000';
 
   @override
   void initState() {

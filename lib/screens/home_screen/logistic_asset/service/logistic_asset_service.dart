@@ -7,7 +7,7 @@ import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 class LogisticAssetService {
-  static const String baseUrl = 'http://192.168.1.4:8000/api';
+  static const String baseUrl = 'http://192.168.1.7:8000/api';
 
   static Future<List<LogisticAsset>> getLogisticAssets({
     String search = '',

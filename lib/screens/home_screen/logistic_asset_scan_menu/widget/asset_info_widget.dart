@@ -31,11 +31,11 @@ class _AssetInfoWidgetState extends State<AssetInfoWidget> {
 
   void _showUploadDialog(BuildContext context) {
     showDialog(
+      // Tampilkan dialog upload
       context: context,
       builder: (context) => AssetUploadDialog(asset: asset),
     ).then((result) {
       if (result == true) {
-        // Panggil callback untuk update photos_count di parent
         if (widget.onUploadSuccess != null) {
           widget.onUploadSuccess!();
         }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ScanAssetTabButton extends StatelessWidget {
   final String label;
-  final IconData? icon; // make nullable
+  final IconData? icon;
   final bool isSelected;
   final VoidCallback onTap;
 
